@@ -55,3 +55,13 @@ describe("friendlyRoomError — names", () => {
     expect(friendlyRoomError("plain")).toBe("plain");
   });
 });
+
+describe("friendlyRoomError — 0019 limits", () => {
+  it.each([
+    ["room_full", /full \(max 8 players\)/],
+    ["too_many_open_rooms", /maximum number of open rooms/],
+    ["room_create_rate_limited", /Try again in a little while/],
+  ])("words %s", (code, text) => {
+    expect(friendlyRoomError({ code: "P0001", message: code })).toMatch(text);
+  });
+});

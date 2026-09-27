@@ -52,9 +52,10 @@ export interface PlayerRow {
 export const PLAYER_COLUMNS =
   "room_id,player_id,display_name,score,streak,connected_at,lives,is_eliminated,turn_order,avatar";
 
-// Best-effort lobby cap. Hard, race-free enforcement belongs in the Session 9
-// edge function (a client can't atomically reserve a slot); here we join then
-// back out if our join tipped the room over this number.
+// Lobby cap. Enforced race-free by the database since 0019 (a join takes a
+// per-room lock, counts, and raises `room_full`); this copy only words the
+// error. Must equal public.player_cap() — test:db reads this line and fails if
+// the two disagree.
 export const PLAYER_CAP = 8;
 
 // Unambiguous charset (no 0/O/1/I/L) so codes are easy to read aloud/share.
@@ -177,19 +178,10 @@ export async function joinRoomByCode(
   const { error: joinErr } = await getSupabase()
     .from("room_players")
     .insert({ room_id: room.id, player_id: uid, display_name: displayName, avatar });
-  // 23505 = we already have a row in this room (re-join) — that's fine.
+  // 23505 = we already have a row in this room (re-join) — that's fine. A full
+  // room is refused by the server (`room_full`, 0019), so there is no longer a
+  // join-then-count-then-back-out here.
   if (joinErr && joinErr.code !== "23505") throw joinErr;
-
-  // Best-effort capacity: we can only count once we're a member, so join first
-  // then back out (self-leave delete) if we pushed the room past the cap.
-  const { count } = await getSupabase()
-    .from("room_players")
-    .select("*", { count: "exact", head: true })
-    .eq("room_id", room.id);
-  if ((count ?? 0) > PLAYER_CAP) {
-    await leaveRoom(room.id);
-    throw new Error(`That room is full (max ${PLAYER_CAP} players).`);
-  }
 
   return {
     id: room.id,

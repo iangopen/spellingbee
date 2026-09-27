@@ -9,19 +9,19 @@ import { freshDb } from "./harness.mjs";
 import { normalizeTerm, termRow } from "../scripts/hash_name_terms.mjs";
 
 describe("0018 display names", () => {
-  let h, host, roomId;
+  let h;
   beforeAll(async () => {
     h = await freshDb();
     await h.sql(
       `insert into private.blocked_name_terms (digest, len, kind) values
        ${termRow("substring", "badger")}, ${termRow("token", "moth")}`
     );
-    host = await h.user();
-    ({ id: roomId } = await h.room(host));
   });
   afterAll(() => h.close());
 
-  const joinAs = async (name) => h.join(await h.user(), roomId, name);
+  // A fresh room per join, so these tests never run into 0019's player cap.
+  const freshRoom = async () => (await h.room(await h.user())).id;
+  const joinAs = async (name) => h.join(await h.user(), await freshRoom(), name);
 
   it("the seeded list is non-empty and holds no plain text", async () => {
     const [r] = await h.sql("select count(*)::int as n, bool_and(octet_length(digest) = 32) as all_sha256 from private.blocked_name_terms");
@@ -66,7 +66,7 @@ describe("0018 display names", () => {
 
   it("filters UPDATE of display_name too", async () => {
     const u = await h.user();
-    await h.join(u, roomId, "Fine");
+    await h.join(u, await freshRoom(), "Fine");
     const bad = await h.as(u, "update room_players set display_name = 'Honey Badger' where player_id = $1", [u]);
     expect(bad.error?.message).toBe("display_name_not_allowed");
     const long = await h.as(u, "update room_players set display_name = $2 where player_id = $1", [u, "y".repeat(30)]);
@@ -75,7 +75,7 @@ describe("0018 display names", () => {
 
   it("an avatar change does not run the name filter on the existing name", async () => {
     const u = await h.user();
-    await h.join(u, roomId, "Legacy");
+    await h.join(u, await freshRoom(), "Legacy");
     // A row that predates the filter (written by the owner, bypassing it).
     await h.sql("alter table room_players disable trigger room_players_check_display_name");
     await h.sql("update room_players set display_name = 'badger' where player_id = $1", [u]);
