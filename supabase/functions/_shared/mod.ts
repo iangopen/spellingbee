@@ -127,22 +127,32 @@ export function handler(
     if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
     if (req.method !== "POST") return fail("method_not_allowed", 405);
 
-    const callerId = await getCallerId(req);
-    if (!callerId) return fail("unauthorized", 401);
-
-    let body: Record<string, unknown>;
     try {
-      body = await req.json();
-    } catch {
-      return fail("invalid_json_body", 400);
-    }
+      const callerId = await getCallerId(req);
+      if (!callerId) return fail("unauthorized", 401);
 
-    try {
+      let body: Record<string, unknown>;
+      try {
+        body = await req.json();
+      } catch {
+        return fail("invalid_json_body", 400);
+      }
+
       return await fn(body, callerId);
     } catch (e) {
-      // Unexpected failure (e.g. the RPC itself errored). Surface it as a real
-      // 500 with a message rather than pretending the call succeeded.
-      return fail("internal_error", 500, { detail: e instanceof Error ? e.message : String(e) });
+      // Unexpected failure (e.g. the RPC itself errored, or Auth was
+      // unreachable). Still a real 500 rather than a pretend success — but the
+      // detail goes to the function logs ONLY (Dashboard → Edge Functions →
+      // Logs). It can carry PostgREST's error body, i.e. SQL function and
+      // constraint names, which a client has no use for (hardening #17).
+      console.error(
+        JSON.stringify({
+          event: "internal_error",
+          path: new URL(req.url).pathname,
+          detail: e instanceof Error ? e.message : String(e),
+        }),
+      );
+      return fail("internal_error", 500);
     }
   };
 }
