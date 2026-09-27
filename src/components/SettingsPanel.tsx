@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Moon, Play, RotateCcw, Settings, Sun, X } from "lucide-react";
 import {
   DEFAULT_RATE,
@@ -50,6 +50,8 @@ import { DISPLAY_NAME_MAX } from "../lib/displayName";
 // GameState, not a stored preference.
 export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [voicesLoading, setVoicesLoading] = useState(true);
@@ -105,18 +107,37 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
     []
   );
 
-  // Close on Escape, the behaviour any dialog is expected to have.
+  // A native modal <dialog> (hardening #18). showModal() is what does the
+  // accessibility work: it moves focus into the dialog, makes everything behind
+  // it inert (so Tab can't wander into the page), and closes on Escape. The
+  // dialog is only mounted while open, so it is shown as soon as it exists.
   useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    const dialog = dialogRef.current;
+    if (!open || !dialog || dialog.open) return;
+    // A native listener rather than React's onClose prop, which was measured not
+    // to fire for Escape or dialog.close() here — the dialog closed but stayed
+    // mounted with the panel state still "open".
+    dialog.addEventListener("close", handleClosed, { once: true });
+    dialog.showModal();
+    // showModal focuses the first focusable descendant, which in Chrome is the
+    // scrollable drawer itself — not a control. Start on Close instead.
+    dialog.querySelector<HTMLButtonElement>(".settings-close")?.focus();
+    return () => dialog.removeEventListener("close", handleClosed);
   }, [open]);
 
-  function close() {
+  // Every way of closing — the X, the scrim, Escape — ends in the dialog's own
+  // "close" event, so this is the single place state is reset and focus goes
+  // back to the gear button that opened it.
+  function handleClosed() {
     setOpen(false);
     setConfirmingReset(false);
     setResetDone(false);
+    triggerRef.current?.focus();
+  }
+
+  function close() {
+    if (dialogRef.current?.open) dialogRef.current.close();
+    else handleClosed();
   }
 
   function chooseTheme(next: Theme) {
@@ -177,250 +198,262 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
 
   const auto = pickAutoVoice(voices);
 
-  if (!open) {
-    return (
-      <button className="settings-toggle" onClick={() => setOpen(true)} aria-label="Settings">
-        <Settings size={18} aria-hidden />
-      </button>
-    );
-  }
+  // The trigger stays mounted while the dialog is open so focus has somewhere
+  // to return to.
+  const trigger = (
+    <button
+      ref={triggerRef}
+      className="settings-toggle"
+      onClick={() => setOpen(true)}
+      aria-label="Settings"
+      aria-haspopup="dialog"
+      aria-expanded={open}
+    >
+      <Settings size={18} aria-hidden />
+    </button>
+  );
+
+  if (!open) return trigger;
 
   return (
-    <div className="settings-scrim" onClick={close}>
-      <div
-        className="settings-drawer"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Settings"
-        onClick={(e) => e.stopPropagation()}
+    <>
+      {trigger}
+      <dialog
+        ref={dialogRef}
+        className="settings-dialog"
+        aria-labelledby="settings-title"
       >
-        <div className="settings-head">
-          <h2 className="settings-title">Settings</h2>
-          <button className="settings-close" onClick={close} aria-label="Close settings">
-            <X size={18} aria-hidden />
-          </button>
-        </div>
+        <div className="settings-scrim" onClick={close}>
+          <div className="settings-drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="settings-head">
+              <h2 className="settings-title" id="settings-title">Settings</h2>
+              <button className="settings-close" onClick={close} aria-label="Close settings">
+                <X size={18} aria-hidden />
+              </button>
+            </div>
 
-        <section className="settings-section">
-          <h3 className="settings-section-title">Player</h3>
-          <label className="field">
-            <span className="field-label">Display name</span>
-            <input
-              className="text-input"
-              value={name}
-              onChange={(e) => changeName(e.target.value)}
-              maxLength={DISPLAY_NAME_MAX}
-              placeholder="e.g. Alex"
-              autoComplete="off"
-            />
-          </label>
-          <p className="settings-note">Used when you create or join a multiplayer room.</p>
-        </section>
+            <section className="settings-section">
+              <h3 className="settings-section-title">Player</h3>
+              <label className="field">
+                <span className="field-label">Display name</span>
+                <input
+                  className="text-input"
+                  value={name}
+                  onChange={(e) => changeName(e.target.value)}
+                  maxLength={DISPLAY_NAME_MAX}
+                  placeholder="e.g. Alex"
+                  autoComplete="off"
+                />
+              </label>
+              <p className="settings-note">Used when you create or join a multiplayer room.</p>
+            </section>
 
-        <section className="settings-section">
-          <h3 className="settings-section-title">Voice</h3>
+            <section className="settings-section">
+              <h3 className="settings-section-title">Voice</h3>
 
-          {!isSpeechSupported() && (
-            <p className="settings-note">This browser doesn't support speech synthesis.</p>
-          )}
-
-          {isSpeechSupported() && (
-            <>
-              {voicesLoading && <p className="settings-note">Loading voices…</p>}
-
-              {!voicesLoading && voices.length === 0 && (
-                <p className="settings-note">
-                  No voices are exposed by this browser. Words are still spoken with the
-                  system default.
-                </p>
+              {!isSpeechSupported() && (
+                <p className="settings-note">This browser doesn't support speech synthesis.</p>
               )}
 
-              {!voicesLoading && voices.length > 0 && (
-                <label className="field">
-                  <span className="field-label">
-                    Voice {selectedVoice === "" && auto ? `(auto: ${auto.name})` : ""}
+              {isSpeechSupported() && (
+                <>
+                  {voicesLoading && <p className="settings-note">Loading voices…</p>}
+
+                  {!voicesLoading && voices.length === 0 && (
+                    <p className="settings-note">
+                      No voices are exposed by this browser. Words are still spoken with the
+                      system default.
+                    </p>
+                  )}
+
+                  {!voicesLoading && voices.length > 0 && (
+                    <label className="field">
+                      <span className="field-label">
+                        Voice {selectedVoice === "" && auto ? `(auto: ${auto.name})` : ""}
+                      </span>
+                      <select
+                        className="text-input"
+                        value={selectedVoice}
+                        onChange={(e) => chooseVoice(e.target.value)}
+                      >
+                        <option value="">Automatic — best available</option>
+                        {voices.map((v) => (
+                          <option key={`${v.name}|${v.lang}`} value={v.name}>
+                            {v.name} ({v.lang}){v.localService ? "" : " · online"}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  )}
+
+                  <label className="field">
+                    <span className="field-label">Speaking rate — {rate.toFixed(2)}×</span>
+                    <input
+                      className="settings-range"
+                      type="range"
+                      min={0.5}
+                      max={1.4}
+                      step={0.05}
+                      value={rate}
+                      onChange={(e) => changeRate(Number(e.target.value))}
+                    />
+                  </label>
+
+                  <label className="field">
+                    <span className="field-label">Volume — {Math.round(volume * 100)}%</span>
+                    <input
+                      className="settings-range"
+                      type="range"
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      value={volume}
+                      onChange={(e) => changeVolume(Number(e.target.value))}
+                    />
+                  </label>
+
+                  <button className="secondary-btn" onClick={() => speakSample()}>
+                    <Play size={14} aria-hidden />
+                    Test voice
+                  </button>
+
+                  {selectedVoice !== "" && (
+                    <button
+                      className="secondary-btn"
+                      onClick={() => {
+                        setSelectedVoice("");
+                        setVoiceOverride(null);
+                      }}
+                    >
+                      <RotateCcw size={14} aria-hidden />
+                      Reset to automatic
+                    </button>
+                  )}
+                </>
+              )}
+            </section>
+
+            {/* Deliberately its own section, not a row inside Voice. Narration and
+                UI feedback are different preferences — someone practising quietly may
+                want the word spoken with no chimes, or chimes with no narration — so
+                these have their own toggle, their own volume and their own
+                "spellingbee:sfx:*" keys. Neither reads the other's value. */}
+            <section className="settings-section">
+              <h3 className="settings-section-title">Sound effects</h3>
+
+              <button
+                className="switch-row"
+                role="switch"
+                aria-checked={sfxOn}
+                onClick={toggleSfx}
+              >
+                <span className="switch-text">
+                  <span className="switch-label">Sound effects</span>
+                  <span className="switch-hint">
+                    Short chimes when you submit and when a word is right or wrong.
                   </span>
-                  <select
-                    className="text-input"
-                    value={selectedVoice}
-                    onChange={(e) => chooseVoice(e.target.value)}
-                  >
-                    <option value="">Automatic — best available</option>
-                    {voices.map((v) => (
-                      <option key={`${v.name}|${v.lang}`} value={v.name}>
-                        {v.name} ({v.lang}){v.localService ? "" : " · online"}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              )}
-
-              <label className="field">
-                <span className="field-label">Speaking rate — {rate.toFixed(2)}×</span>
-                <input
-                  className="settings-range"
-                  type="range"
-                  min={0.5}
-                  max={1.4}
-                  step={0.05}
-                  value={rate}
-                  onChange={(e) => changeRate(Number(e.target.value))}
-                />
-              </label>
-
-              <label className="field">
-                <span className="field-label">Volume — {Math.round(volume * 100)}%</span>
-                <input
-                  className="settings-range"
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={volume}
-                  onChange={(e) => changeVolume(Number(e.target.value))}
-                />
-              </label>
-
-              <button className="secondary-btn" onClick={() => speakSample()}>
-                <Play size={14} aria-hidden />
-                Test voice
-              </button>
-
-              {selectedVoice !== "" && (
-                <button
-                  className="secondary-btn"
-                  onClick={() => {
-                    setSelectedVoice("");
-                    setVoiceOverride(null);
-                  }}
-                >
-                  <RotateCcw size={14} aria-hidden />
-                  Reset to automatic
-                </button>
-              )}
-            </>
-          )}
-        </section>
-
-        {/* Deliberately its own section, not a row inside Voice. Narration and
-            UI feedback are different preferences — someone practising quietly may
-            want the word spoken with no chimes, or chimes with no narration — so
-            these have their own toggle, their own volume and their own
-            "spellingbee:sfx:*" keys. Neither reads the other's value. */}
-        <section className="settings-section">
-          <h3 className="settings-section-title">Sound effects</h3>
-
-          <button
-            className="switch-row"
-            role="switch"
-            aria-checked={sfxOn}
-            onClick={toggleSfx}
-          >
-            <span className="switch-text">
-              <span className="switch-label">Sound effects</span>
-              <span className="switch-hint">
-                Short chimes when you submit and when a word is right or wrong.
-              </span>
-            </span>
-            <span className={`switch-track${sfxOn ? " on" : ""}`} aria-hidden>
-              <span className="switch-thumb" />
-            </span>
-          </button>
-
-          {sfxOn && (
-            <>
-              <label className="field">
-                <span className="field-label">
-                  Effects volume — {Math.round(sfxVolume * 100)}%
                 </span>
-                <input
-                  className="settings-range"
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={sfxVolume}
-                  onChange={(e) => changeSfxVolume(Number(e.target.value))}
-                />
-              </label>
-
-              <button className="secondary-btn" onClick={() => playPreview()}>
-                <Play size={14} aria-hidden />
-                Test sound
+                <span className={`switch-track${sfxOn ? " on" : ""}`} aria-hidden>
+                  <span className="switch-thumb" />
+                </span>
               </button>
-            </>
-          )}
-        </section>
 
-        <section className="settings-section">
-          <h3 className="settings-section-title">Appearance</h3>
+              {sfxOn && (
+                <>
+                  <label className="field">
+                    <span className="field-label">
+                      Effects volume — {Math.round(sfxVolume * 100)}%
+                    </span>
+                    <input
+                      className="settings-range"
+                      type="range"
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      value={sfxVolume}
+                      onChange={(e) => changeSfxVolume(Number(e.target.value))}
+                    />
+                  </label>
 
-          <div className="field">
-            <span className="field-label">Theme</span>
-            <div className="segmented">
-              <button
-                className={`segment${theme === "light" ? " active" : ""}`}
-                onClick={() => chooseTheme("light")}
-                aria-pressed={theme === "light"}
-              >
-                <Sun size={15} aria-hidden />
-                Light
-              </button>
-              <button
-                className={`segment${theme === "dark" ? " active" : ""}`}
-                onClick={() => chooseTheme("dark")}
-                aria-pressed={theme === "dark"}
-              >
-                <Moon size={15} aria-hidden />
-                Dark
-              </button>
-            </div>
-          </div>
+                  <button className="secondary-btn" onClick={() => playPreview()}>
+                    <Play size={14} aria-hidden />
+                    Test sound
+                  </button>
+                </>
+              )}
+            </section>
 
-          <button
-            className="switch-row"
-            role="switch"
-            aria-checked={reduceMotion}
-            onClick={toggleReduceMotion}
-          >
-            <span className="switch-text">
-              <span className="switch-label">Reduce motion</span>
-              <span className="switch-hint">Turn off the pop, shake and streak animations.</span>
-            </span>
-            <span className={`switch-track${reduceMotion ? " on" : ""}`} aria-hidden>
-              <span className="switch-thumb" />
-            </span>
-          </button>
-        </section>
+            <section className="settings-section">
+              <h3 className="settings-section-title">Appearance</h3>
 
-        <section className="settings-section">
-          <h3 className="settings-section-title">Data</h3>
-
-          {!confirmingReset && !resetDone && (
-            <button className="danger-btn" onClick={() => setConfirmingReset(true)}>
-              Reset best scores
-            </button>
-          )}
-
-          {confirmingReset && (
-            <div className="confirm-block">
-              <p className="settings-note">
-                This clears your best score for all four difficulties. It can't be undone.
-              </p>
-              <div className="confirm-actions">
-                <button className="danger-btn" onClick={doReset}>
-                  Yes, reset them
-                </button>
-                <button className="secondary-btn" onClick={() => setConfirmingReset(false)}>
-                  Cancel
-                </button>
+              <div className="field">
+                <span className="field-label">Theme</span>
+                <div className="segmented">
+                  <button
+                    className={`segment${theme === "light" ? " active" : ""}`}
+                    onClick={() => chooseTheme("light")}
+                    aria-pressed={theme === "light"}
+                  >
+                    <Sun size={15} aria-hidden />
+                    Light
+                  </button>
+                  <button
+                    className={`segment${theme === "dark" ? " active" : ""}`}
+                    onClick={() => chooseTheme("dark")}
+                    aria-pressed={theme === "dark"}
+                  >
+                    <Moon size={15} aria-hidden />
+                    Dark
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
 
-          {resetDone && <p className="settings-note">Best scores cleared.</p>}
-        </section>
-      </div>
-    </div>
+              <button
+                className="switch-row"
+                role="switch"
+                aria-checked={reduceMotion}
+                onClick={toggleReduceMotion}
+              >
+                <span className="switch-text">
+                  <span className="switch-label">Reduce motion</span>
+                  <span className="switch-hint">Turn off the pop, shake and streak animations.</span>
+                </span>
+                <span className={`switch-track${reduceMotion ? " on" : ""}`} aria-hidden>
+                  <span className="switch-thumb" />
+                </span>
+              </button>
+            </section>
+
+            <section className="settings-section">
+              <h3 className="settings-section-title">Data</h3>
+
+              {!confirmingReset && !resetDone && (
+                <button className="danger-btn" onClick={() => setConfirmingReset(true)}>
+                  Reset best scores
+                </button>
+              )}
+
+              {confirmingReset && (
+                <div className="confirm-block">
+                  <p className="settings-note">
+                    This clears your best score for all four difficulties. It can't be undone.
+                  </p>
+                  <div className="confirm-actions">
+                    <button className="danger-btn" onClick={doReset}>
+                      Yes, reset them
+                    </button>
+                    <button className="secondary-btn" onClick={() => setConfirmingReset(false)}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {resetDone && <p className="settings-note">Best scores cleared.</p>}
+            </section>
+          </div>
+        </div>
+      </dialog>
+    </>
   );
 }

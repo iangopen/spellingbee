@@ -454,6 +454,29 @@
    becomes a full-width sheet, because a side drawer on a 360px phone leaves no
    usable content width.
 --------------------------------------------------------------------------- */
+/* The native <dialog> (opened with showModal) supplies focus handling, inertness
+   and Escape; it is a transparent full-viewport box so the scrim and drawer
+   below render exactly as they did before it existed. UA dialog styles (border,
+   padding, centring, max sizes, Canvas colours) are reset here. */
+.settings-dialog {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow: hidden;
+}
+
+.settings-dialog::backdrop {
+  background: transparent;
+}
+
 .settings-scrim {
   position: fixed;
   inset: 0;
