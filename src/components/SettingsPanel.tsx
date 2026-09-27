@@ -39,6 +39,7 @@ import {
   setSfxEnabled as persistSfxEnabled,
   setSfxVolume as persistSfxVolume,
 } from "../lib/storage";
+import { DISPLAY_NAME_MAX } from "../lib/displayName";
 
 // The one place for genuinely global, cross-cutting preferences. It absorbed
 // Session 11's standalone VoiceSettings and Session 12's floating ThemeToggle,
@@ -208,7 +209,7 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
               className="text-input"
               value={name}
               onChange={(e) => changeName(e.target.value)}
-              maxLength={24}
+              maxLength={DISPLAY_NAME_MAX}
               placeholder="e.g. Alex"
               autoComplete="off"
             />

@@ -21,6 +21,8 @@ import {
   type RoomPreview,
 } from "../lib/rooms";
 import { AvatarPicker } from "./AvatarPicker";
+import { DISPLAY_NAME_MAX, displayNameProblemText, validateDisplayName } from "../lib/displayName";
+import { friendlyRoomError } from "../lib/roomErrors";
 
 import { TIERS, TIER_META } from "../lib/tiers";
 
@@ -52,8 +54,12 @@ export function LobbyScreen({
   const [preview, setPreview] = useState<RoomPreview | null>(null);
   const [previewing, setPreviewing] = useState(false);
 
-  const trimmedName = name.trim();
-  const nameOk = trimmedName.length > 0;
+  // Mirrors the server's CHECK (0018) so a problem is explained before the round
+  // trip. The server is still the authority, and the only one that can see the
+  // blocklist — its rejection arrives through friendlyRoomError below.
+  const nameCheck = validateDisplayName(name);
+  const nameOk = nameCheck.ok;
+  const trimmedName = nameCheck.ok ? nameCheck.name : name.trim();
   const trimmedCode = code.trim();
 
   // Debounced so a 6-character code costs one lookup, not six. Cancels cleanly
@@ -101,7 +107,7 @@ export function LobbyScreen({
       });
       onEnterRoom(room, true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(friendlyRoomError(e));
     } finally {
       setBusy(null);
     }
@@ -117,7 +123,7 @@ export function LobbyScreen({
       const room = await joinRoomByCode(code, trimmedName, avatar);
       onEnterRoom(room, false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(friendlyRoomError(e));
     } finally {
       setBusy(null);
     }
@@ -153,7 +159,7 @@ export function LobbyScreen({
           className="text-input"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          maxLength={24}
+          maxLength={DISPLAY_NAME_MAX}
           placeholder="e.g. Alex"
           autoComplete="off"
         />
@@ -287,7 +293,7 @@ export function LobbyScreen({
         </button>
       </div>
 
-      {!nameOk && <p className="hint">Enter a name to create or join a room.</p>}
+      {!nameCheck.ok && <p className="hint">{displayNameProblemText(nameCheck.problem)}</p>}
       {error && <p className="lobby-error">{error}</p>}
     </div>
   );
