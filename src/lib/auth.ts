@@ -15,14 +15,19 @@ import { getSupabase } from "./supabaseClient";
 // in a loop.
 let inFlight: Promise<void> | null = null;
 
-export function ensureAnonymousSession(): Promise<void> {
-  inFlight ??= establish().finally(() => {
+/**
+ * @param getCaptchaToken Supplies a Turnstile token for a NEW sign-in. Called
+ *   only when one is actually needed, so a returning visitor with a live
+ *   session never sees a challenge. Omitted when CAPTCHA isn't configured.
+ */
+export function ensureAnonymousSession(getCaptchaToken?: () => Promise<string>): Promise<void> {
+  inFlight ??= establish(getCaptchaToken).finally(() => {
     inFlight = null;
   });
   return inFlight;
 }
 
-async function establish(): Promise<void> {
+async function establish(getCaptchaToken?: () => Promise<string>): Promise<void> {
   const auth = getSupabase().auth;
 
   // A refresh that fails for a deleted user already clears the stored session
@@ -38,7 +43,10 @@ async function establish(): Promise<void> {
     await auth.signOut({ scope: "local" });
   }
 
-  const { error } = await auth.signInAnonymously();
+  const captchaToken = getCaptchaToken ? await getCaptchaToken() : undefined;
+  const { error } = await auth.signInAnonymously(
+    captchaToken ? { options: { captchaToken } } : undefined
+  );
   if (error) throw error;
 }
 

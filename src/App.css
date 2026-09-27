@@ -933,6 +933,13 @@
   margin-top: 16px;
 }
 
+/* Turnstile renders here only if it needs an interaction (see lib/captcha.ts). */
+.captcha-slot {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
 .field {
   display: block;
   margin-bottom: 14px;

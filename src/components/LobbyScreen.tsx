@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import type { DifficultyTier } from "../types";
 import { useSupabaseUser } from "../hooks/useSupabaseUser";
@@ -37,7 +37,10 @@ export function LobbyScreen({
   onExitToModes: () => void;
   onEnterRoom: (room: RoomInfo, isHost: boolean) => void;
 }) {
-  const { userId, ready, error: authError } = useSupabaseUser();
+  // Where the Turnstile widget renders, if this build has one and a new guest
+  // sign-in is needed. Mounted for as long as we're "Connecting…".
+  const captchaSlot = useRef<HTMLDivElement>(null);
+  const { userId, ready, error: authError } = useSupabaseUser(captchaSlot);
 
   const [name, setName] = useState(() => getDisplayName());
   const [avatar, setAvatar] = useState(() => getAvatar());
@@ -130,7 +133,12 @@ export function LobbyScreen({
   }
 
   if (!ready) {
-    return <div className="lobby"><p className="lobby-status">Connecting…</p></div>;
+    return (
+      <div className="lobby">
+        <p className="lobby-status">Connecting…</p>
+        <div ref={captchaSlot} className="captcha-slot" />
+      </div>
+    );
   }
 
   if (authError || !userId) {

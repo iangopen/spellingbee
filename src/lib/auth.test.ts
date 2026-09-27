@@ -93,3 +93,34 @@ describe("ensureAnonymousSession", () => {
     expect(auth.signInAnonymously).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("ensureAnonymousSession — CAPTCHA", () => {
+  it("passes the Turnstile token to a new sign-in", async () => {
+    auth.getSession.mockResolvedValue({ data: { session: null }, error: null });
+    const getToken = vi.fn().mockResolvedValue("tok-123");
+    await ensureAnonymousSession(getToken);
+    expect(auth.signInAnonymously).toHaveBeenCalledWith({ options: { captchaToken: "tok-123" } });
+  });
+
+  it("never asks for a token when a live session exists", async () => {
+    auth.getSession.mockResolvedValue({ data: { session }, error: null });
+    auth.getUser.mockResolvedValue({ data: { user: session.user }, error: null });
+    const getToken = vi.fn();
+    await ensureAnonymousSession(getToken);
+    expect(getToken).not.toHaveBeenCalled();
+  });
+
+  it("asks for a token when replacing a purged session", async () => {
+    auth.getSession.mockResolvedValue({ data: { session }, error: null });
+    auth.getUser.mockResolvedValue({ data: { user: null }, error: purged });
+    const getToken = vi.fn().mockResolvedValue("tok-456");
+    await ensureAnonymousSession(getToken);
+    expect(auth.signInAnonymously).toHaveBeenCalledWith({ options: { captchaToken: "tok-456" } });
+  });
+
+  it("without a token getter (no site key) sends no captcha options, as before", async () => {
+    auth.getSession.mockResolvedValue({ data: { session: null }, error: null });
+    await ensureAnonymousSession();
+    expect(auth.signInAnonymously).toHaveBeenCalledWith(undefined);
+  });
+});

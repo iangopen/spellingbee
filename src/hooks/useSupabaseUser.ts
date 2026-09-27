@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type RefObject } from "react";
 import { getSupabase, isSupabaseConfigured } from "../lib/supabaseClient";
 import { ensureAnonymousSession } from "../lib/auth";
+import { getTurnstileToken, isCaptchaEnabled } from "../lib/captcha";
 
 export interface SupabaseUserState {
   userId: string | null;
@@ -11,7 +12,10 @@ export interface SupabaseUserState {
 // Signs the visitor in anonymously (once) and tracks their auth user id.
 // Keeps the singleplayer path completely independent — nothing here runs unless
 // this hook is mounted, which only happens on the multiplayer path.
-export function useSupabaseUser(): SupabaseUserState {
+//
+// `captchaSlot` is where a Turnstile widget may render if this build has a site
+// key and a NEW sign-in is needed; it must stay mounted until `ready`.
+export function useSupabaseUser(captchaSlot?: RefObject<HTMLElement | null>): SupabaseUserState {
   const [state, setState] = useState<SupabaseUserState>({
     userId: null,
     ready: false,
@@ -34,7 +38,15 @@ export function useSupabaseUser(): SupabaseUserState {
       return;
     }
 
-    ensureAnonymousSession()
+    const getCaptchaToken = isCaptchaEnabled
+      ? () => {
+          const el = captchaSlot?.current;
+          if (!el) return Promise.reject(new Error("The bot check couldn't be shown. Reload to try again."));
+          return getTurnstileToken(el);
+        }
+      : undefined;
+
+    ensureAnonymousSession(getCaptchaToken)
       .then(async () => {
         const { data } = await getSupabase().auth.getUser();
         if (active) setState({ userId: data.user?.id ?? null, ready: true, error: null });
@@ -58,7 +70,8 @@ export function useSupabaseUser(): SupabaseUserState {
       active = false;
       sub.subscription.unsubscribe();
     };
-  }, []);
+    // captchaSlot is a ref: stable identity, read lazily at sign-in time.
+  }, [captchaSlot]);
 
   return state;
 }
