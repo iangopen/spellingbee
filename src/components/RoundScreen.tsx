@@ -162,7 +162,13 @@ export function RoundScreen({
           value={guess}
           onChange={(e) => setGuess(e.target.value)}
           onFocus={scrollInputIntoView}
-          disabled={state.status !== "playing"}
+          // readOnly, NOT disabled, during the feedback beat: disabling the
+          // focused input drops focus to <body>, so the next word arrived with
+          // the keyboard user's place lost (hardening #19). readOnly keeps focus
+          // here, the submit handler above already ignores non-"playing"
+          // states, and aria-disabled tells assistive tech it's inactive.
+          readOnly={state.status !== "playing"}
+          aria-disabled={state.status !== "playing"}
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
@@ -197,7 +203,15 @@ export function RoundScreen({
       {!awaitingOthers && resultNote && <p className="result-note">{resultNote}</p>}
 
       {state.status === "playing" && canSkip && (
-        <button className="skip-btn" onClick={onSkip}>
+        <button
+          className="skip-btn"
+          onClick={() => {
+            onSkip();
+            // This button unmounts as the word resolves; keep the keyboard on
+            // the input rather than letting focus fall to <body>.
+            inputRef.current?.focus();
+          }}
+        >
           Skip
         </button>
       )}

@@ -956,6 +956,13 @@
   margin-top: 16px;
 }
 
+/* Headings and status lines that receive focus only programmatically, on a
+   screen change (useScreenFocus / TurnScreen). They aren't controls, so no ring;
+   real controls keep theirs. */
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
 /* Present for assistive technology, invisible on screen (live regions). */
 .sr-only {
   position: absolute;

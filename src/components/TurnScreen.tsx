@@ -145,6 +145,18 @@ export function TurnScreen({
     if (isMyTurn) inputRef.current?.focus();
   }, [isMyTurn, wordId]);
 
+  // When my turn ends the <form> leaves the tree (structurally, see the header),
+  // taking focus with it to <body>. Hand it to the status line that replaces the
+  // form ("Alex is spelling…" / "You're out…"), so the keyboard keeps its place
+  // and a screen reader lands on what is happening now (hardening #19). Only on
+  // that transition: a watcher who never had the turn keeps whatever they had.
+  const statusRef = useRef<HTMLDivElement>(null);
+  const wasMyTurn = useRef(isMyTurn);
+  useEffect(() => {
+    if (wasMyTurn.current && !isMyTurn) statusRef.current?.focus();
+    wasMyTurn.current = isMyTurn;
+  }, [isMyTurn]);
+
   // --- the elimination moment ----------------------------------------------
   //
   // Latched rather than derived, on purpose. `amEliminated` is true forever
@@ -368,14 +380,14 @@ export function TurnScreen({
           )}
         </form>
       ) : amEliminated ? (
-        <div className="spectating" role="status">
+        <div ref={statusRef} tabIndex={-1} className="spectating" role="status">
           <Eye size={16} aria-hidden />
           <span>
             You're out — watching {holder ? holder.display_name : "the table"} play it out.
           </span>
         </div>
       ) : (
-        <div className="waiting-turn" role="status">
+        <div ref={statusRef} tabIndex={-1} className="waiting-turn" role="status">
           <span className="waiting-dots" aria-hidden>
             <i />
             <i />

@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import { RotateCcw, Trophy } from "lucide-react";
+import { useScreenFocus } from "../hooks/useScreenFocus";
 
 export function ResultsScreen({
   score,
@@ -14,6 +16,9 @@ export function ResultsScreen({
   onMenu: () => void;
 }) {
   const isNewBest = score >= best && score > 0;
+  // The game just ended under the player's hands: "Play again" is the next move.
+  const primaryRef = useRef<HTMLButtonElement>(null);
+  useScreenFocus(primaryRef);
   return (
     <div className="results-screen">
       <h2>
@@ -35,7 +40,7 @@ export function ResultsScreen({
         {isNewBest && " — new best!"}
       </p>
       <div className="results-actions">
-        <button className="primary-btn" onClick={onReplay}>
+        <button ref={primaryRef} className="primary-btn" onClick={onReplay}>
           <RotateCcw size={16} aria-hidden />
           Play again
         </button>

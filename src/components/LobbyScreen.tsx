@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import type { DifficultyTier } from "../types";
 import { useSupabaseUser } from "../hooks/useSupabaseUser";
+import { useScreenFocus } from "../hooks/useScreenFocus";
 import {
   getAvatar,
   getDisplayName,
@@ -41,6 +42,9 @@ export function LobbyScreen({
   // sign-in is needed. Mounted for as long as we're "Connecting…".
   const captchaSlot = useRef<HTMLDivElement>(null);
   const { userId, ready, error: authError } = useSupabaseUser(captchaSlot);
+  // Moves focus to the heading once the form appears (after "Connecting…").
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useScreenFocus(headingRef);
 
   const [name, setName] = useState(() => getDisplayName());
   const [avatar, setAvatar] = useState(() => getAvatar());
@@ -159,7 +163,7 @@ export function LobbyScreen({
         <ArrowLeft size={15} aria-hidden />
         Modes
       </button>
-      <h2>Multiplayer</h2>
+      <h2 ref={headingRef} tabIndex={-1}>Multiplayer</h2>
 
       <label className="field">
         <span className="field-label">Your name</span>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { getSupabase } from "../lib/supabaseClient";
 import {
@@ -17,6 +17,7 @@ import { setAvatar as persistAvatar } from "../lib/storage";
 import { AvatarBadge, AvatarPicker } from "./AvatarPicker";
 
 import { TIER_META } from "../lib/tiers";
+import { useScreenFocus } from "../hooks/useScreenFocus";
 
 export function WaitingRoom({
   room,
@@ -29,6 +30,9 @@ export function WaitingRoom({
   isHost: boolean;
   onLeave: () => void;
 }) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useScreenFocus(headingRef);
+
   const [players, setPlayers] = useState<PlayerRow[]>([]);
   const [hostId, setHostId] = useState<string | null>(isHost ? currentUserId : null);
   const [startMsg, setStartMsg] = useState<string | null>(null);
@@ -116,7 +120,7 @@ export function WaitingRoom({
         Leave room
       </button>
 
-      <h2>Waiting room</h2>
+      <h2 ref={headingRef} tabIndex={-1}>Waiting room</h2>
 
       <div className="room-code-block">
         <span className="room-code-label">Room code — share to invite</span>

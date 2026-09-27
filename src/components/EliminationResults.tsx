@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import { Trophy } from "lucide-react";
+import { useScreenFocus } from "../hooks/useScreenFocus";
 import type { MultiplayerExtras } from "../hooks/useMultiplayerGame";
 import { AvatarBadge } from "./AvatarPicker";
 
@@ -33,6 +35,9 @@ export function EliminationResults({
   extras: MultiplayerExtras;
   onLeave: () => void;
 }) {
+  const primaryRef = useRef<HTMLButtonElement>(null);
+  useScreenFocus(primaryRef);
+
   const { players, winnerId, currentUserId, eliminationOrder } = extras;
 
   const winner = players.find((p) => p.player_id === winnerId) ?? null;
@@ -91,7 +96,7 @@ export function EliminationResults({
         </ol>
       </div>
 
-      <button className="primary-btn" onClick={onLeave}>
+      <button ref={primaryRef} className="primary-btn" onClick={onLeave}>
         Back to lobby
       </button>
     </div>

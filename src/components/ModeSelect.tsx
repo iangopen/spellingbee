@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import { Users, User } from "lucide-react";
+import { useScreenFocus } from "../hooks/useScreenFocus";
 
 export function ModeSelect({
   onSingle,
@@ -7,9 +9,12 @@ export function ModeSelect({
   onSingle: () => void;
   onMulti: () => void;
 }) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useScreenFocus(headingRef);
+
   return (
     <div className="mode-select">
-      <h1>Spelling race</h1>
+      <h1 ref={headingRef} tabIndex={-1}>Spelling race</h1>
       <p className="subtitle">Hear it. Spell it. Beat the clock.</p>
       <div className="mode-grid">
         <button className="mode-card" onClick={onSingle}>

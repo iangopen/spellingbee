@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { EyeOff, Timer } from "lucide-react";
 import type { DifficultyTier, GameOptions } from "../types";
 import { TIERS } from "../lib/tiers";
+import { useScreenFocus } from "../hooks/useScreenFocus";
 
 export function DifficultySelect({
   bests,
@@ -16,9 +17,12 @@ export function DifficultySelect({
   const [untimed, setUntimed] = useState(false);
   const [hideDefinition, setHideDefinition] = useState(false);
 
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  useScreenFocus(headingRef);
+
   return (
     <div className="tier-select">
-      <h1>Spelling race</h1>
+      <h1 ref={headingRef} tabIndex={-1}>Spelling race</h1>
       <p className="subtitle">Hear it. Spell it. Beat the clock.</p>
 
       <div className="mode-toggles">
