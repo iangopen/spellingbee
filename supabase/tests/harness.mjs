@@ -38,6 +38,13 @@ create role service_role nologin bypassrls;
 
 grant usage on schema public to anon, authenticated, service_role;
 
+-- Supabase preinstalls pgcrypto into its own schema, so 0001's
+-- "create extension if not exists pgcrypto" is a no-op there. Mirror that, or
+-- every pgcrypto function lands in public and pollutes the grant sweeps.
+create schema extensions;
+create extension pgcrypto schema extensions;
+grant usage on schema extensions to anon, authenticated, service_role;
+
 -- Supabase's default privileges for objects the migration owner creates in public.
 alter default privileges in schema public grant all on tables    to anon, authenticated, service_role;
 alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
