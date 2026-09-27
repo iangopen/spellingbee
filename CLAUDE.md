@@ -761,6 +761,17 @@ Running the legacy `verify_*.mjs` scripts repeatedly can now hit
 That's the cap working, not a regression. `verify_hardening.mjs` cleans up
 after itself.
 
+### Rollback
+`supabase/rollback/0016-0020_down.sql` reverses 0016–0020 in one transaction.
+It lives outside `migrations/`, so `db push` never runs it; run it by hand in
+the SQL editor. `test:db` (`rollback.test.mjs`) applies the chain and then the
+rollback, and asserts the whole catalog (functions with source/ACL/comments,
+table and column ACLs, constraints, triggers, policies, indexes, schemas, cron
+jobs) equals a fresh 0001–0015 database. It also asserts the chain can be
+re-applied afterwards. Data the purge jobs deleted, and names 0018 trimmed,
+cannot come back. **Any new migration must extend this file and its test, or be
+given its own rollback.**
+
 ### Pending steps (Ian), in order
 1. SQL editor: `delete from auth.users where id = '32b35724-8324-4560-9a77-7bbe7b165a20' and is_anonymous;`
 2. Dashboard:
