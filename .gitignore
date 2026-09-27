@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Supabase CLI scratch (project ref, pooler URL, versions) - local only
+supabase/.temp/

@@ -3,8 +3,8 @@
 ## Project overview
 Word-spelling race game, built singleplayer first, multiplayer planned.
 Stack: Vite + React + TypeScript, deployed to GitHub Pages via GitHub Actions.
-Repo: https://github.com/iangopenbusinessai-lab/spellingbee (confirm/update if different)
-Live: https://iangopenbusinessai-lab.github.io/spellingbee/
+Repo: https://github.com/iangopen/spellingbee
+Live: https://iangopen.github.io/spellingbee/
 
 ## CRITICAL: vite.config.ts
 `base` must always be `'/spellingbee/'` — never change this, never remove it,
