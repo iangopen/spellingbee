@@ -50,14 +50,14 @@ describe("0017 rooms insert columns", () => {
     expect(r.error?.code).toBe("42501");
   });
 
-  it.each(["FUCKOFF1", "ABCDE0", "ILLO23", "abc234", "AB"])("code %s outside the alphabet is rejected", async (code) => {
+  it.each(["OOPS1LOL", "ABCDE0", "ILLO23", "abc234", "AB"])("code %s outside the alphabet is rejected", async (code) => {
     const u = await h.user();
     const r = await h.as(
       u,
       "insert into rooms (id, code, tier, host_id, mode, lives_setting) values (gen_random_uuid(), $1, 'medium', $2, 'race', 3)",
       [code, u]
     );
-    // FUCKOFF1 is 8 chars but contains O and 1; every case must hit the charset CHECK.
+    // OOPS1LOL is 8 chars but contains O, 1 and L; every case must hit the charset CHECK.
     expect(r.error?.code).toBe("23514");
   });
 
