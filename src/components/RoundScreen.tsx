@@ -4,6 +4,7 @@ import type { GameState } from "../types";
 import { repeatWord, stopSpeaking } from "../lib/tts";
 import { playSubmit } from "../lib/sfx";
 import { formatResponseDetail } from "../lib/wpm";
+import { roundAnnouncement } from "../lib/announce";
 import { useAnnouncedWord } from "../hooks/useAnnouncedWord";
 import { useSfxForOutcome } from "../hooks/useSfxForOutcome";
 import { ScoreBar } from "./ScoreBar";
@@ -106,6 +107,15 @@ export function RoundScreen({
           )}
         </div>
       )}
+
+      {/* The ONE live region for this screen: outcome + score, for screen
+          readers (hardening #13). Always in the tree — a live region that mounts
+          together with its text is often not announced — and visually hidden,
+          because the coloured input and the feedback line below already show
+          the same facts. */}
+      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {roundAnnouncement(state.status, state.currentWord.word, state.score, awaitingOthers)}
+      </p>
 
       <ScoreBar
         score={state.score}
