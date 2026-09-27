@@ -139,8 +139,9 @@ client (env vars only, never hardcoded); `useSupabaseUser` signs the visitor in
 anonymously once per load using supabase-js's default session persistence.
 `src/lib/rooms.ts` is the only place that talks to the room tables — create,
 join-by-code via `get_room_by_code()`, self-leave, and a Realtime subscription
-to `room_players`. Lobby cap is `PLAYER_CAP = 8`, enforced best-effort on the
-client (join-then-back-out); race-free enforcement is the edge function's job.
+to `room_players`. Lobby cap is `PLAYER_CAP = 8`. Since 0019 the database enforces it race-free
+(`player_cap()`, see Security below); the client constant only words the error,
+and the old join-then-back-out is gone.
 Migrations `0004_realtime.sql` (adds `room_players` to the realtime publication)
 and `0005_self_leave.sql` (a player may DELETE only their own row, only while
 `status='lobby'`) were applied via `supabase db push`.
@@ -649,3 +650,133 @@ initial scaffolding — that's cosmetic and doesn't need to match the repo
 name. The GitHub repo and deployed URL are "spellingbee". Use
 "spellingbee" as the prefix for any localStorage keys going forward
 (e.g. "spellingbee:best:easy"), not "spelling-race".
+
+## Security (hardening pass, 2026-09-27)
+
+Fixes for the portfolio audit (`C:\devwork\portfolio-audit\HARDENING.md`).
+Migrations 0016–0020 and one edge-function change. **Committed locally, not
+pushed, not applied**: the live database still runs 0001–0015 until the steps
+at the end of this section are done.
+
+### What changed, and the rules it adds
+- **Scores are server-only (#1, 0016).** `room_players` INSERT is a column
+  grant on `(room_id, player_id, display_name, avatar)`, and UPDATE stays
+  `(display_name, avatar)`. A backstop trigger rejects non-default game columns
+  from client roles. Race `start_game_tx` zeroes score/streak, as the
+  elimination start already did. `room_accepts_new_players` is lobby-only for
+  BOTH modes, so there are no mid-game joins at all. Never widen these grants:
+  every client write the app makes fits in them.
+- **Room creation is column-limited (§A1, 0017):** `(id, code, tier, host_id,
+  mode, lives_setting)` only. `created_at` in particular must stay
+  server-set, because retention and the hourly cap both age rooms by it. Room
+  codes are CHECKed against the client's alphabet.
+- **Names (#6, 0018):** a CHECK (1–24 code points, not blank, no control
+  characters) plus a SECURITY DEFINER trigger against
+  `private.blocked_name_terms`. The `private` schema isn't exposed by
+  PostgREST and no client role can read it. The table holds sha256 digests of
+  normalized terms, **never plain text**. The source term list is
+  deliberately not in the repo. To add terms: `node
+  supabase/scripts/hash_name_terms.mjs < terms.txt`, then write a NEW migration
+  inserting its output. Long terms match as substrings, short ones only as whole
+  words (or the whole name with separators removed), so "Therapist", "Dickens"
+  and "Scunthorpe" pass. The client mirrors only the CHECK
+  (`src/lib/displayName.ts`) and can never see the list.
+- **Abuse limits and retention (#5, §C11, 0019).** All numbers live in
+  `abuse_limits()` / `player_cap()`:
+  - 3 open rooms per host, and 20 created per rolling hour. The hourly cap
+    counts `private.room_creations`, not `rooms`, because leaving deletes empty
+    lobbies and would otherwise reset it.
+  - 8 players per room.
+  - An empty lobby is deleted when its last member leaves. Joins and leaves
+    take the same per-room advisory lock (`lock_for('room', id)`), so a join
+    racing the last leave can't orphan a row. Room creation takes the per-host
+    lock.
+  - pg_cron:
+    - guesses of finished games are deleted every 10 min
+    - rooms after 30 days, lobbies after 24 h, and memberless lobbies after
+      10 min (every 10 min)
+    - anonymous users older than 30 days that NO game row references, daily. It
+      checks all seven FK columns, because four are NO ACTION and `host_id`
+      cascades into other players' history.
+    - `cron.job_run_details` after 7 days, daily
+  - Triggers that need to see past RLS are SECURITY DEFINER with `search_path`
+    pinned. Inside one, `current_user` is the OWNER, so a "clients only" check
+    must read `current_setting('role')`, not `current_user`.
+- **Purged sessions (client).** `ensureAnonymousSession` checks a stored
+  session with the Auth server. If the user was purged, it drops the session
+  and signs in a new guest, once, silently. A network error keeps the session.
+- **CAPTCHA (#5, client).** Turnstile runs only if `VITE_TURNSTILE_SITE_KEY` is
+  set at build time. Supabase Auth does the enforcing.
+- **Grants (#15, #16, 0020).** `round_attempts` has no client grants. The
+  constant getters are revoked from `public`/`anon`, and `authenticated` keeps
+  them because the multiplayer client calls four. test:db sweeps the whole
+  schema: anon can execute nothing and touch no table, and a guest can execute
+  exactly 13 named functions. **Every new function needs an explicit revoke**:
+  Supabase's default privileges grant anon EXECUTE on anything created in
+  public.
+- **Edge functions (#17).** Internal errors are logged (Dashboard → Edge
+  Functions → Logs) and return only `{ok:false, error:"internal_error"}`.
+- **Accessibility (#13, #18, #19).** RoundScreen has one `role="status"`
+  region (`src/lib/announce.ts`); it never names the word while other racers
+  are still typing. Settings is a native `<dialog>` + `showModal()`, closed
+  through its native `close` event (React's `onClose` prop didn't fire). The
+  guess input is `readOnly`, not `disabled`, during feedback so focus survives.
+  `useScreenFocus` moves focus on screen changes, but never on the first screen
+  of a load.
+- **Repo:** the word-bank blocklist lives in
+  `scripts/data/wordbank-blocklist.txt` and no longer inline in JS.
+  `supabase/.temp/` is untracked and ignored.
+
+### Tests
+- `npm test`: client logic (names, error wording, announcements, session
+  recovery, CAPTCHA wiring).
+- `npm run test:db`: the REAL migrations under PGlite (Postgres 18 in WASM;
+  production is 17.6), acting as anon / authenticated / service_role via
+  `SET ROLE`. The harness stubs `auth.users`/`auth.uid()`, pg_cron (jobs are
+  called directly, never scheduled), and the realtime publication, and
+  reproduces Supabase's default privileges and its `extensions` schema. It first
+  reproduces the original hole at 0015, then proves the fix.
+
+### Verified locally vs. still needs the live project
+Verified locally (PGlite, Vitest, and Chrome against a dev server with a dead
+Supabase URL and Cloudflare's always-pass test key):
+- every grant, RLS, CHECK and trigger above
+- retention with no orphan rows
+- the user purge's FK safety
+- the edge-function error shape (real `mod.ts` under a stub `Deno`)
+- the focus, dialog and announcement behaviour
+- the captcha token reaching `signInAnonymously`
+
+Live only:
+- concurrency of the advisory locks (PGlite has one connection)
+- pg_cron actually running the jobs
+- `purge_anonymous_users` being allowed to DELETE from `auth.users` as the
+  function owner on Supabase
+- real Turnstile tokens accepted by Supabase Auth
+- the deployed edge functions
+- a real two-browser race
+
+Running the legacy `verify_*.mjs` scripts repeatedly can now hit
+`too_many_open_rooms`, because `buildRoom` leaves never-started lobbies behind.
+That's the cap working, not a regression. `verify_hardening.mjs` cleans up
+after itself.
+
+### Pending steps (Ian), in order
+1. SQL editor: `delete from auth.users where id = '32b35724-8324-4560-9a77-7bbe7b165a20' and is_anonymous;`
+2. Dashboard:
+   - Auth → Providers: disable **Email** (#7).
+   - Database → Extensions: confirm `pg_cron` is on.
+   - Storage: confirm there are no public buckets.
+   - Auth → Rate Limits: review the anonymous sign-in limit.
+3. Apply 0016–0020 (`npx supabase db push`, or the SQL-editor fallback), then
+   redeploy all five edge functions.
+4. Run `node supabase/scripts/verify_hardening.mjs` and
+   `node supabase/scripts/probe.mjs`. **Both must run before CAPTCHA is on.**
+5. Turnstile, in this order:
+   1. Add the GitHub secret `VITE_TURNSTILE_SITE_KEY`.
+   2. Push the client.
+   3. Confirm the lobby signs in.
+   4. THEN enable CAPTCHA in Supabase Auth.
+
+   The reverse order locks out every new visitor on the old client.
+6. Play one two-browser race.
