@@ -59,13 +59,12 @@ const TIER_RULES = {
 // Vulgarity / slurs. SCOWL's larger sizes include plenty, and this is a
 // spelling game aimed at learners. Substring matching is intentionally blunt —
 // a few false positives cost nothing when the pool is this oversized.
-const BLOCK_SUBSTRINGS = [
-  "fuck", "shit", "cunt", "nigg", "fagg", "whore", "slut", "rape", "rapist",
-  "penis", "vagina", "seman", "semen", "scrotum", "testicle", "orgasm", "erotic",
-  "porn", "incest", "bastard", "bitch", "damn", "hell", "piss", "turd", "arse",
-  "wank", "bollock", "prick", "dick", "tit", "boob", "anal", "anus", "nazi",
-  "kill", "murder", "suicide", "corpse", "heroin", "cocaine", "opium",
-];
+// The list itself lives in a data file rather than inline here, so the source
+// doesn't carry it as a string literal. Lines starting with # are comments.
+const BLOCK_SUBSTRINGS = readFileSync(join(repoRoot, "scripts", "data", "wordbank-blocklist.txt"), "utf8")
+  .split(/\r?\n/)
+  .map((l) => l.trim())
+  .filter((l) => l && !l.startsWith("#"));
 
 const isBlocked = (w) => BLOCK_SUBSTRINGS.some((b) => w.includes(b));
 
