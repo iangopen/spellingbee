@@ -654,9 +654,9 @@ name. The GitHub repo and deployed URL are "spellingbee". Use
 ## Security (hardening pass, 2026-09-27)
 
 Fixes for the portfolio audit (`C:\devwork\portfolio-audit\HARDENING.md`).
-Migrations 0016–0020 and one edge-function change. **Committed locally, not
-pushed, not applied**: the live database still runs 0001–0015 until the steps
-at the end of this section are done.
+Migrations 0016–0020 and one edge-function change. **Live since 2026-09-28**:
+migrations applied with `db push`, all five edge functions redeployed, the
+client deployed from `2263581`, and CAPTCHA on. See "Live verification" below.
 
 ### What changed, and the rules it adds
 - **Scores are server-only (#1, 0016).** `room_players` INSERT is a column
@@ -747,14 +747,17 @@ Supabase URL and Cloudflare's always-pass test key):
 - the focus, dialog and announcement behaviour
 - the captcha token reaching `signInAnonymously`
 
-Live only:
-- concurrency of the advisory locks (PGlite has one connection)
-- pg_cron actually running the jobs
-- `purge_anonymous_users` being allowed to DELETE from `auth.users` as the
-  function owner on Supabase
-- real Turnstile tokens accepted by Supabase Auth
-- the deployed edge functions
-- a real two-browser race
+Live only, and their status after the 2026-09-28 rollout:
+- concurrency of the advisory locks (PGlite has one connection): **still not
+  exercised.** No test has produced truly simultaneous joins.
+- pg_cron running the jobs: **verified** for the 10-minute jobs; the daily
+  jobs are pending their first run.
+- `purge_anonymous_users` allowed to DELETE from `auth.users`: **verified**
+  (rolled back).
+- real Turnstile tokens accepted by Supabase Auth: **verified**.
+- the deployed edge functions: **verified** through start-game / submit-answer
+  in the race. The generic 500 shape wasn't triggered live.
+- a real two-browser race: **verified**.
 
 Running the legacy `verify_*.mjs` scripts repeatedly can now hit
 `too_many_open_rooms`, because `buildRoom` leaves never-started lobbies behind.
@@ -772,22 +775,58 @@ re-applied afterwards. Data the purge jobs deleted, and names 0018 trimmed,
 cannot come back. **Any new migration must extend this file and its test, or be
 given its own rollback.**
 
-### Pending steps (Ian), in order
-1. SQL editor: `delete from auth.users where id = '32b35724-8324-4560-9a77-7bbe7b165a20' and is_anonymous;`
-2. Dashboard:
-   - Auth → Providers: disable **Email** (#7).
-   - Database → Extensions: confirm `pg_cron` is on.
-   - Storage: confirm there are no public buckets.
-   - Auth → Rate Limits: review the anonymous sign-in limit.
-3. Apply 0016–0020 (`npx supabase db push`, or the SQL-editor fallback), then
-   redeploy all five edge functions.
-4. Run `node supabase/scripts/verify_hardening.mjs` and
-   `node supabase/scripts/probe.mjs`. **Both must run before CAPTCHA is on.**
-5. Turnstile, in this order:
-   1. Add the GitHub secret `VITE_TURNSTILE_SITE_KEY`.
-   2. Push the client.
-   3. Confirm the lobby signs in.
-   4. THEN enable CAPTCHA in Supabase Auth.
+### Live verification (2026-09-28)
+Done in the order above. Each step below was observed, not assumed.
+1. **Cleanup and dashboard (Ian):** the audit's probe user was deleted (0 rows
+   confirmed). Email provider off, pg_cron on, no public buckets, rate limits
+   reviewed.
+2. **`db push`:**
+   - The dry run listed exactly 0016–0020.
+   - The push applied all five, and local and remote history now match from
+     0001 to 0020.
+   - All 5 edge functions were redeployed (`functions deploy --use-api`).
+3. **SQL checks** (`supabase db query --linked`):
+   - 6 active cron jobs.
+   - The purge was called inside a `DO` block that always raises, so it was
+     rolled back. It is allowed to delete from `auth.users` and would have
+     removed 35 users; 185 anonymous users remained afterwards.
+   - The blocklist caught 59 of 59 test variants, with 0 false positives, and
+     all 58 hashed terms are present.
+4. **`verify_hardening.mjs`:** 18 PASS. The blocklist case was covered by the
+   SQL check instead.
+5. **`probe.mjs`:** ALL AS EXPECTED.
+   - **P-auth-8 is 42501** (it was 23503).
+   - P-anon-5 / P-auth-5 (`round_attempts`) are 42501.
+   - P-anon-15…20 (constants, anon) are 42501; a guest can still call them.
+   - The private schema isn't exposed (406 PGRST106).
+   - No probe row persisted, and the probe's guest user was deleted afterwards.
+6. **Turnstile:**
+   - The live bundle contained the site key, and the sign-up carried a real
+     token (200 before CAPTCHA was on).
+   - The first CAPTCHA attempt failed with `invalid-input-secret`: the wrong
+     secret had been saved in Supabase. It was re-pasted.
+   - After the fix, a fresh visitor signs in (200). No token gives 400
+     `captcha_failed`, and a forged token gives 400 `invalid-input-response`.
+7. **Two-browser race** (Chrome host plus Ian's separate browser, room
+   `2TTFZR`):
+   - 10 of 10 rounds played and the room reached `finished`.
+   - Server-computed scores: 205 and 0, both starting from 0.
+   - While an answer was locked in, the host's live region said only "Answer
+     locked in"; the word was announced only after each round ended.
+   - Results focused "Play again".
+8. **pg_cron:** both 10-minute purge jobs had run 4 times, all successful, by
+   00:42 UTC. The race above finished at ~00:41, and by 00:52 its 12 stored
+   guesses were gone while all 10 scoreboard rounds remained, so the guess
+   purge works live. The daily jobs first run at 03:17 / 03:37 UTC.
 
-   The reverse order locks out every new visitor on the old client.
-6. Play one two-browser race.
+### Pending
+- The first daily `purge-anonymous-users` run (03:17 UTC) will delete the
+  eligible anonymous users for real (35 at the time of the rolled-back test).
+  That's intended.
+- `verify_hardening.mjs` left 3 anonymous users and one finished race room.
+  Retention removes them after 30 days.
+- **With CAPTCHA on, no script can sign up users.** `probe.mjs` and the
+  `verify_*.mjs` scripts need CAPTCHA switched off temporarily, or an existing
+  session.
+- #8 (privacy note) goes in the docs session. REPORT.md's "server-authoritative
+  scoring" claim can now be restored, since the re-probe passed.
