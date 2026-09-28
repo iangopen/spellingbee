@@ -30,6 +30,11 @@ Deploys via `.github/workflows/deploy.yml` on every push to `main`
   field is genuinely needed everywhere, and update this file when you do.
 - All speech synthesis goes through `src/lib/tts.ts` — never call
   `window.speechSynthesis` directly from a component.
+  Every speak path goes through `afterClearing()` (2026-09-28 fix). It calls
+  `cancel()` only when something is actually speaking or queued, then waits
+  `CANCEL_SETTLE_MS` before speaking. The old unconditional cancel-then-speak
+  in the same tick clipped the start of the lead-in in desktop Chrome. Don't
+  "simplify" it back; `tts.test.ts` pins the sequencing.
 - `DEFAULT_VOICE_NAME` ("Google UK English Male") is a chosen-by-ear hard
   default, checked in `pickAutoVoice` BEFORE the quality heuristic. Don't
   "simplify" it into a big score bonus: a bonus would still lose to some

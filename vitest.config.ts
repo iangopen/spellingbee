@@ -7,7 +7,7 @@ import { defineConfig } from "vitest/config";
 //   npm run test:db  -> the real migrations under PGlite (supabase/tests/)
 export default defineConfig({
   test: {
-    include: ["src/**/*.test.ts", "supabase/tests/**/*.test.mjs"],
+    include: ["src/**/*.test.{ts,tsx}", "supabase/tests/**/*.test.mjs"],
     environment: "node",
     // Each DB test file migrates a fresh in-process Postgres (~1.5s, 1,200 words).
     testTimeout: 60_000,

@@ -10,6 +10,9 @@ import { useSfxForOutcome } from "../hooks/useSfxForOutcome";
 import { ScoreBar } from "./ScoreBar";
 import { TimerBar } from "./TimerBar";
 
+/** Unlock a submitted answer that never got a verdict (the request failed). */
+const PENDING_TIMEOUT_MS = 5000;
+
 export function RoundScreen({
   state,
   onSubmit,
@@ -46,10 +49,31 @@ export function RoundScreen({
   const wordId = state.currentWord?.id;
   const wordText = state.currentWord?.word;
 
+  // Which word I've sent an answer for and am still waiting on a verdict for.
+  // In singleplayer the verdict arrives in the same render, so this is never
+  // visible. In a race it covers the submit-answer round trip (0.3-1.3s,
+  // measured), during which the screen used to show nothing at all and Enter
+  // felt dead. It only ACKNOWLEDGES the keypress — the verdict still comes from
+  // the engine, and the server decides it.
+  const [submittedFor, setSubmittedFor] = useState<string | null>(null);
+
   useEffect(() => {
     setGuess("");
+    setSubmittedFor(null);
     inputRef.current?.focus();
   }, [wordId]);
+
+  const pending =
+    submittedFor !== null && submittedFor === wordId && state.status === "playing" && !awaitingOthers;
+
+  // A request that fails outright (network drop, a stale round) never produces
+  // a verdict. Unlock after a generous wait rather than leave the input frozen
+  // until the round happens to end.
+  useEffect(() => {
+    if (!pending) return;
+    const t = window.setTimeout(() => setSubmittedFor(null), PENDING_TIMEOUT_MS);
+    return () => window.clearTimeout(t);
+  }, [pending]);
 
   // Announcement moved to a shared hook in Session 20 so the elimination turn
   // screen uses the same implementation rather than a copy. The engine hooks
@@ -151,7 +175,11 @@ export function RoundScreen({
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (state.status !== "playing") return;
+          // One answer per word: a second Enter while the first is in flight
+          // used to send a second request, whose already_submitted reply could
+          // overwrite the first one's verdict.
+          if (state.status !== "playing" || pending) return;
+          setSubmittedFor(wordId ?? null);
           playSubmit();
           onSubmit(guess);
         }}
@@ -167,8 +195,8 @@ export function RoundScreen({
           // the keyboard user's place lost (hardening #19). readOnly keeps focus
           // here, the submit handler above already ignores non-"playing"
           // states, and aria-disabled tells assistive tech it's inactive.
-          readOnly={state.status !== "playing"}
-          aria-disabled={state.status !== "playing"}
+          readOnly={state.status !== "playing" || pending}
+          aria-disabled={state.status !== "playing" || pending}
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
@@ -182,6 +210,10 @@ export function RoundScreen({
           TimerBar for why its scale comes from the state rather than a
           constant. */}
       <TimerBar wordId={wordId} timeLeft={state.timeLeft} untimed={state.untimed} />
+
+      {/* Sent, verdict not back yet. Says only that it was SENT, never whether
+          it was right — the same rule TurnScreen's "Checking…" follows. */}
+      {pending && <p className="feedback waiting">Checking…</p>}
 
       {/* Answered, round still live: no reveal — others are still racing. */}
       {awaitingOthers && (

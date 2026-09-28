@@ -252,13 +252,44 @@ function makeUtterance(text: string, rate: number, voice: SpeechSynthesisVoice |
   return u;
 }
 
-/** Speak one phrase on its own, cancelling anything already in progress. */
+// How long a real cancel() is given to settle before the next speak().
+export const CANCEL_SETTLE_MS = 60;
+
+/**
+ * Run `speak` on a clear queue, without clipping it.
+ *
+ * Every announcement used to call cancel() and then speak() in the same tick,
+ * even when nothing was playing. In Chrome — especially with its online Google
+ * voices, which the default voice is — a speak() issued straight after cancel()
+ * can lose the start of the utterance, and the short lead-in phrase is exactly
+ * what got clipped. So: when the engine is idle there is nothing to cancel and
+ * we speak at once; when something IS speaking or queued, cancel it and give
+ * the engine a beat before speaking.
+ *
+ * Callers pass their generation so a newer announcement arriving during that
+ * beat supersedes this one instead of both speaking.
+ */
+function afterClearing(mine: number, speak: () => void): void {
+  const ss = window.speechSynthesis;
+  const run = () => {
+    if (mine === generation) speak();
+  };
+  if (ss.speaking || ss.pending) {
+    ss.cancel();
+    window.setTimeout(run, CANCEL_SETTLE_MS);
+  } else {
+    run();
+  }
+}
+
+/** Speak one phrase on its own, replacing anything already in progress. */
 async function speakAlone(text: string, rate: number): Promise<void> {
   if (!supported()) return;
   const list = await loadVoices();
-  generation++;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(makeUtterance(text, rate, resolveVoice(list)));
+  const mine = ++generation;
+  afterClearing(mine, () => {
+    window.speechSynthesis.speak(makeUtterance(text, rate, resolveVoice(list)));
+  });
 }
 
 /**
@@ -279,9 +310,8 @@ async function speakSequence(leadIn: string, word: string): Promise<void> {
   const rate = getRate();
   const leadRate = Math.min(MAX_RATE, rate + 0.1); // intro a touch brisker
 
-  window.speechSynthesis.cancel();
-
   let wordSpoken = false;
+  let guard: number | undefined;
   const sayWord = () => {
     if (wordSpoken || mine !== generation) return;
     wordSpoken = true;
@@ -289,13 +319,14 @@ async function speakSequence(leadIn: string, word: string): Promise<void> {
     window.speechSynthesis.speak(makeUtterance(word, rate, voice));
   };
 
-  const intro = makeUtterance(leadIn, leadRate, voice);
-  intro.onend = sayWord;
-
-  // Fallback: rough spoken duration of the lead-in plus slack.
-  const guard = window.setTimeout(sayWord, (leadIn.length / 10) * 1000 + 2500);
-
-  window.speechSynthesis.speak(intro);
+  afterClearing(mine, () => {
+    const intro = makeUtterance(leadIn, leadRate, voice);
+    intro.onend = sayWord;
+    // Fallback: rough spoken duration of the lead-in plus slack. Started with
+    // the intro, not before any settle delay, so it measures the right thing.
+    guard = window.setTimeout(sayWord, (leadIn.length / 10) * 1000 + 2500);
+    window.speechSynthesis.speak(intro);
+  });
 }
 
 // Remembered so "hear it again" replays the SAME intro for the same word; a
