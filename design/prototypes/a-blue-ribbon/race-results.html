@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spelling Bee | Race results</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="#"><i data-mark class="mark"></i>Spelling Bee</a>
+      <button class="icon-btn" aria-label="Settings"><i data-icon="settings"></i></button>
+    </header>
+
+    <main class="results">
+      <section class="winner">
+        <i data-mark class="rosette"></i>
+        <div>
+          <p class="kicker">Race winner, Medium words</p>
+          <h1 tabindex="-1">Tomasz</h1>
+          <p>You placed 2nd with 205 points. 3 points behind.</p>
+        </div>
+      </section>
+
+      <ol class="standings" aria-label="Final standings">
+        <li class="p1"><span class="place num">1</span><span class="avatar-card"><i data-avatar="clover"></i></span><span class="pname">Tomasz<small>8 of 10 spelled</small></span><span class="pscore num">208</span></li>
+        <li class="p2 you"><span class="place num">2</span><span class="avatar-card"><i data-avatar="bee"></i></span><span class="pname">Maya (you)<small>8 of 10 spelled</small></span><span class="pscore num">205</span></li>
+        <li class="p3"><span class="place num">3</span><span class="avatar-card"><i data-avatar="blossom"></i></span><span class="pname">Adaeze<small>6 of 10 spelled</small></span><span class="pscore num">141</span></li>
+        <li><span class="place num">4</span><span class="avatar-card"><i data-avatar="wasp"></i></span><span class="pname">Rafael<small>3 of 10 spelled</small></span><span class="pscore num">67</span></li>
+      </ol>
+
+      <div class="actions">
+        <button class="btn btn-primary"><i data-icon="rotate-ccw"></i>Back to lobby</button>      </div>
+    </main>
+  </div>
+  <script src="../_shared/icons.js"></script>
+  <script src="../_shared/avatars.js"></script>
+  <script src="mark.js"></script>
+</body>
+</html>

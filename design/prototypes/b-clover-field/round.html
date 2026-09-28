@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spelling Bee | Medium, word 4 of 10</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <button class="link-back"><i data-icon="arrow-left"></i>Quit</button>
+      <button class="icon-btn" aria-label="Settings"><i data-icon="settings"></i></button>
+    </header>
+
+    <main class="round">
+      <p class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+      <section class="note" aria-labelledby="note-h">
+        <div class="note-head">
+          <span class="label" id="note-h">Word 4 of 10</span>
+          <span class="label">Medium</span>
+        </div>
+        <p class="definition">“A strong, regular repeated pattern of sound”</p>
+        <button class="hear"><i data-icon="volume-2"></i>Hear it again</button>
+
+        <form class="answer" onsubmit="return false">
+          <label class="label" for="guess">Your spelling</label>
+          <div class="ruled" id="guess" role="textbox" aria-label="Your spelling">rhyt<span class="caret"></span></div>
+          <div class="vine" aria-hidden="true"><i></i></div>
+        </form>
+        <div class="note-foot"><button class="skip">Skip this word</button></div>
+      </section>
+
+      <aside class="side" aria-label="Game status">
+        <div><span class="label">time left</span><div class="big num">9s</div></div>
+        <div><span class="label">score</span><div class="mid num">58</div></div>
+        <div><span class="label">in a row</span><div class="mid num">3</div></div>
+      </aside>
+    </main>
+  </div>
+  <script src="../_shared/icons.js"></script>
+</body>
+</html>
