@@ -835,3 +835,65 @@ Done in the order above. Each step below was observed, not assumed.
   session.
 - #8 (privacy note) goes in the docs session. REPORT.md's "server-authoritative
   scoring" claim can now be restored, since the re-probe passed.
+
+## Redesign (planning, started 2026-09-28)
+
+The game is being renamed **Spelling Bee** (Ian's decision, 2026-09-28) and given
+a distinct visual identity. Work happens on branch `redesign/spelling-bee`.
+**Nothing merges to `main` without Ian's OK**, because pushing `main` redeploys
+the live site.
+
+### Status
+- Phase 1 (audit) and Phase 2 (brand plus three directions) are done, in
+  `design/`. See `design/README.md` for the map.
+- **Chosen direction: pending Ian's pick.** The options are in
+  `design/DIRECTIONS.md`: A Blue Ribbon, B Clover Field, C Bee Line, or a mix.
+  The recommendation is A with C's race lanes.
+- Phase 3 (design system and staged build plan) starts after the pick. No `src/`
+  file has changed yet.
+
+### Rules for the build, whatever the direction
+- **Presentation only.** Don't touch any of these:
+  - `src/hooks/*` game logic, `checkAnswer`, `GameEngineApi`
+  - `src/lib/rooms.ts`, `auth.ts`, `captcha.ts`
+  - `supabase/`
+  The hardening is verified live and must stay that way.
+- **No accessibility regressions.** All of these must survive:
+  - the `role="status"` announcements (`lib/announce.ts`, TurnScreen)
+  - the native `<dialog>` Settings (focus in, Tab trap, Escape, focus return)
+  - `useScreenFocus`, and the `readOnly` guess input
+  - visible `:focus-visible`
+  - AA contrast (4.5:1 text, 3:1 UI; measure with `design/harness/contrast.mjs`)
+  - the single global reduced-motion block plus the in-app override
+  - no zoom blocking
+  - 44px targets
+- **Keep:**
+  - the `/spellingbee/` base and the repo slug
+  - every `spellingbee:*` localStorage key
+  - the tier ids
+  - the 8 avatar KEYS (DB CHECK); only their art changes
+- The game **mode** "Race" keeps its name.
+- **Rename scope:** every user-facing "Spelling Race" becomes "Spelling Bee":
+  - `<title>` and the meta description
+  - the `<h1>` in ModeSelect and DifficultySelect
+  - a new web manifest, share tags and icons
+  - this file's heading
+
+  The `package.json` name stays (it isn't user-facing).
+- **No honeycomb letter layout, hexagon motif or NYT-style yellow/grey or serif
+  wordmark** (trademark distance; see `DIRECTIONS.md`).
+- **Lean bundle:** no animation or UI libraries without asking. Self-host fonts
+  (HARDENING #24). Assets must be original or properly licensed, with credits.
+- The existing CLAUDE.md rules still bind, especially "every colour is a token
+  in both palettes" and "motion only decorates a visible state".
+
+### Open
+- Ian's pick of direction (or mix).
+- Then Phase 3: tokens, the component list and a staged plan (one commit per
+  stage: tokens, shared components, screen by screen, rename, assets, polish).
+- The name itself: a distinct look lowers the risk of being mistaken for NYT's
+  game but doesn't clear the name. See HARDENING #14 / §C10.
+- Found in the audit and worth fixing in the build (presentation only):
+  - Race results reuse the solo results screen: they always say "new best!",
+    show no winner or standings, and the secondary button is mislabelled.
+  - Lobby and Settings text inputs fail 3:1 edge contrast.
