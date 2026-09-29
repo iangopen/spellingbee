@@ -25,6 +25,72 @@ function hsl(r, g, b) {
 }
 const isYellow = (r, g, b) => { const [h, s, l] = hsl(r, g, b); return h >= 32 && h <= 70 && s > 0.35 && l > 0.25 && l < 0.92; };
 
+// ---------------------------------------------------------------------------
+// TARGET=app: the same checks against the REAL app (source under src/,
+// index.html, public/; screens rendered by design/harness on APP_URL).
+// Writes design/baseline/checks-app.txt. The redesign's background component
+// (stage 2) must carry [data-honeycomb]; until then this reports its absence
+// and the legacy body::before wallpaper.
+if (process.env.TARGET === "app") {
+  const { mkdirSync, statSync } = await import("node:fs");
+  const APP_URL = process.env.APP_URL || "http://localhost:5199";
+  const SCREENS = ["home", "difficulty", "sp-round", "sp-correct", "sp-incorrect", "sp-results", "settings",
+    "lobby", "waiting-room", "race-round", "race-locked", "race-roundend", "race-results", "elim-watch", "elim-myturn", "elim-results"];
+  const walk = (d) => readdirSync(d).flatMap((f) => { const p = resolve(d, f); return statSync(p).isDirectory() ? walk(p) : [p]; });
+  const srcFiles = [...walk(resolve("src")).filter((f) => /\.(css|tsx?|svg)$/.test(f) && !/\.test\./.test(f)),
+    resolve("index.html"), ...readdirSync(resolve("public")).filter((f) => f.endsWith(".svg")).map((f) => resolve("public", f))];
+  const colours = new Map();
+  for (const f of srcFiles) {
+    const t = readFileSync(f, "utf8");
+    for (const m of t.matchAll(/#([0-9a-f]{6}|[0-9a-f]{3})\b/gi)) {
+      let h = m[1]; if (h.length === 3) h = [...h].map((c) => c + c).join("");
+      colours.set("#" + h.toLowerCase(), [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]);
+    }
+    for (const m of t.matchAll(/rgba?\(\s*(\d+)[ ,]+(\d+)[ ,]+(\d+)/gi)) colours.set(m[0] + ")", [+m[1], +m[2], +m[3]]);
+  }
+  const ySrc = [...colours].filter(([, c]) => isYellow(...c)).map(([k]) => k);
+  log(`App source colours: ${colours.size} distinct literals in ${srcFiles.length} files. Yellow/gold/amber: ${ySrc.length}${ySrc.length ? " -> " + ySrc.join(", ") : ""}`);
+
+  const browser = await chromium.launch();
+  const counter = await browser.newPage();
+  let yellowPx = 0, totalPx = 0, renders = 0; const hits = [];
+  for (const s of SCREENS) for (const theme of ["dark", "light"]) for (const [w, h] of [[1280, 800], [390, 844]]) {
+    const ctx = await browser.newContext({ viewport: { width: w, height: h }, colorScheme: theme, reducedMotion: "reduce" });
+    const p = await ctx.newPage();
+    await p.goto(`${APP_URL}/?screen=${s}&theme=${theme}`, { waitUntil: "networkidle" });
+    if (s === "settings") await p.click(".settings-toggle");
+    await p.waitForTimeout(250);
+    const struct = await p.evaluate(() => {
+      const bg = document.querySelector("[data-honeycomb]");
+      const hex = [...document.querySelectorAll("body *")].filter((el) => (!bg || !bg.contains(el)) && /polygon/.test(getComputedStyle(el).clipPath || "")).length;
+      const legacy = /svg/.test(getComputedStyle(document.body, "::before").backgroundImage || "");
+      return {
+        honeycomb: bg ? { text: bg.textContent.trim().length, ariaHidden: bg.getAttribute("aria-hidden"), pointer: getComputedStyle(bg).pointerEvents, focusable: bg.querySelectorAll("a,button,input,[tabindex]").length } : null,
+        hexagonClippedInContent: hex, legacyWallpaper: legacy,
+      };
+    });
+    const b64 = (await p.screenshot()).toString("base64");
+    await ctx.close();
+    const { n, px } = await counter.evaluate(async ({ b64, isYellowSrc, hslSrc }) => {
+      const hsl = new Function(`return ${hslSrc}`)();
+      const isYellow = new Function("hsl", `return ${isYellowSrc}`)(hsl);
+      const img = await new Promise((ok) => { const i = new Image(); i.onload = () => ok(i); i.src = "data:image/png;base64," + b64; });
+      const c = document.createElement("canvas"); c.width = img.width; c.height = img.height;
+      const x = c.getContext("2d"); x.drawImage(img, 0, 0);
+      const d = x.getImageData(0, 0, img.width, img.height).data;
+      let n = 0; for (let k = 0; k < d.length; k += 4) if (isYellow(d[k], d[k + 1], d[k + 2])) n++;
+      return { n, px: d.length / 4 };
+    }, { b64, isYellowSrc: isYellow.toString(), hslSrc: hsl.toString() });
+    yellowPx += n; totalPx += px; renders++;
+    if (w === 1280) log(`${s} (${theme}): yellow px ${n}; honeycomb ${struct.honeycomb ? JSON.stringify(struct.honeycomb) : "component absent"}; legacy wallpaper ${struct.legacyWallpaper}; hexagon-clipped elements in content ${struct.hexagonClippedInContent}`);
+  }
+  await browser.close();
+  log(`App screenshot pixels: ${totalPx.toLocaleString("en")} across ${renders} renders (16 screens x 2 themes x 2 widths). Yellow/gold/amber pixels: ${yellowPx}`);
+  mkdirSync(resolve("design/baseline"), { recursive: true });
+  writeFileSync(resolve("design/baseline/checks-app.txt"), out.join("\n") + "\n");
+  process.exit(0);
+}
+
 // 1a. source colour literals
 const files = [...readdirSync(DIR).filter((f) => /\.(css|js|html)$/.test(f)).map((f) => resolve(DIR, f)),
   resolve(DIR, "../_shared/avatars.js"), resolve(DIR, "../_shared/icons.js")];

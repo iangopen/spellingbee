@@ -862,8 +862,16 @@ the live site.
   so a player who chose light keeps light.
 - **Phase 3 is written:** `design/PHASE3.md` has the design system (tokens,
   type, space, motion, the honeycomb spec, components) and the stage-by-stage
-  build plan (stages 0 to 7, one commit each). **Not implemented yet:** no
-  `src/` file has changed.
+  build plan (stages 0 to 7, one commit each).
+- **Build progress:** all stages are built on this branch, and nothing merges
+  to `main` until Ian reviews the finished redesign (one merge at the end).
+  - **Stage 0 is done (2026-09-29):** the redesign fonts are self-hosted, with
+    `CREDITS.md`. `measure.mjs` and `check-glow.mjs` run against the real app
+    (`TARGET=app`), and the baseline is in `design/baseline/` (715 pairs, 47
+    failing; 44 controls without an outline; 5.2M yellow pixels). Stage 1 is
+    next.
+  - Shipped to `main` separately (Ian, 2026-09-29): the current fonts
+    self-hosted (HARDENING #24) and the race results button fix.
 
 ### Rules for the build, whatever the direction
 - **Presentation only.** Don't touch any of these:
@@ -876,7 +884,9 @@ the live site.
   - the native `<dialog>` Settings (focus in, Tab trap, Escape, focus return)
   - `useScreenFocus`, and the `readOnly` guess input
   - visible `:focus-visible`
-  - AA contrast (4.5:1 text, 3:1 UI; measure with `design/harness/contrast.mjs`)
+  - AA contrast (4.5:1 text, 3:1 UI) against the worst pixel behind each
+    pair: `TARGET=app node design/harness/measure.mjs`, compared with
+    `design/baseline/`
   - the single global reduced-motion block plus the in-app override
   - no zoom blocking
   - 44px targets
@@ -914,7 +924,7 @@ the live site.
   in both palettes" and "motion only decorates a visible state".
 
 ### Open
-- Ian's go-ahead to start building (stage 0 of `design/PHASE3.md`).
+- Stage 1 of `design/PHASE3.md` (tokens and the dark default) is next.
 - A real-phone check of the shimmer (in stage 7). The perf numbers so far are
   headless Chrome with the CPU throttled 4×. The static glow is the fallback.
 - The name itself: a distinct look lowers the risk of being mistaken for NYT's

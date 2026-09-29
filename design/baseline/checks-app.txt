@@ -1,0 +1,34 @@
+App source colours: 88 distinct literals in 55 files. Yellow/gold/amber: 26 -> #e8a63d, #9c6b1f, #85661f, #96631f, #edae47, #b97c1e, #f2c268, #e6d6b4, #9a6210, #e09a2c, #c9a05a, #f3f5da, #e6ebbd, #b5c063, #fcefd0, #f3dfaa, #d3ad4b, #fce5c4, #f6d39d, #d69b3c, #f4c691, #f0ad42, #d4841a, #a96712, rgba(232, 166, 61), rgba(224, 154, 44)
+home (dark): yellow px 3589; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+home (light): yellow px 244742; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+difficulty (dark): yellow px 20701; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 8
+difficulty (light): yellow px 276682; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 8
+sp-round (dark): yellow px 6286; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+sp-round (light): yellow px 236698; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+sp-correct (dark): yellow px 3959; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+sp-correct (light): yellow px 232994; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+sp-incorrect (dark): yellow px 4153; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+sp-incorrect (light): yellow px 233670; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+sp-results (dark): yellow px 8247; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+sp-results (light): yellow px 250345; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+settings (dark): yellow px 10392; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+settings (light): yellow px 14556; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+lobby (dark): yellow px 32654; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+lobby (light): yellow px 242852; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+waiting-room (dark): yellow px 25960; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+waiting-room (light): yellow px 241317; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+race-round (dark): yellow px 6333; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+race-round (light): yellow px 235925; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+race-locked (dark): yellow px 5992; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+race-locked (light): yellow px 235844; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+race-roundend (dark): yellow px 4157; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+race-roundend (light): yellow px 234569; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+race-results (dark): yellow px 8247; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+race-results (light): yellow px 250368; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+elim-watch (dark): yellow px 5563; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+elim-watch (light): yellow px 233931; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+elim-myturn (dark): yellow px 28201; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+elim-myturn (light): yellow px 253954; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+elim-results (dark): yellow px 24258; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+elim-results (light): yellow px 229101; honeycomb component absent; legacy wallpaper true; hexagon-clipped elements in content 0
+App screenshot pixels: 43,301,120 across 64 renders (16 screens x 2 themes x 2 widths). Yellow/gold/amber pixels: 5177667

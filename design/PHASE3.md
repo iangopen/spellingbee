@@ -219,7 +219,7 @@ middle stages alone would show a half-old, half-new UI.
 
 | # | Stage (one commit) | Files | Tests / checks added |
 |---|---|---|---|
-| 0 | **Groundwork.** Self-host the two fonts (woff2, Latin subset) and add `CREDITS.md` (the OFL fonts, lucide ISC). Port `measure.mjs` / `check-glow.mjs` to render the real screens through `design/harness`. | `public/fonts/`, `index.css` @font-face, `design/harness/*` | a font-load check in the harness; no Google Fonts request (network log) |
+| 0 ✅ | **Groundwork (done 2026-09-29).** Self-host the two fonts (woff2, Latin + Latin Extended) and add `CREDITS.md` (the OFL fonts, lucide ISC). Port `measure.mjs` / `check-glow.mjs` to the real screens (`TARGET=app`, through `design/harness`), and record the baseline in `design/baseline/`. The current fonts were self-hosted on `main` first (HARDENING #24; live, 0 Google requests). | `src/fonts.css`, `src/assets/fonts/`, `CREDITS.md`, `design/harness/*`, `design/baseline/*` | prototype regression: 152 pairs, 0 failing, unchanged; app baseline: 715 pairs, 47 failing, 44 controls without an outline |
 | 1 | **Tokens + dark default.** The new token set in both themes, old tokens aliased. `theme.ts`: `resolveTheme()` becomes stored ?? **`"dark"`**; drop the OS listener in `SettingsPanel`; the pre-JS fallback becomes dark. The `spellingbee:theme` key and its values are unchanged, so a player who chose light keeps it. | `index.css`, `lib/theme.ts`, `SettingsPanel.tsx` (listener only) | new `theme.test.ts`: no stored value gives dark; stored light gives light; the OS setting is ignored |
 | 2 | **Honeycomb background.** The `HoneycombBackground` component + CSS (28×49 tile, glow, shimmer, vignette, header band), replacing `body::before`. The shimmer is hidden under the OS setting AND the in-app override. | `components/HoneycombBackground.tsx`, `index.css` | render test (`aria-hidden`, no text, no focusables); check-glow on the app; the perf script at 390px |
 | 3 | **Shared components.** Panel, Button, AnswerField (moat + states), TextInput/Select, Placard, Rosette, BeeMascot, AvatarArt, Clock/TimerBar and Tally restyles; the global focus-moat rule. | new `components/ui/*`, `AvatarPicker.tsx`, `TimerBar.tsx` (CSS only), `ScoreBar.tsx`, `lib/avatars.ts` (art mapping only) | `AVATAR_KEYS` unchanged (unit test pins the list); TimerBar tests unchanged and green; focus-ring contrast |
@@ -237,7 +237,7 @@ middle stages alone would show a half-old, half-new UI.
 
 **Budgets:**
 - no new runtime dependencies
-- fonts ≤ 150 KB woff2 in total (subset)
+- fonts ≤ 150 KB of woff2 **downloaded per page** (the Latin files; Latin Extended loads only for names that need it). Redesign fonts: Bricolage 76.9 KB + Atkinson 400/700 34.7 KB = 111.6 KB. Inter and Space Grotesk leave in stage 7.
 - JS growth ≤ 6 KB gzip over `main`
 - the honeycomb adds no JS beyond its component (the tile is generated CSS)
 - Lighthouse mobile performance no worse than `main`
@@ -254,7 +254,13 @@ middle stages alone would show a half-old, half-new UI.
   doesn't clear the name (HARDENING #14, §C10). It's Ian's decision, still
   open.
 
-## Open before stage 0
-- A go-ahead to start building, with stage 0 first.
-- Whether the Google Fonts removal (HARDENING #24) should also go to `main`
-  early, on its own. It's independent of the redesign.
+## Decisions (Ian, 2026-09-29)
+- **Build all stages on `redesign/spelling-bee`.** Do NOT merge to `main`
+  stage by stage. Ian reviews the finished redesign, and it merges once at the
+  end.
+- **The Google Fonts removal went to `main` on its own,** ahead of the
+  redesign: the current fonts are self-hosted and live, with 0 requests to
+  Google.
+- **Multiplayer screens** will be tested locally against the real backend with
+  localhost added to the Turnstile widget. This also needs
+  `VITE_TURNSTILE_SITE_KEY` in `.env.local`.
