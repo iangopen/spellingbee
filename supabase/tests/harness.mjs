@@ -18,7 +18,8 @@
 //                                        is stripped from 0009. Jobs never run on a
 //                                        schedule here; tests call the job functions.
 //   * supabase_realtime publication    — created empty so 0004/0007 apply
-//   * single connection                — no concurrency; locks are not exercised
+//   * single connection                — no concurrency here; supabase/concurrency/
+//                                        races the locks on a real Postgres
 //
 // PGlite is Postgres 18.x; production is 17.6. Nothing used here differs between them.
 
@@ -31,7 +32,7 @@ import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto";
 export const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const migrationsDir = join(repoRoot, "supabase", "migrations");
 
-const BOOTSTRAP = `
+export const BOOTSTRAP = `
 create role anon nologin;
 create role authenticated nologin;
 create role service_role nologin bypassrls;
@@ -95,6 +96,11 @@ export function migrationFiles() {
     .sort();
 }
 
+/** A migration's SQL, with pg_cron's CREATE EXTENSION stripped (the stub cron schema stands in for it). */
+export function migrationSql(f) {
+  return readFileSync(join(migrationsDir, f), "utf8").replace(/create extension if not exists pg_cron;/gi, "");
+}
+
 /**
  * A fresh database with every migration up to and including `upTo` (a filename
  * prefix like "0015"), or all of them.
@@ -104,9 +110,7 @@ export async function freshDb({ upTo } = {}) {
   await db.exec(BOOTSTRAP);
   for (const f of migrationFiles()) {
     if (upTo && f.slice(0, 4) > upTo) break;
-    let sql = readFileSync(join(migrationsDir, f), "utf8");
-    // pg_cron isn't available in WASM; the stub schema above stands in for it.
-    sql = sql.replace(/create extension if not exists pg_cron;/gi, "");
+    const sql = migrationSql(f);
     try {
       await db.exec(sql);
     } catch (e) {

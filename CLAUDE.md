@@ -741,6 +741,16 @@ client deployed from `2263581`, and CAPTCHA on. See "Live verification" below.
   called directly, never scheduled), and the realtime publication, and
   reproduces Supabase's default privileges and its `extensions` schema. It first
   reproduces the original hole at 0015, then proves the fix.
+- `npm --prefix supabase/concurrency ci && npm --prefix supabase/concurrency test`
+  (2026-09-29): the same migrations on a REAL Postgres 17 (embedded-postgres),
+  racing separate connections against the 0019 advisory locks. It is its own
+  package on purpose: the root `npm ci` runs on every deploy and shouldn't pull
+  ~100 MB of Postgres binaries. Needs the root `npm ci` first (it imports the
+  PGlite harness's bootstrap SQL). Every race has a NEGATIVE CONTROL with
+  `lock_for()` stubbed to a no-op that must break the invariant, so a pass can't
+  come from the transactions simply never overlapping. Measured: 20 joins seat 8
+  (control: 21), 30 creations stop at 20 (control: 30), and a join committing
+  during the last leave survives (control: silently deleted by the cleanup).
 
 ### Verified locally vs. still needs the live project
 Verified locally (PGlite, Vitest, and Chrome against a dev server with a dead
@@ -753,10 +763,13 @@ Supabase URL and Cloudflare's always-pass test key):
 - the captcha token reaching `signInAnonymously`
 
 Live only, and their status after the 2026-09-28 rollout:
-- concurrency of the advisory locks (PGlite has one connection): **still not
-  exercised.** No test has produced truly simultaneous joins.
-- pg_cron running the jobs: **verified** for the 10-minute jobs; the daily
-  jobs are pending their first run.
+- concurrency of the advisory locks: **verified 2026-09-29 on a real local
+  Postgres 17** (`supabase/concurrency/`, above), not on the live project.
+  The live project runs the identical 0019 SQL.
+- pg_cron running the jobs: **verified** for all of them. On 2026-09-29 (read-only
+  query) both daily jobs had succeeded on 09-28 and 09-29, and the 10-minute
+  jobs were 195/195 succeeded over two days. `auth.users` then held 8
+  anonymous users, none older than 30 days.
 - `purge_anonymous_users` allowed to DELETE from `auth.users`: **verified**
   (rolled back).
 - real Turnstile tokens accepted by Supabase Auth: **verified**.
@@ -824,10 +837,32 @@ Done in the order above. Each step below was observed, not assumed.
    guesses were gone while all 10 scoreboard rounds remained, so the guess
    purge works live. The daily jobs first run at 03:17 / 03:37 UTC.
 
+### Audit follow-up (2026-09-29)
+Everything in the audit for this repo was already fixed except the items below.
+This session worked on `main`, like the hardening pass:
+- **Locks under concurrency:** proven locally, see Tests.
+- **Daily purges:** confirmed live, see above.
+- **Third-party notices:** the minifier strips every `@license` comment, so the
+  bundle shipped React, supabase-js, lucide-react and more with no notices.
+  `scripts/licenseNotices.ts` (a Vite plugin) now writes
+  `dist/third-party-licenses.txt`, derived from the modules actually bundled
+  plus the fonts' OFL texts and SCOWL's notice (`licenses/SCOWL-Copyright.txt`,
+  verbatim from wordlist-english 1.2.1). **A bundled package with no licence
+  file fails the build.** Keep new self-hosted fonts' `OFL-*.txt` in
+  `src/assets/fonts/`, where the plugin looks for them.
+- **Text-input contrast (WCAG 1.4.11):** `.text-input` uses the new
+  `--field-edge` token (3.25-3.70:1 against every background it sits on,
+  including the honeycomb lines) plus a honey `:focus-visible` outline. The
+  outline is required, not decoration: the resting edge is close to honey in
+  lightness, so a border-colour change alone is too weak a focus cue.
+- **Multiplayer keyboard pass:** the lobby passes by keyboard. The waiting room,
+  race, elimination turn and results screens were NOT driven, because that needs
+  the live server plus a second browser identity (one Chrome profile shares one
+  guest session across tabs). Next time Ian runs a two-browser game, one side
+  should play it by keyboard only: create/join, Start, type and submit, "Hear it
+  again", quit's two-step confirm, and the results buttons in both modes.
+
 ### Pending
-- The first daily `purge-anonymous-users` run (03:17 UTC) will delete the
-  eligible anonymous users for real (35 at the time of the rolled-back test).
-  That's intended.
 - `verify_hardening.mjs` left 3 anonymous users and one finished race room.
   Retention removes them after 30 days.
 - **With CAPTCHA on, no script can sign up users.** `probe.mjs` and the

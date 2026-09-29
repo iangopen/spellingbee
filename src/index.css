@@ -23,6 +23,7 @@
   --bg: #16130f;
   --surface: #211c15;
   --border: #3a3226;
+  --field-edge: #7a6c57;   /* text-input boundary: >=3:1 on --bg and --surface (WCAG 1.4.11) */
 
   --honey: #e8a63d;        /* accent for text, borders, headings */
   --honey-solid: #e8a63d;  /* accent as a fill behind text */
@@ -81,6 +82,7 @@
     --bg: #faf3e3;
     --surface: #fffcf5;
     --border: #e6d6b4;
+    --field-edge: #96805a;
 
     --honey: #9a6210;
     --honey-solid: #e09a2c;
@@ -126,6 +128,7 @@
   --bg: #faf3e3;
   --surface: #fffcf5;
   --border: #e6d6b4;
+  --field-edge: #96805a;
 
   --honey: #9a6210;
   --honey-solid: #e09a2c;

@@ -1004,14 +1004,23 @@
   padding: 12px;
   min-height: 44px;
   border-radius: 8px;
-  border: 2px solid var(--border);
+  /* --field-edge, not --border: --border is 1.3-1.5:1 and would leave the
+     field with no visible boundary (WCAG 1.4.11 wants 3:1). */
+  border: 2px solid var(--field-edge);
   background: var(--bg);
   color: var(--text);
   outline: none;
 }
 
+/* The resting edge is close to honey in lightness, so a border colour change
+   alone is too weak a focus cue; the outline carries it. */
 .text-input:focus {
   border-color: var(--honey);
+}
+
+.text-input:focus-visible {
+  outline: 2px solid var(--honey);
+  outline-offset: 2px;
 }
 
 .code-input {
