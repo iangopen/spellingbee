@@ -146,8 +146,7 @@ function App() {
               score={mp.state.score}
               bestStreak={mp.state.bestStreak}
               best={mp.state.score}
-              onReplay={handleLeaveRoom}
-              onMenu={handleLeaveRoom}
+              onLeaveRoom={handleLeaveRoom}
             />
           ))}
 

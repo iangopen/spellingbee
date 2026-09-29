@@ -1,6 +1,14 @@
 import { useRef } from "react";
-import { RotateCcw, Trophy } from "lucide-react";
+import { ArrowLeft, RotateCcw, Trophy } from "lucide-react";
 import { useScreenFocus } from "../hooks/useScreenFocus";
+
+// Two callers with different next moves. Singleplayer can replay or change
+// difficulty. A finished race can only leave the room: there is no rematch,
+// and both old buttons ("Play again", "Change difficulty") silently did that.
+// So a race passes onLeaveRoom and gets exactly one button that says so.
+type Actions =
+  | { onReplay: () => void; onMenu: () => void; onLeaveRoom?: undefined }
+  | { onLeaveRoom: () => void; onReplay?: undefined; onMenu?: undefined };
 
 export function ResultsScreen({
   score,
@@ -8,13 +16,12 @@ export function ResultsScreen({
   best,
   onReplay,
   onMenu,
+  onLeaveRoom,
 }: {
   score: number;
   bestStreak: number;
   best: number;
-  onReplay: () => void;
-  onMenu: () => void;
-}) {
+} & Actions) {
   const isNewBest = score >= best && score > 0;
   // The game just ended under the player's hands: "Play again" is the next move.
   const primaryRef = useRef<HTMLButtonElement>(null);
@@ -40,13 +47,22 @@ export function ResultsScreen({
         {isNewBest && " — new best!"}
       </p>
       <div className="results-actions">
-        <button ref={primaryRef} className="primary-btn" onClick={onReplay}>
-          <RotateCcw size={16} aria-hidden />
-          Play again
-        </button>
-        <button className="ghost-btn" onClick={onMenu}>
-          Change difficulty
-        </button>
+        {onLeaveRoom ? (
+          <button ref={primaryRef} className="primary-btn" onClick={onLeaveRoom}>
+            <ArrowLeft size={16} aria-hidden />
+            Back to lobby
+          </button>
+        ) : (
+          <>
+            <button ref={primaryRef} className="primary-btn" onClick={onReplay}>
+              <RotateCcw size={16} aria-hidden />
+              Play again
+            </button>
+            <button className="ghost-btn" onClick={onMenu}>
+              Change difficulty
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
