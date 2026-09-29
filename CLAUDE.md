@@ -868,8 +868,8 @@ This session worked on `main`, like the hardening pass:
 - **With CAPTCHA on, no script can sign up users.** `probe.mjs` and the
   `verify_*.mjs` scripts need CAPTCHA switched off temporarily, or an existing
   session.
-- #8 (privacy note) goes in the docs session. REPORT.md's "server-authoritative
-  scoring" claim can now be restored, since the re-probe passed.
+- #8 (privacy note): done 2026-09-29, see "Docs and disclosures". REPORT.md's
+  "server-authoritative scoring" claim was restored the same day.
 
 ## Docs and disclosures (2026-09-29)
 
