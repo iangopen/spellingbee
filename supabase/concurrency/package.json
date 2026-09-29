@@ -1,0 +1,13 @@
+{
+  "name": "spellingbee-concurrency-tests",
+  "private": true,
+  "type": "module",
+  "description": "Real-Postgres concurrency tests for the 0019 advisory locks. Kept out of the root package so npm ci (and every deploy) doesn't download ~100 MB of Postgres binaries.",
+  "scripts": {
+    "test": "node --test --test-concurrency=1 locks.test.mjs"
+  },
+  "devDependencies": {
+    "embedded-postgres": "17.10.0-beta.17",
+    "pg": "^8.23.0"
+  }
+}

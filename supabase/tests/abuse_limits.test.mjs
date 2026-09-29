@@ -2,7 +2,8 @@
 //
 // NOT covered here (PGlite is one connection): two transactions actually racing
 // on the advisory locks. The lock calls are asserted to be present; that they
-// serialise real concurrent requests is a live-only check.
+// serialise real concurrent requests is proven against a real Postgres 17 in
+// supabase/concurrency/locks.test.mjs.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
