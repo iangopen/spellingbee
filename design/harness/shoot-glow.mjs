@@ -22,7 +22,7 @@ async function shot(name, page, q, { w, theme, motion = "no-preference", prep } 
   const ctx = await browser.newContext({ viewport: W[w], deviceScaleFactor: 1, colorScheme: theme, reducedMotion: motion });
   const p = await ctx.newPage();
   p.on("pageerror", (e) => errors.push(`${name}: ${e.message}`));
-  await p.goto(url(page, q), { waitUntil: "networkidle" });
+  await p.goto(url(page, { ...q, theme }), { waitUntil: "networkidle" });
   await p.evaluate(() => document.fonts.ready);
   await p.waitForTimeout(motion === "reduce" ? 200 : 1400); // let entry animations finish
   if (prep) await prep(p);
@@ -47,6 +47,12 @@ const pointerAt = (fx, fy) => async (p) => {
 };
 
 let n = 0;
+// F. FINAL: the picked direction (slow shimmer caught mid-sweep, bee, old cell size)
+for (const page of ["home", "round", "race-results"])
+  for (const w of ["desktop", "phone"])
+    for (const theme of ["dark", "light"]) {
+      await shot(`final--${page}--${w}--${theme}`, page, { bg: "shimmer", bee: "1" }, { w, theme, prep: midSweep }); n++;
+    }
 // A. main set: static background, bee off/on, both widths, both themes
 for (const page of ["home", "round", "race-results"])
   for (const bee of ["0", "1"])
@@ -104,6 +110,10 @@ for (const s of stills) {
   }, [bufs.get(s).toString("base64"), bufs.get(`${s}--ref`).toString("base64")]);
   if (r.over === 0) same++;
   console.log(`${r.over === 0 ? "STILL OK" : "DIFFERS "}  ${s}: max channel diff ${r.max}/255, pixels over tolerance ${r.over}`);
+  if (r.over && process.env.STILL_DEBUG) {
+    writeFileSync(resolve(process.env.STILL_DEBUG, `${s}.png`), bufs.get(s));
+    writeFileSync(resolve(process.env.STILL_DEBUG, `${s}--ref.png`), bufs.get(`${s}--ref`));
+  }
   rmSync(resolve(OUT, `${s}--ref.jpg`));
 }
 await browser.close();

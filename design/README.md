@@ -9,6 +9,7 @@ and oxlint reports nothing here.
 | `audit/screens/` | The current app: 16 screens × desktop/phone × dark/light (64 PNGs) |
 | `audit/current-palette.json` | The current colour pairs, measured |
 | `DIRECTIONS.md` | Phase 2: brand basics and three directions (A Blue Ribbon, B Clover Field, C Bee Line), with contrast, trademark notes and a recommendation |
+| **`PHASE3.md`** | **The design system and the stage-by-stage build plan** for the final direction (not implemented yet). |
 | **`prototypes/blue-ribbon-glow/`** | **The chosen direction**: Blue Ribbon + glowing blue honeycomb + C's race lanes. Start at `compare.html`; the folder's README has the notes and verification. |
 | `prototypes/<direction>/` | Phase 2 static prototypes (home, round, race-results) of A, B and C, kept as the record. |
 | `prototypes/screens/` | 3 directions × 3 screens × desktop/phone × light/dark (36 PNGs) |

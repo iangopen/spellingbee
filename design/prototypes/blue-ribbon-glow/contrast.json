@@ -43,40 +43,14 @@
    999
   ],
   "fg": "#8f99bb",
-  "worst": 5.47,
-  "wp": "#1c233e",
+  "worst": 5.68,
+  "wp": "#1a2039",
   "where": "desktop"
  },
  {
   "page": "home",
   "theme": "dark",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "ring",
-  "idx": 27,
-  "label": "focus ring: Play with friends",
-  "color": "rgb(183, 198, 255)",
-  "need": 3,
-  "band": [
-   42,
-   403.984375,
-   348,
-   457.984375,
-   3,
-   6,
-   17
-  ],
-  "fg": "#b7c6ff",
-  "worst": 4.86,
-  "wp": "#3d4d81",
-  "focused": true,
-  "where": "phone"
- },
- {
-  "page": "home",
-  "theme": "dark",
-  "w": "phone",
+  "w": "desktop",
   "bee": "0",
   "state": "",
   "kind": "ring",
@@ -85,19 +59,19 @@
   "color": "rgb(183, 198, 255)",
   "need": 3,
   "band": [
-   326,
+   1136,
    24,
-   370,
+   1180,
    68,
    3,
    6,
    1002
   ],
   "fg": "#b7c6ff",
-  "worst": 6.07,
-  "wp": "#343f6a",
+  "worst": 10.97,
+  "wp": "#0d1329",
   "focused": true,
-  "where": "phone"
+  "where": "desktop"
  },
  {
   "page": "home",
@@ -114,6 +88,32 @@
    136,
    423.28125,
    293.453125,
+   477.28125,
+   3,
+   6,
+   17
+  ],
+  "fg": "#b7c6ff",
+  "worst": 11.67,
+  "wp": "#070b1c",
+  "focused": true,
+  "where": "desktop"
+ },
+ {
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "0",
+  "state": "",
+  "kind": "ring",
+  "idx": 27,
+  "label": "focus ring: Play with friends",
+  "color": "rgb(183, 198, 255)",
+  "need": 3,
+  "band": [
+   305.453125,
+   423.28125,
+   524.859375,
    477.28125,
    3,
    6,
@@ -156,8 +156,8 @@
    ]
   ],
   "fg": "#a9b1ca",
-  "worst": 6.5,
-  "wp": "#232b49",
+  "worst": 6.48,
+  "wp": "#242b49",
   "where": "phone"
  },
  {
@@ -185,8 +185,8 @@
    ]
   ],
   "fg": "#a9b1ca",
-  "worst": 6.68,
-  "wp": "#222945",
+  "worst": 6.62,
+  "wp": "#222a45",
   "where": "phone"
  },
  {
@@ -231,8 +231,8 @@
    ]
   ],
   "fg": "#a9b1ca",
-  "worst": 8.13,
-  "wp": "#121931",
+  "worst": 8.02,
+  "wp": "#141a33",
   "where": "desktop"
  },
  {
@@ -254,8 +254,8 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 12.27,
-  "wp": "#232b49",
+  "worst": 12.25,
+  "wp": "#242b49",
   "where": "phone"
  },
  {
@@ -274,6 +274,29 @@
     567.984375,
     190.90625,
     588.984375
+   ]
+  ],
+  "fg": "#eef1f8",
+  "worst": 12.63,
+  "wp": "#222945",
+  "where": "phone"
+ },
+ {
+  "page": "home",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "214",
+  "color": "rgb(238, 241, 248)",
+  "need": 4.5,
+  "rects": [
+   [
+    314.375,
+    665.6875,
+    342,
+    686.6875
    ]
   ],
   "fg": "#eef1f8",
@@ -300,31 +323,8 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 13.35,
-  "wp": "#1e253f",
-  "where": "phone"
- },
- {
-  "page": "home",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "Building",
-  "color": "rgb(238, 241, 248)",
-  "need": 4.5,
-  "rects": [
-   [
-    48,
-    754.6875,
-    114.609375,
-    775.6875
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 13.73,
-  "wp": "#1c233b",
+  "worst": 13.01,
+  "wp": "#202741",
   "where": "phone"
  },
  {
@@ -346,54 +346,8 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 13.85,
-  "wp": "#1b223c",
-  "where": "phone"
- },
- {
-  "page": "home",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "Medium",
-  "color": "rgb(238, 241, 248)",
-  "need": 4.5,
-  "rects": [
-   [
-    48,
-    799.1875,
-    112.1875,
-    820.1875
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 13.9,
-  "wp": "#1b223a",
-  "where": "phone"
- },
- {
-  "page": "home",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "118",
-  "color": "rgb(238, 241, 248)",
-  "need": 4.5,
-  "rects": [
-   [
-    318.390625,
-    799.1875,
-    342,
-    820.1875
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 14.04,
-  "wp": "#1a213a",
+  "worst": 13.35,
+  "wp": "#1e253f",
   "where": "phone"
  },
  {
@@ -415,8 +369,100 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 14.06,
-  "wp": "#1a2139",
+  "worst": 13.37,
+  "wp": "#1e253e",
+  "where": "phone"
+ },
+ {
+  "page": "home",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "Building",
+  "color": "rgb(238, 241, 248)",
+  "need": 4.5,
+  "rects": [
+   [
+    48,
+    754.6875,
+    114.609375,
+    775.6875
+   ]
+  ],
+  "fg": "#eef1f8",
+  "worst": 13.68,
+  "wp": "#1d233c",
+  "where": "phone"
+ },
+ {
+  "page": "home",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "152",
+  "color": "rgb(238, 241, 248)",
+  "need": 4.5,
+  "rects": [
+   [
+    314.703125,
+    754.6875,
+    342,
+    775.6875
+   ]
+  ],
+  "fg": "#eef1f8",
+  "worst": 13.69,
+  "wp": "#1c233d",
+  "where": "phone"
+ },
+ {
+  "page": "home",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "118",
+  "color": "rgb(238, 241, 248)",
+  "need": 4.5,
+  "rects": [
+   [
+    318.390625,
+    799.1875,
+    342,
+    820.1875
+   ]
+  ],
+  "fg": "#eef1f8",
+  "worst": 13.88,
+  "wp": "#1b223b",
+  "where": "phone"
+ },
+ {
+  "page": "home",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "Medium",
+  "color": "rgb(238, 241, 248)",
+  "need": 4.5,
+  "rects": [
+   [
+    48,
+    799.1875,
+    112.1875,
+    820.1875
+   ]
+  ],
+  "fg": "#eef1f8",
+  "worst": 14.01,
+  "wp": "#1b213a",
   "where": "phone"
  },
  {
@@ -438,8 +484,8 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 14.37,
-  "wp": "#191f37",
+  "worst": 14.23,
+  "wp": "#192038",
   "where": "phone"
  },
  {
@@ -449,67 +495,21 @@
   "bee": "0",
   "state": "",
   "kind": "text",
-  "label": "214",
+  "label": "64",
   "color": "rgb(238, 241, 248)",
   "need": 4.5,
   "rects": [
    [
-    314.375,
-    665.6875,
+    319.34375,
+    843.6875,
     342,
-    686.6875
+    864.6875
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 15.36,
-  "wp": "#121931",
+  "worst": 14.35,
+  "wp": "#191f38",
   "where": "phone"
- },
- {
-  "page": "home",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "Play with friends",
-  "color": "rgb(238, 241, 248)",
-  "need": 4.5,
-  "rects": [
-   [
-    140.84375,
-    420.484375,
-    276.703125,
-    441.484375
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 15.44,
-  "wp": "#131831",
-  "where": "phone"
- },
- {
-  "page": "home",
-  "theme": "dark",
-  "w": "desktop",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "152",
-  "color": "rgb(238, 241, 248)",
-  "need": 4.5,
-  "rects": [
-   [
-    1124.703125,
-    311.90625,
-    1152,
-    332.90625
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 15.47,
-  "wp": "#121831",
-  "where": "desktop"
  },
  {
   "page": "home",
@@ -530,8 +530,54 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 15.47,
-  "wp": "#121831",
+  "worst": 15.16,
+  "wp": "#141a33",
+  "where": "desktop"
+ },
+ {
+  "page": "home",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "Play with friends",
+  "color": "rgb(238, 241, 248)",
+  "need": 4.5,
+  "rects": [
+   [
+    140.84375,
+    420.484375,
+    276.703125,
+    441.484375
+   ]
+  ],
+  "fg": "#eef1f8",
+  "worst": 15.29,
+  "wp": "#141932",
+  "where": "phone"
+ },
+ {
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "Expert",
+  "color": "rgb(238, 241, 248)",
+  "need": 4.5,
+  "rects": [
+   [
+    747.1875,
+    489.90625,
+    798.90625,
+    510.90625
+   ]
+  ],
+  "fg": "#eef1f8",
+  "worst": 15.31,
+  "wp": "#131932",
   "where": "desktop"
  },
  {
@@ -553,60 +599,14 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 15.49,
-  "wp": "#121830",
-  "where": "desktop"
- },
- {
-  "page": "home",
-  "theme": "dark",
-  "w": "desktop",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "64",
-  "color": "rgb(238, 241, 248)",
-  "need": 4.5,
-  "rects": [
-   [
-    1129.34375,
-    400.90625,
-    1152,
-    421.90625
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 15.51,
-  "wp": "#12182f",
-  "where": "desktop"
- },
- {
-  "page": "home",
-  "theme": "dark",
-  "w": "desktop",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "Expert",
-  "color": "rgb(238, 241, 248)",
-  "need": 4.5,
-  "rects": [
-   [
-    747.1875,
-    489.90625,
-    798.90625,
-    510.90625
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 15.51,
-  "wp": "#12182f",
+  "worst": 15.31,
+  "wp": "#131932",
   "where": "desktop"
  },
  {
   "page": "race-results",
   "theme": "dark",
-  "w": "phone",
+  "w": "desktop",
   "bee": "0",
   "state": "",
   "kind": "ring",
@@ -615,19 +615,19 @@
   "color": "rgb(183, 198, 255)",
   "need": 3,
   "band": [
-   326,
+   1136,
    24,
-   370,
+   1180,
    68,
    3,
    6,
    1002
   ],
   "fg": "#b7c6ff",
-  "worst": 6.16,
-  "wp": "#333e69",
+  "worst": 11.67,
+  "wp": "#070b1c",
   "focused": true,
-  "where": "phone"
+  "where": "desktop"
  },
  {
   "page": "race-results",
@@ -703,8 +703,8 @@
    ]
   ],
   "fg": "#a9b1ca",
-  "worst": 6.77,
-  "wp": "#212844",
+  "worst": 6.52,
+  "wp": "#232b47",
   "where": "phone"
  },
  {
@@ -726,8 +726,8 @@
    ]
   ],
   "fg": "#a9b1ca",
-  "worst": 6.97,
-  "wp": "#1f2640",
+  "worst": 6.88,
+  "wp": "#202741",
   "where": "phone"
  },
  {
@@ -749,8 +749,8 @@
    ]
   ],
   "fg": "#aabcff",
-  "worst": 7.2,
-  "wp": "#252e4d",
+  "worst": 7.07,
+  "wp": "#262f50",
   "where": "phone"
  },
  {
@@ -795,8 +795,8 @@
    ]
   ],
   "fg": "#a9b1ca",
-  "worst": 8.21,
-  "wp": "#12182f",
+  "worst": 8.12,
+  "wp": "#131931",
   "where": "desktop"
  },
  {
@@ -818,9 +818,32 @@
    ]
   ],
   "fg": "#eef1f8",
+  "worst": 12.27,
+  "wp": "#232b49",
+  "where": "phone"
+ },
+ {
+  "page": "race-results",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "208",
+  "color": "rgb(238, 241, 248)",
+  "need": 3,
+  "rects": [
+   [
+    315.90625,
+    448.015625,
+    356,
+    473.015625
+   ]
+  ],
+  "fg": "#eef1f8",
   "worst": 12.3,
   "wp": "#232b48",
-  "where": "phone"
+  "where": "phone, bee"
  },
  {
   "page": "race-results",
@@ -841,31 +864,8 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 12.63,
-  "wp": "#222945",
-  "where": "phone"
- },
- {
-  "page": "race-results",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "208",
-  "color": "rgb(238, 241, 248)",
-  "need": 3,
-  "rects": [
-   [
-    315.90625,
-    448.015625,
-    356,
-    473.015625
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 12.82,
-  "wp": "#212843",
+  "worst": 12.32,
+  "wp": "#232b47",
   "where": "phone"
  },
  {
@@ -887,31 +887,8 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 12.99,
-  "wp": "#202742",
-  "where": "phone"
- },
- {
-  "page": "race-results",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "205",
-  "color": "rgb(238, 241, 248)",
-  "need": 3,
-  "rects": [
-   [
-    316.796875,
-    574.4375,
-    356,
-    599.4375
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 12.99,
-  "wp": "#202742",
+  "worst": 12.82,
+  "wp": "#212843",
   "where": "phone"
  },
  {
@@ -933,8 +910,54 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 13.16,
-  "wp": "#1f2641",
+  "worst": 12.82,
+  "wp": "#212843",
+  "where": "phone"
+ },
+ {
+  "page": "race-results",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "205",
+  "color": "rgb(238, 241, 248)",
+  "need": 3,
+  "rects": [
+   [
+    316.796875,
+    574.4375,
+    356,
+    599.4375
+   ]
+  ],
+  "fg": "#eef1f8",
+  "worst": 12.96,
+  "wp": "#202743",
+  "where": "phone"
+ },
+ {
+  "page": "race-results",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "2",
+  "color": "rgb(238, 241, 248)",
+  "need": 3,
+  "rects": [
+   [
+    43.71875,
+    566.828125,
+    58.265625,
+    594.828125
+   ]
+  ],
+  "fg": "#eef1f8",
+  "worst": 12.99,
+  "wp": "#202742",
   "where": "phone"
  },
  {
@@ -956,8 +979,8 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 13.16,
-  "wp": "#1f2641",
+  "worst": 12.99,
+  "wp": "#202742",
   "where": "phone"
  },
  {
@@ -1002,8 +1025,8 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 13.54,
-  "wp": "#1d243d",
+  "worst": 13.37,
+  "wp": "#1e253e",
   "where": "phone"
  },
  {
@@ -1025,8 +1048,8 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 14.2,
-  "wp": "#1a2038",
+  "worst": 14.01,
+  "wp": "#1b213a",
   "where": "phone"
  },
  {
@@ -1048,8 +1071,8 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 14.35,
-  "wp": "#191f38",
+  "worst": 14.23,
+  "wp": "#192038",
   "where": "phone"
  },
  {
@@ -1071,32 +1094,9 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 14.42,
-  "wp": "#181f36",
+  "worst": 14.37,
+  "wp": "#191f37",
   "where": "phone"
- },
- {
-  "page": "race-results",
-  "theme": "dark",
-  "w": "desktop",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "2",
-  "color": "rgb(238, 241, 248)",
-  "need": 3,
-  "rects": [
-   [
-    265.859375,
-    380.703125,
-    284.140625,
-    416.703125
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 15.49,
-  "wp": "#121830",
-  "where": "desktop"
  },
  {
   "page": "race-results",
@@ -1141,8 +1141,8 @@
    999
   ],
   "fg": "#8f99bb",
-  "worst": 4.98,
-  "wp": "#232a47",
+  "worst": 4.93,
+  "wp": "#232b48",
   "where": "phone"
  },
  {
@@ -1165,41 +1165,15 @@
    14
   ],
   "fg": "#8aa2ff",
-  "worst": 5.21,
-  "wp": "#273159",
+  "worst": 5.76,
+  "wp": "#232b47",
   "where": "phone"
  },
  {
   "page": "round",
   "theme": "dark",
-  "w": "phone",
+  "w": "desktop",
   "bee": "0",
-  "state": "correct",
-  "kind": "ring",
-  "idx": 22,
-  "label": "focus ring: Hear it again",
-  "color": "rgb(183, 198, 255)",
-  "need": 3,
-  "band": [
-   40,
-   307.796875,
-   205.15625,
-   351.796875,
-   3,
-   6,
-   1002
-  ],
-  "fg": "#b7c6ff",
-  "worst": 5.69,
-  "wp": "#374371",
-  "focused": true,
-  "where": "phone, correct"
- },
- {
-  "page": "round",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "1",
   "state": "",
   "kind": "ring",
   "idx": 21,
@@ -1207,45 +1181,19 @@
   "color": "rgb(183, 198, 255)",
   "need": 3,
   "band": [
-   36,
-   451.296875,
-   354,
-   519.296875,
+   302,
+   459.84375,
+   978,
+   535.84375,
    3,
    6,
    17
   ],
   "fg": "#b7c6ff",
-  "worst": 5.88,
-  "wp": "#35416e",
+  "worst": 11.15,
+  "wp": "#0c1126",
   "focused": true,
-  "where": "phone, bee"
- },
- {
-  "page": "round",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "1",
-  "state": "",
-  "kind": "ring",
-  "idx": 19,
-  "label": "focus ring: Settings",
-  "color": "rgb(183, 198, 255)",
-  "need": 3,
-  "band": [
-   326,
-   24,
-   370,
-   68,
-   3,
-   6,
-   1002
-  ],
-  "fg": "#b7c6ff",
-  "worst": 6.16,
-  "wp": "#333e69",
-  "focused": true,
-  "where": "phone, bee"
+  "where": "desktop"
  },
  {
   "page": "round",
@@ -1263,6 +1211,58 @@
    24,
    181.703125,
    68,
+   3,
+   6,
+   1002
+  ],
+  "fg": "#b7c6ff",
+  "worst": 11.67,
+  "wp": "#070b1c",
+  "focused": true,
+  "where": "desktop"
+ },
+ {
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "0",
+  "state": "",
+  "kind": "ring",
+  "idx": 19,
+  "label": "focus ring: Settings",
+  "color": "rgb(183, 198, 255)",
+  "need": 3,
+  "band": [
+   1136,
+   24,
+   1180,
+   68,
+   3,
+   6,
+   1002
+  ],
+  "fg": "#b7c6ff",
+  "worst": 11.67,
+  "wp": "#070b1c",
+  "focused": true,
+  "where": "desktop"
+ },
+ {
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "0",
+  "state": "",
+  "kind": "ring",
+  "idx": 20,
+  "label": "focus ring: Hear it again",
+  "color": "rgb(183, 198, 255)",
+  "need": 3,
+  "band": [
+   308,
+   306.34375,
+   473.15625,
+   350.34375,
    3,
    6,
    1002
@@ -1318,9 +1318,32 @@
    ]
   ],
   "fg": "#ff8b83",
-  "worst": 6.24,
-  "wp": "#222a45",
+  "worst": 6.31,
+  "wp": "#222944",
   "where": "phone, incorrect"
+ },
+ {
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "Medium",
+  "color": "rgb(169, 177, 202)",
+  "need": 4.5,
+  "rects": [
+   [
+    36,
+    114.390625,
+    100.1875,
+    135.390625
+   ]
+  ],
+  "fg": "#a9b1ca",
+  "worst": 6.7,
+  "wp": "#212945",
+  "where": "phone"
  },
  {
   "page": "round",
@@ -1341,8 +1364,31 @@
    ]
   ],
   "fg": "#a9b1ca",
-  "worst": 6.87,
-  "wp": "#202742",
+  "worst": 6.78,
+  "wp": "#212843",
+  "where": "phone"
+ },
+ {
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "s",
+  "color": "rgb(169, 177, 202)",
+  "need": 4.5,
+  "rects": [
+   [
+    347.203125,
+    121.140625,
+    354,
+    139.140625
+   ]
+  ],
+  "fg": "#a9b1ca",
+  "worst": 6.86,
+  "wp": "#202743",
   "where": "phone"
  },
  {
@@ -1364,31 +1410,8 @@
    ]
   ],
   "fg": "#a9b1ca",
-  "worst": 6.88,
-  "wp": "#202741",
-  "where": "phone"
- },
- {
-  "page": "round",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "Medium",
-  "color": "rgb(169, 177, 202)",
-  "need": 4.5,
-  "rects": [
-   [
-    36,
-    114.390625,
-    100.1875,
-    135.390625
-   ]
-  ],
-  "fg": "#a9b1ca",
-  "worst": 6.95,
-  "wp": "#1f2642",
+  "worst": 6.87,
+  "wp": "#202742",
   "where": "phone"
  },
  {
@@ -1419,23 +1442,23 @@
   "theme": "dark",
   "w": "phone",
   "bee": "0",
-  "state": "",
+  "state": "correct",
   "kind": "text",
-  "label": "s",
-  "color": "rgb(169, 177, 202)",
-  "need": 4.5,
+  "label": "+14",
+  "color": "rgb(95, 220, 170)",
+  "need": 3,
   "rects": [
    [
-    347.203125,
-    121.140625,
-    354,
-    139.140625
+    321.453125,
+    415.296875,
+    350,
+    438.296875
    ]
   ],
-  "fg": "#a9b1ca",
-  "worst": 8.03,
-  "wp": "#131a33",
-  "where": "phone"
+  "fg": "#5fdcaa",
+  "worst": 8,
+  "wp": "#212e44",
+  "where": "phone, correct"
  },
  {
   "page": "round",
@@ -1485,31 +1508,8 @@
    ]
   ],
   "fg": "#5fdcaa",
-  "worst": 8.28,
-  "wp": "#222a45",
-  "where": "phone, correct"
- },
- {
-  "page": "round",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "0",
-  "state": "correct",
-  "kind": "text",
-  "label": "+14",
-  "color": "rgb(95, 220, 170)",
-  "need": 3,
-  "rects": [
-   [
-    321.453125,
-    415.296875,
-    350,
-    438.296875
-   ]
-  ],
-  "fg": "#5fdcaa",
-  "worst": 8.34,
-  "wp": "#1e2b40",
+  "worst": 8.38,
+  "wp": "#222944",
   "where": "phone, correct"
  },
  {
@@ -1537,8 +1537,8 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 12.27,
-  "wp": "#232b49",
+  "worst": 12.25,
+  "wp": "#242b49",
   "where": "phone"
  },
  {
@@ -1560,8 +1560,8 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 12.46,
-  "wp": "#222a47",
+  "worst": 12.3,
+  "wp": "#232b48",
   "where": "phone"
  },
  {
@@ -1569,7 +1569,7 @@
   "theme": "dark",
   "w": "phone",
   "bee": "0",
-  "state": "",
+  "state": "correct",
   "kind": "text",
   "label": "Spell it",
   "color": "rgb(238, 241, 248)",
@@ -1583,55 +1583,9 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 12.82,
-  "wp": "#212843",
-  "where": "phone"
- },
- {
-  "page": "round",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "0",
-  "state": "correct",
-  "kind": "text",
-  "label": "4",
-  "color": "rgb(238, 241, 248)",
-  "need": 3,
-  "rects": [
-   [
-    130.796875,
-    650.546875,
-    143.53125,
-    674.546875
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 12.99,
-  "wp": "#202742",
+  "worst": 12.37,
+  "wp": "#222b46",
   "where": "phone, correct"
- },
- {
-  "page": "round",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "Skip this word",
-  "color": "rgb(238, 241, 248)",
-  "need": 4.5,
-  "rects": [
-   [
-    240.265625,
-    630.546875,
-    346,
-    651.546875
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 12.99,
-  "wp": "#202742",
-  "where": "phone"
  },
  {
   "page": "round",
@@ -1652,9 +1606,101 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 13.13,
-  "wp": "#1f2642",
+  "worst": 12.79,
+  "wp": "#212844",
   "where": "phone"
+ },
+ {
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "3",
+  "color": "rgb(238, 241, 248)",
+  "need": 3,
+  "rects": [
+   [
+    133.6875,
+    627.546875,
+    145.859375,
+    651.546875
+   ]
+  ],
+  "fg": "#eef1f8",
+  "worst": 12.82,
+  "wp": "#212843",
+  "where": "phone"
+ },
+ {
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "Skip this word",
+  "color": "rgb(238, 241, 248)",
+  "need": 4.5,
+  "rects": [
+   [
+    240.265625,
+    630.546875,
+    346,
+    651.546875
+   ]
+  ],
+  "fg": "#eef1f8",
+  "worst": 12.82,
+  "wp": "#212843",
+  "where": "phone"
+ },
+ {
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "incorrect",
+  "kind": "text",
+  "label": "0",
+  "color": "rgb(238, 241, 248)",
+  "need": 3,
+  "rects": [
+   [
+    133.6875,
+    627.546875,
+    147,
+    651.546875
+   ]
+  ],
+  "fg": "#eef1f8",
+  "worst": 12.82,
+  "wp": "#212843",
+  "where": "phone, incorrect"
+ },
+ {
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "0",
+  "state": "correct",
+  "kind": "text",
+  "label": "4",
+  "color": "rgb(238, 241, 248)",
+  "need": 3,
+  "rects": [
+   [
+    130.796875,
+    650.546875,
+    143.53125,
+    674.546875
+   ]
+  ],
+  "fg": "#eef1f8",
+  "worst": 13.01,
+  "wp": "#202741",
+  "where": "phone, correct"
  },
  {
   "page": "round",
@@ -1684,29 +1730,6 @@
   "theme": "dark",
   "w": "phone",
   "bee": "0",
-  "state": "incorrect",
-  "kind": "text",
-  "label": "0",
-  "color": "rgb(238, 241, 248)",
-  "need": 3,
-  "rects": [
-   [
-    133.6875,
-    627.546875,
-    147,
-    651.546875
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 13.18,
-  "wp": "#1f2640",
-  "where": "phone, incorrect"
- },
- {
-  "page": "round",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "0",
   "state": "correct",
   "kind": "text",
   "label": "72",
@@ -1721,32 +1744,9 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 13.35,
-  "wp": "#1e253f",
+  "worst": 13.32,
+  "wp": "#1f253f",
   "where": "phone, correct"
- },
- {
-  "page": "round",
-  "theme": "dark",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "3",
-  "color": "rgb(238, 241, 248)",
-  "need": 3,
-  "rects": [
-   [
-    133.6875,
-    627.546875,
-    145.859375,
-    651.546875
-   ]
-  ],
-  "fg": "#eef1f8",
-  "worst": 14.04,
-  "wp": "#1a213a",
-  "where": "phone"
  },
  {
   "page": "round",
@@ -1767,8 +1767,8 @@
    ]
   ],
   "fg": "#eef1f8",
-  "worst": 14.91,
-  "wp": "#131b3a",
+  "worst": 14.73,
+  "wp": "#151c3b",
   "where": "desktop"
  },
  {
@@ -1797,7 +1797,7 @@
  {
   "page": "round",
   "theme": "dark",
-  "w": "phone",
+  "w": "desktop",
   "bee": "0",
   "state": "",
   "kind": "text",
@@ -1806,39 +1806,15 @@
   "need": 4.5,
   "rects": [
    [
-    55.546875,
+    135.546875,
     35.25,
-    87.703125,
+    167.703125,
     56.25
    ]
   ],
   "fg": "#eef1f8",
   "worst": 17.55,
   "wp": "#060916",
-  "where": "phone"
- },
- {
-  "page": "home",
-  "theme": "light",
-  "w": "desktop",
-  "bee": "0",
-  "state": "",
-  "kind": "edge",
-  "label": "Settings button edge",
-  "color": "rgb(95, 104, 134)",
-  "need": 3,
-  "band": [
-   1136,
-   24,
-   1180,
-   68,
-   -3,
-   2,
-   999
-  ],
-  "fg": "#5f6886",
-  "worst": 4.21,
-  "wp": "#dbe0f8",
   "where": "desktop"
  },
  {
@@ -1871,6 +1847,30 @@
   "w": "desktop",
   "bee": "0",
   "state": "",
+  "kind": "edge",
+  "label": "Settings button edge",
+  "color": "rgb(95, 104, 134)",
+  "need": 3,
+  "band": [
+   1136,
+   24,
+   1180,
+   68,
+   -3,
+   2,
+   999
+  ],
+  "fg": "#5f6886",
+  "worst": 4.43,
+  "wp": "#e1e6fa",
+  "where": "desktop"
+ },
+ {
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "0",
+  "state": "",
   "kind": "ring",
   "idx": 25,
   "label": "focus ring: Settings",
@@ -1886,36 +1886,10 @@
    1002
   ],
   "fg": "#1a37b8",
-  "worst": 5.69,
-  "wp": "#c1caf2",
+  "worst": 8.66,
+  "wp": "#f6f8fd",
   "focused": true,
   "where": "desktop"
- },
- {
-  "page": "home",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "ring",
-  "idx": 27,
-  "label": "focus ring: Play with friends",
-  "color": "rgb(26, 55, 184)",
-  "need": 3,
-  "band": [
-   42,
-   403.984375,
-   348,
-   457.984375,
-   3,
-   6,
-   17
-  ],
-  "fg": "#1a37b8",
-  "worst": 6.52,
-  "wp": "#d0d8f9",
-  "focused": true,
-  "where": "phone"
  },
  {
   "page": "home",
@@ -1932,6 +1906,32 @@
    136,
    423.28125,
    293.453125,
+   477.28125,
+   3,
+   6,
+   17
+  ],
+  "fg": "#1a37b8",
+  "worst": 9.2,
+  "wp": "#ffffff",
+  "focused": true,
+  "where": "desktop"
+ },
+ {
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "0",
+  "state": "",
+  "kind": "ring",
+  "idx": 27,
+  "label": "focus ring: Play with friends",
+  "color": "rgb(26, 55, 184)",
+  "need": 3,
+  "band": [
+   305.453125,
+   423.28125,
+   524.859375,
    477.28125,
    3,
    6,
@@ -1974,8 +1974,8 @@
    ]
   ],
   "fg": "#4a5470",
-  "worst": 6.55,
-  "wp": "#ebeffc",
+  "worst": 6.5,
+  "wp": "#ebeefc",
   "where": "phone"
  },
  {
@@ -2043,14 +2043,14 @@
   "rects": [
    [
     1056.53125,
-    447.40625,
+    491.90625,
     1152,
-    465.40625
+    509.90625
    ]
   ],
   "fg": "#4a5470",
-  "worst": 7.2,
-  "wp": "#f8faff",
+  "worst": 7.14,
+  "wp": "#f7f9ff",
   "where": "desktop"
  },
  {
@@ -2072,8 +2072,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.02,
-  "wp": "#ebeffc",
+  "worst": 14.93,
+  "wp": "#ebeefc",
   "where": "phone"
  },
  {
@@ -2095,8 +2095,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.44,
-  "wp": "#eff2fd",
+  "worst": 15.16,
+  "wp": "#ecf0fd",
   "where": "phone"
  },
  {
@@ -2118,8 +2118,77 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.57,
-  "wp": "#f0f3fd",
+  "worst": 15.31,
+  "wp": "#eef1fd",
+  "where": "phone"
+ },
+ {
+  "page": "home",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "214",
+  "color": "rgb(20, 26, 46)",
+  "need": 4.5,
+  "rects": [
+   [
+    314.375,
+    665.6875,
+    342,
+    686.6875
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 15.31,
+  "wp": "#eef1fd",
+  "where": "phone"
+ },
+ {
+  "page": "home",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "Easy",
+  "color": "rgb(20, 26, 46)",
+  "need": 4.5,
+  "rects": [
+   [
+    48,
+    710.1875,
+    85.15625,
+    731.1875
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 15.44,
+  "wp": "#eff2fd",
+  "where": "phone"
+ },
+ {
+  "page": "home",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "187",
+  "color": "rgb(20, 26, 46)",
+  "need": 4.5,
+  "rects": [
+   [
+    315.609375,
+    710.1875,
+    342,
+    731.1875
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 15.44,
+  "wp": "#eff2fd",
   "where": "phone"
  },
  {
@@ -2138,6 +2207,52 @@
     754.6875,
     114.609375,
     775.6875
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 15.57,
+  "wp": "#f0f3fd",
+  "where": "phone"
+ },
+ {
+  "page": "home",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "152",
+  "color": "rgb(20, 26, 46)",
+  "need": 4.5,
+  "rects": [
+   [
+    314.703125,
+    754.6875,
+    342,
+    775.6875
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 15.57,
+  "wp": "#f0f3fd",
+  "where": "phone"
+ },
+ {
+  "page": "home",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "118",
+  "color": "rgb(20, 26, 46)",
+  "need": 4.5,
+  "rects": [
+   [
+    318.390625,
+    799.1875,
+    342,
+    820.1875
    ]
   ],
   "fg": "#141a2e",
@@ -2164,54 +2279,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.69,
-  "wp": "#f1f4fd",
-  "where": "phone"
- },
- {
-  "page": "home",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "118",
-  "color": "rgb(20, 26, 46)",
-  "need": 4.5,
-  "rects": [
-   [
-    318.390625,
-    799.1875,
-    342,
-    820.1875
-   ]
-  ],
-  "fg": "#141a2e",
   "worst": 15.72,
   "wp": "#f2f4fd",
-  "where": "phone"
- },
- {
-  "page": "home",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "187",
-  "color": "rgb(20, 26, 46)",
-  "need": 4.5,
-  "rects": [
-   [
-    315.609375,
-    710.1875,
-    342,
-    731.1875
-   ]
-  ],
-  "fg": "#141a2e",
-  "worst": 15.86,
-  "wp": "#f3f5fe",
   "where": "phone"
  },
  {
@@ -2244,75 +2313,6 @@
   "bee": "0",
   "state": "",
   "kind": "text",
-  "label": "Easy",
-  "color": "rgb(20, 26, 46)",
-  "need": 4.5,
-  "rects": [
-   [
-    48,
-    710.1875,
-    85.15625,
-    731.1875
-   ]
-  ],
-  "fg": "#141a2e",
-  "worst": 15.99,
-  "wp": "#f4f6fe",
-  "where": "phone"
- },
- {
-  "page": "home",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "214",
-  "color": "rgb(20, 26, 46)",
-  "need": 4.5,
-  "rects": [
-   [
-    314.375,
-    665.6875,
-    342,
-    686.6875
-   ]
-  ],
-  "fg": "#141a2e",
-  "worst": 16.51,
-  "wp": "#f8fafe",
-  "where": "phone"
- },
- {
-  "page": "home",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "152",
-  "color": "rgb(20, 26, 46)",
-  "need": 4.5,
-  "rects": [
-   [
-    314.703125,
-    754.6875,
-    342,
-    775.6875
-   ]
-  ],
-  "fg": "#141a2e",
-  "worst": 16.51,
-  "wp": "#f8fafe",
-  "where": "phone"
- },
- {
-  "page": "home",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
   "label": "64",
   "color": "rgb(20, 26, 46)",
   "need": 4.5,
@@ -2325,8 +2325,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 16.51,
-  "wp": "#f8fafe",
+  "worst": 15.86,
+  "wp": "#f3f5fe",
   "where": "phone"
  },
  {
@@ -2348,8 +2348,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 16.52,
-  "wp": "#f8faff",
+  "worst": 16.39,
+  "wp": "#f7f9ff",
   "where": "desktop"
  },
  {
@@ -2371,8 +2371,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 16.52,
-  "wp": "#f8faff",
+  "worst": 16.39,
+  "wp": "#f7f9ff",
   "where": "desktop"
  },
  {
@@ -2394,8 +2394,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 16.52,
-  "wp": "#f8faff",
+  "worst": 16.39,
+  "wp": "#f7f9ff",
   "where": "desktop"
  },
  {
@@ -2424,32 +2424,6 @@
  {
   "page": "race-results",
   "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "ring",
-  "idx": 21,
-  "label": "focus ring: Settings",
-  "color": "rgb(26, 55, 184)",
-  "need": 3,
-  "band": [
-   326,
-   24,
-   370,
-   68,
-   3,
-   6,
-   1002
-  ],
-  "fg": "#1a37b8",
-  "worst": 5.79,
-  "wp": "#c1ccf4",
-  "focused": true,
-  "where": "phone"
- },
- {
-  "page": "race-results",
-  "theme": "light",
   "w": "desktop",
   "bee": "0",
   "state": "",
@@ -2470,6 +2444,32 @@
   "fg": "#1a37b8",
   "worst": 8.52,
   "wp": "#f4f6fd",
+  "focused": true,
+  "where": "desktop"
+ },
+ {
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "0",
+  "state": "",
+  "kind": "ring",
+  "idx": 21,
+  "label": "focus ring: Settings",
+  "color": "rgb(26, 55, 184)",
+  "need": 3,
+  "band": [
+   1136,
+   24,
+   1180,
+   68,
+   3,
+   6,
+   1002
+  ],
+  "fg": "#1a37b8",
+  "worst": 9.2,
+  "wp": "#ffffff",
   "focused": true,
   "where": "desktop"
  },
@@ -2521,8 +2521,8 @@
    ]
   ],
   "fg": "#4a5470",
-  "worst": 6.67,
-  "wp": "#eef1fd",
+  "worst": 6.55,
+  "wp": "#ebeffc",
   "where": "phone"
  },
  {
@@ -2544,8 +2544,8 @@
    ]
   ],
   "fg": "#4a5470",
-  "worst": 6.73,
-  "wp": "#eff2fd",
+  "worst": 6.67,
+  "wp": "#eef1fd",
   "where": "phone"
  },
  {
@@ -2590,8 +2590,8 @@
    ]
   ],
   "fg": "#4a5470",
-  "worst": 7.2,
-  "wp": "#f8faff",
+  "worst": 7.14,
+  "wp": "#f7f9ff",
   "where": "desktop"
  },
  {
@@ -2613,9 +2613,32 @@
    ]
   ],
   "fg": "#1a37b8",
-  "worst": 7.81,
-  "wp": "#e8ecfb",
+  "worst": 7.68,
+  "wp": "#e6eafb",
   "where": "phone"
+ },
+ {
+  "page": "race-results",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "208",
+  "color": "rgb(20, 26, 46)",
+  "need": 3,
+  "rects": [
+   [
+    315.90625,
+    448.015625,
+    356,
+    473.015625
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 14.78,
+  "wp": "#e9edfc",
+  "where": "phone, bee"
  },
  {
   "page": "race-results",
@@ -2636,8 +2659,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.02,
-  "wp": "#ebeffc",
+  "worst": 14.94,
+  "wp": "#ebeefd",
   "where": "phone"
  },
  {
@@ -2659,31 +2682,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.29,
-  "wp": "#edf1fd",
-  "where": "phone"
- },
- {
-  "page": "race-results",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "208",
-  "color": "rgb(20, 26, 46)",
-  "need": 3,
-  "rects": [
-   [
-    315.90625,
-    448.015625,
-    356,
-    473.015625
-   ]
-  ],
-  "fg": "#141a2e",
-  "worst": 15.31,
-  "wp": "#eef1fd",
+  "worst": 15.02,
+  "wp": "#ebeffc",
   "where": "phone"
  },
  {
@@ -2705,8 +2705,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.41,
-  "wp": "#eef2fd",
+  "worst": 15.19,
+  "wp": "#edf0fd",
   "where": "phone"
  },
  {
@@ -2728,8 +2728,31 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.44,
-  "wp": "#eff2fd",
+  "worst": 15.19,
+  "wp": "#edf0fd",
+  "where": "phone"
+ },
+ {
+  "page": "race-results",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "2",
+  "color": "rgb(20, 26, 46)",
+  "need": 3,
+  "rects": [
+   [
+    43.71875,
+    566.828125,
+    58.265625,
+    594.828125
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 15.29,
+  "wp": "#edf1fd",
   "where": "phone"
  },
  {
@@ -2751,8 +2774,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.44,
-  "wp": "#eff2fd",
+  "worst": 15.29,
+  "wp": "#edf1fd",
   "where": "phone"
  },
  {
@@ -2771,6 +2794,29 @@
     690.546875,
     144.265625,
     711.546875
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 15.31,
+  "wp": "#eef1fd",
+  "where": "phone"
+ },
+ {
+  "page": "race-results",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "3",
+  "color": "rgb(20, 26, 46)",
+  "need": 3,
+  "rects": [
+   [
+    43.734375,
+    693.25,
+    58.265625,
+    721.25
    ]
   ],
   "fg": "#141a2e",
@@ -2797,29 +2843,6 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.44,
-  "wp": "#eff2fd",
-  "where": "phone"
- },
- {
-  "page": "race-results",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "3",
-  "color": "rgb(20, 26, 46)",
-  "need": 3,
-  "rects": [
-   [
-    43.734375,
-    693.25,
-    58.265625,
-    721.25
-   ]
-  ],
-  "fg": "#141a2e",
   "worst": 15.57,
   "wp": "#f0f3fd",
   "where": "phone"
@@ -2843,8 +2866,31 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.82,
-  "wp": "#f2f5fd",
+  "worst": 15.69,
+  "wp": "#f1f4fd",
+  "where": "phone"
+ },
+ {
+  "page": "race-results",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "4",
+  "color": "rgb(20, 26, 46)",
+  "need": 3,
+  "rects": [
+   [
+    43.390625,
+    819.671875,
+    58.609375,
+    847.671875
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 15.83,
+  "wp": "#f2f5fe",
   "where": "phone"
  },
  {
@@ -2873,29 +2919,6 @@
  {
   "page": "race-results",
   "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "4",
-  "color": "rgb(20, 26, 46)",
-  "need": 3,
-  "rects": [
-   [
-    43.390625,
-    819.671875,
-    58.609375,
-    847.671875
-   ]
-  ],
-  "fg": "#141a2e",
-  "worst": 15.86,
-  "wp": "#f3f5fe",
-  "where": "phone"
- },
- {
-  "page": "race-results",
-  "theme": "light",
   "w": "desktop",
   "bee": "0",
   "state": "",
@@ -2912,31 +2935,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 16.15,
-  "wp": "#f6f7fe",
-  "where": "desktop"
- },
- {
-  "page": "race-results",
-  "theme": "light",
-  "w": "desktop",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "2",
-  "color": "rgb(20, 26, 46)",
-  "need": 3,
-  "rects": [
-   [
-    265.859375,
-    380.703125,
-    284.140625,
-    416.703125
-   ]
-  ],
-  "fg": "#141a2e",
-  "worst": 16.55,
-  "wp": "#f9faff",
+  "worst": 16.12,
+  "wp": "#f5f7fe",
   "where": "desktop"
  },
  {
@@ -2959,59 +2959,9 @@
    999
   ],
   "fg": "#5f6886",
-  "worst": 4.84,
-  "wp": "#ecf0fd",
+  "worst": 4.8,
+  "wp": "#ebeffc",
   "where": "phone"
- },
- {
-  "page": "round",
-  "theme": "light",
-  "w": "desktop",
-  "bee": "0",
-  "state": "incorrect",
-  "kind": "edge",
-  "label": "Answer field edge",
-  "color": "rgb(176, 47, 40)",
-  "need": 3,
-  "band": [
-   302,
-   459.84375,
-   978,
-   535.84375,
-   -3,
-   2,
-   14
-  ],
-  "fg": "#b02f28",
-  "worst": 5.24,
-  "wp": "#f5e5e4",
-  "where": "desktop, incorrect"
- },
- {
-  "page": "round",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "incorrect",
-  "kind": "ring",
-  "idx": 20,
-  "label": "focus ring: Settings",
-  "color": "rgb(26, 55, 184)",
-  "need": 3,
-  "band": [
-   326,
-   24,
-   370,
-   68,
-   3,
-   6,
-   1002
-  ],
-  "fg": "#1a37b8",
-  "worst": 5.79,
-  "wp": "#c1ccf4",
-  "focused": true,
-  "where": "phone, incorrect"
  },
  {
   "page": "round",
@@ -3019,51 +2969,23 @@
   "w": "phone",
   "bee": "0",
   "state": "",
-  "kind": "ring",
-  "idx": 21,
-  "label": "focus ring: guess",
-  "color": "rgb(26, 55, 184)",
+  "kind": "edge",
+  "label": "Answer field edge",
+  "color": "rgb(35, 70, 216)",
   "need": 3,
   "band": [
    36,
    451.296875,
    354,
    519.296875,
-   3,
-   6,
-   17
+   -3,
+   2,
+   14
   ],
-  "fg": "#1a37b8",
-  "worst": 6.45,
-  "wp": "#cfd7f7",
-  "focused": true,
+  "fg": "#2346d8",
+  "worst": 6.22,
+  "wp": "#ebeffc",
   "where": "phone"
- },
- {
-  "page": "round",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "correct",
-  "kind": "ring",
-  "idx": 22,
-  "label": "focus ring: Hear it again",
-  "color": "rgb(26, 55, 184)",
-  "need": 3,
-  "band": [
-   40,
-   307.796875,
-   205.15625,
-   351.796875,
-   3,
-   6,
-   1002
-  ],
-  "fg": "#1a37b8",
-  "worst": 6.78,
-  "wp": "#d6dcf9",
-  "focused": true,
-  "where": "phone, correct"
  },
  {
   "page": "round",
@@ -3084,6 +3006,84 @@
    3,
    6,
    1002
+  ],
+  "fg": "#1a37b8",
+  "worst": 9.2,
+  "wp": "#ffffff",
+  "focused": true,
+  "where": "desktop"
+ },
+ {
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "0",
+  "state": "",
+  "kind": "ring",
+  "idx": 19,
+  "label": "focus ring: Settings",
+  "color": "rgb(26, 55, 184)",
+  "need": 3,
+  "band": [
+   1136,
+   24,
+   1180,
+   68,
+   3,
+   6,
+   1002
+  ],
+  "fg": "#1a37b8",
+  "worst": 9.2,
+  "wp": "#ffffff",
+  "focused": true,
+  "where": "desktop"
+ },
+ {
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "0",
+  "state": "",
+  "kind": "ring",
+  "idx": 20,
+  "label": "focus ring: Hear it again",
+  "color": "rgb(26, 55, 184)",
+  "need": 3,
+  "band": [
+   308,
+   306.34375,
+   473.15625,
+   350.34375,
+   3,
+   6,
+   1002
+  ],
+  "fg": "#1a37b8",
+  "worst": 9.2,
+  "wp": "#ffffff",
+  "focused": true,
+  "where": "desktop"
+ },
+ {
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "0",
+  "state": "",
+  "kind": "ring",
+  "idx": 21,
+  "label": "focus ring: guess",
+  "color": "rgb(26, 55, 184)",
+  "need": 3,
+  "band": [
+   302,
+   459.84375,
+   978,
+   535.84375,
+   3,
+   6,
+   17
   ],
   "fg": "#1a37b8",
   "worst": 9.2,
@@ -3122,6 +3122,29 @@
   "theme": "light",
   "w": "phone",
   "bee": "0",
+  "state": "correct",
+  "kind": "text",
+  "label": "+14",
+  "color": "rgb(20, 107, 69)",
+  "need": 3,
+  "rects": [
+   [
+    321.453125,
+    415.296875,
+    350,
+    438.296875
+   ]
+  ],
+  "fg": "#146b45",
+  "worst": 5.61,
+  "wp": "#e9eef8",
+  "where": "phone, correct"
+ },
+ {
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
   "state": "incorrect",
   "kind": "text",
   "label": "Missed. The word was “rhythm”.",
@@ -3136,8 +3159,8 @@
    ]
   ],
   "fg": "#b02f28",
-  "worst": 5.62,
-  "wp": "#ecf0fd",
+  "worst": 5.67,
+  "wp": "#edf1fd",
   "where": "phone, incorrect"
  },
  {
@@ -3165,53 +3188,7 @@
    ]
   ],
   "fg": "#146b45",
-  "worst": 5.73,
-  "wp": "#ecf0fd",
-  "where": "phone, correct"
- },
- {
-  "page": "round",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "correct",
-  "kind": "text",
-  "label": "+14",
-  "color": "rgb(20, 107, 69)",
-  "need": 3,
-  "rects": [
-   [
-    321.453125,
-    415.296875,
-    350,
-    438.296875
-   ]
-  ],
-  "fg": "#146b45",
-  "worst": 5.76,
-  "wp": "#edf1f9",
-  "where": "phone, correct"
- },
- {
-  "page": "round",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "correct",
-  "kind": "text",
-  "label": "in a row",
-  "color": "rgb(74, 84, 112)",
-  "need": 4.5,
-  "rects": [
-   [
-    147.53125,
-    653.546875,
-    206.296875,
-    674.546875
-   ]
-  ],
-  "fg": "#4a5470",
-  "worst": 6.66,
+  "worst": 5.78,
   "wp": "#edf1fd",
   "where": "phone, correct"
  },
@@ -3220,23 +3197,23 @@
   "theme": "light",
   "w": "phone",
   "bee": "0",
-  "state": "correct",
+  "state": "",
   "kind": "text",
-  "label": "points",
+  "label": "in a row",
   "color": "rgb(74, 84, 112)",
   "need": 4.5,
   "rects": [
    [
-    62.484375,
-    653.546875,
-    108.796875,
-    674.546875
+    149.859375,
+    630.546875,
+    208.625,
+    651.546875
    ]
   ],
   "fg": "#4a5470",
-  "worst": 6.67,
-  "wp": "#eef1fd",
-  "where": "phone, correct"
+  "worst": 6.62,
+  "wp": "#edf0fd",
+  "where": "phone"
  },
  {
   "page": "round",
@@ -3257,14 +3234,37 @@
    ]
   ],
   "fg": "#4a5470",
-  "worst": 6.73,
-  "wp": "#eff2fd",
+  "worst": 6.66,
+  "wp": "#edf1fd",
   "where": "phone"
  },
  {
   "page": "round",
   "theme": "light",
-  "w": "desktop",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "points",
+  "color": "rgb(74, 84, 112)",
+  "need": 4.5,
+  "rects": [
+   [
+    65.375,
+    630.546875,
+    111.6875,
+    651.546875
+   ]
+  ],
+  "fg": "#4a5470",
+  "worst": 6.66,
+  "wp": "#edf1fd",
+  "where": "phone"
+ },
+ {
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
   "bee": "0",
   "state": "",
   "kind": "text",
@@ -3273,16 +3273,16 @@
   "need": 4.5,
   "rects": [
    [
-    977.203125,
-    124.75,
-    984,
-    142.75
+    347.203125,
+    121.140625,
+    354,
+    139.140625
    ]
   ],
   "fg": "#4a5470",
-  "worst": 7.2,
-  "wp": "#f8faff",
-  "where": "desktop"
+  "worst": 6.71,
+  "wp": "#eef2fd",
+  "where": "phone"
  },
  {
   "page": "round",
@@ -3326,9 +3326,32 @@
    ]
   ],
   "fg": "#1a37b8",
-  "worst": 8.01,
-  "wp": "#ebeffc",
+  "worst": 7.96,
+  "wp": "#ebeefc",
   "where": "phone"
+ },
+ {
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "correct",
+  "kind": "text",
+  "label": "Spell it",
+  "color": "rgb(20, 26, 46)",
+  "need": 4.5,
+  "rects": [
+   [
+    36,
+    411.796875,
+    94.203125,
+    432.796875
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 14.92,
+  "wp": "#ebeefb",
+  "where": "phone, correct"
  },
  {
   "page": "round",
@@ -3355,8 +3378,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.02,
-  "wp": "#ebeffc",
+  "worst": 14.93,
+  "wp": "#ebeefc",
   "where": "phone"
  },
  {
@@ -3378,77 +3401,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.16,
-  "wp": "#ecf0fd",
-  "where": "phone"
- },
- {
-  "page": "round",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "correct",
-  "kind": "text",
-  "label": "4",
-  "color": "rgb(20, 26, 46)",
-  "need": 3,
-  "rects": [
-   [
-    130.796875,
-    650.546875,
-    143.53125,
-    674.546875
-   ]
-  ],
-  "fg": "#141a2e",
-  "worst": 15.29,
-  "wp": "#edf1fd",
-  "where": "phone, correct"
- },
- {
-  "page": "round",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "correct",
-  "kind": "text",
-  "label": "Skip this word",
-  "color": "rgb(20, 26, 46)",
-  "need": 4.5,
-  "rects": [
-   [
-    240.265625,
-    653.546875,
-    346,
-    674.546875
-   ]
-  ],
-  "fg": "#141a2e",
-  "worst": 15.29,
-  "wp": "#edf1fd",
-  "where": "phone, correct"
- },
- {
-  "page": "round",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "Spell it",
-  "color": "rgb(20, 26, 46)",
-  "need": 4.5,
-  "rects": [
-   [
-    36,
-    411.796875,
-    94.203125,
-    432.796875
-   ]
-  ],
-  "fg": "#141a2e",
-  "worst": 15.31,
-  "wp": "#eef1fd",
+  "worst": 15.02,
+  "wp": "#ebeffc",
   "where": "phone"
  },
  {
@@ -3470,78 +3424,9 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.44,
-  "wp": "#eff2fd",
+  "worst": 15.19,
+  "wp": "#edf0fd",
   "where": "phone"
- },
- {
-  "page": "round",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "",
-  "kind": "text",
-  "label": "58",
-  "color": "rgb(20, 26, 46)",
-  "need": 3,
-  "rects": [
-   [
-    36,
-    627.546875,
-    61.375,
-    651.546875
-   ]
-  ],
-  "fg": "#141a2e",
-  "worst": 15.44,
-  "wp": "#eff2fd",
-  "where": "phone"
- },
- {
-  "page": "round",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "correct",
-  "kind": "text",
-  "label": "72",
-  "color": "rgb(20, 26, 46)",
-  "need": 3,
-  "rects": [
-   [
-    36,
-    650.546875,
-    58.484375,
-    674.546875
-   ]
-  ],
-  "fg": "#141a2e",
-  "worst": 15.57,
-  "wp": "#f0f3fd",
-  "where": "phone, correct"
- },
- {
-  "page": "round",
-  "theme": "light",
-  "w": "phone",
-  "bee": "0",
-  "state": "incorrect",
-  "kind": "text",
-  "label": "0",
-  "color": "rgb(20, 26, 46)",
-  "need": 3,
-  "rects": [
-   [
-    133.6875,
-    627.546875,
-    147,
-    651.546875
-   ]
-  ],
-  "fg": "#141a2e",
-  "worst": 15.57,
-  "wp": "#f0f3fd",
-  "where": "phone, incorrect"
  },
  {
   "page": "round",
@@ -3562,9 +3447,124 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 15.86,
-  "wp": "#f3f5fe",
+  "worst": 15.19,
+  "wp": "#edf0fd",
   "where": "phone"
+ },
+ {
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "Skip this word",
+  "color": "rgb(20, 26, 46)",
+  "need": 4.5,
+  "rects": [
+   [
+    240.265625,
+    630.546875,
+    346,
+    651.546875
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 15.19,
+  "wp": "#edf0fd",
+  "where": "phone"
+ },
+ {
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "incorrect",
+  "kind": "text",
+  "label": "0",
+  "color": "rgb(20, 26, 46)",
+  "need": 3,
+  "rects": [
+   [
+    133.6875,
+    627.546875,
+    147,
+    651.546875
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 15.19,
+  "wp": "#edf0fd",
+  "where": "phone, incorrect"
+ },
+ {
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "",
+  "kind": "text",
+  "label": "58",
+  "color": "rgb(20, 26, 46)",
+  "need": 3,
+  "rects": [
+   [
+    36,
+    627.546875,
+    61.375,
+    651.546875
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 15.31,
+  "wp": "#eef1fd",
+  "where": "phone"
+ },
+ {
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "correct",
+  "kind": "text",
+  "label": "4",
+  "color": "rgb(20, 26, 46)",
+  "need": 3,
+  "rects": [
+   [
+    130.796875,
+    650.546875,
+    143.53125,
+    674.546875
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 15.41,
+  "wp": "#eef2fd",
+  "where": "phone, correct"
+ },
+ {
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "0",
+  "state": "correct",
+  "kind": "text",
+  "label": "72",
+  "color": "rgb(20, 26, 46)",
+  "need": 3,
+  "rects": [
+   [
+    36,
+    650.546875,
+    58.484375,
+    674.546875
+   ]
+  ],
+  "fg": "#141a2e",
+  "worst": 15.44,
+  "wp": "#eff2fd",
+  "where": "phone, correct"
  },
  {
   "page": "round",
@@ -3608,8 +3608,8 @@
    ]
   ],
   "fg": "#141a2e",
-  "worst": 16.39,
-  "wp": "#f7f9ff",
+  "worst": 16.26,
+  "wp": "#f6f8ff",
   "where": "desktop"
  },
  {

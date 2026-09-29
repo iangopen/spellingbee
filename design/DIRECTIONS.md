@@ -5,12 +5,14 @@ Status: **direction chosen (Ian, 2026-09-28):**
 - a **glowing, decoration-only blue honeycomb** behind the whole app
 - **C's race lanes** for race results
 
-Two choices are still pending:
-- the background variant: static, shimmer or reactive
-- bee or no bee
+**Final picks (Ian, 2026-09-28):**
+- the **slow shimmer** background
+- at the **old live site's cell size** (28×49px tile)
+- **with the bee**
+- **dark as the default theme**
 
-Both are on `prototypes/blue-ribbon-glow/compare.html`, and that folder's
-README has the full notes and verification. Nothing here touches `src/`, and
+See `prototypes/blue-ribbon-glow/` and `PHASE3.md` (design system and build
+plan). Nothing here touches `src/`, and
 the live game is unchanged.
 
 The three directions below are kept as the record of what was considered.

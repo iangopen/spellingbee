@@ -1,6 +1,6 @@
 static   home   frames=240 median=16.7ms p95=16.8ms >25ms=0 | animated props: opacity,transform | hidden tab: data-paused=true, bg animations still running=0/0
 static   round  frames=241 median=16.7ms p95=16.7ms >25ms=0 | animated props: opacity,transform | hidden tab: data-paused=true, bg animations still running=0/0
 shimmer  home   frames=240 median=16.7ms p95=16.8ms >25ms=0 | animated props: opacity,transform | hidden tab: data-paused=true, bg animations still running=0/3
-shimmer  round  frames=240 median=16.7ms p95=16.7ms >25ms=0 | animated props: opacity,transform | hidden tab: data-paused=true, bg animations still running=0/3
-reactive home   frames=241 median=16.7ms p95=16.8ms >25ms=0 | animated props: opacity,transform | hidden tab: data-paused=true, bg animations still running=0/0
-reactive round  frames=241 median=16.7ms p95=16.7ms >25ms=0 | animated props: opacity,transform | hidden tab: data-paused=true, bg animations still running=0/0
+shimmer  round  frames=240 median=16.7ms p95=16.8ms >25ms=0 | animated props: opacity,transform | hidden tab: data-paused=true, bg animations still running=0/3
+reactive home   frames=239 median=16.7ms p95=16.7ms >25ms=1 | animated props: opacity,transform | hidden tab: data-paused=true, bg animations still running=0/0
+reactive round  frames=237 median=16.7ms p95=16.7ms >25ms=1 | animated props: opacity,transform | hidden tab: data-paused=true, bg animations still running=0/0

@@ -23,7 +23,7 @@
 :root {
   --hex-tile: none;          /* set by honeycomb.js */
   --hex-tile-bright: none;
-  --hex-size: 64px 110.85px;
+  --hex-size: 28px 49px;   /* the old live site's tile (main src/index.css:181-189) */
 }
 
 /* ---- base gradient ---- */

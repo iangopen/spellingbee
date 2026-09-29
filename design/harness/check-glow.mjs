@@ -47,15 +47,20 @@ const shots = readdirSync(resolve(DIR, "screens")).filter((f) => f.endsWith(".jp
 let yellowPx = 0, totalPx = 0; const hits = [];
 for (const f of shots) {
   const b64 = readFileSync(resolve(DIR, "screens", f)).toString("base64");
-  const r = await page.evaluate(async (b64) => {
+  // Count inside the page and return only the totals; shipping millions of
+  // pixel values back to Node was what made this check crawl.
+  const { n, px } = await page.evaluate(async ({ b64, isYellowSrc, hslSrc }) => {
+    const hsl = new Function(`return ${hslSrc}`)();
+    const isYellow = new Function("hsl", `return ${isYellowSrc}`)(hsl);
     const img = await new Promise((ok) => { const i = new Image(); i.onload = () => ok(i); i.src = "data:image/jpeg;base64," + b64; });
     const c = document.createElement("canvas"); c.width = img.width; c.height = img.height;
     const x = c.getContext("2d"); x.drawImage(img, 0, 0);
-    return Array.from(x.getImageData(0, 0, img.width, img.height).data);
-  }, b64);
-  let n = 0;
-  for (let k = 0; k < r.length; k += 4) if (isYellow(r[k], r[k + 1], r[k + 2])) n++;
-  yellowPx += n; totalPx += r.length / 4;
+    const d = x.getImageData(0, 0, img.width, img.height).data;
+    let n = 0;
+    for (let k = 0; k < d.length; k += 4) if (isYellow(d[k], d[k + 1], d[k + 2])) n++;
+    return { n, px: d.length / 4 };
+  }, { b64, isYellowSrc: isYellow.toString(), hslSrc: hsl.toString() });
+  yellowPx += n; totalPx += px;
   if (n) hits.push(`${f}: ${n}`);
 }
 log(`Screenshot pixels scanned: ${totalPx.toLocaleString("en")} in ${shots.length} screenshots. Yellow/gold/amber pixels: ${yellowPx}${hits.length ? "\n  " + hits.join("\n  ") : ""}`);
@@ -64,7 +69,7 @@ log(`Screenshot pixels scanned: ${totalPx.toLocaleString("en")} in ${shots.lengt
 for (const p of ["home", "round", "race-results", "avatars"]) for (const theme of ["dark", "light"]) {
   const ctx = await browser.newContext({ colorScheme: theme });
   const pg = await ctx.newPage();
-  await pg.goto(`${pathToFileURL(resolve(DIR, p + ".html")).href}?bg=shimmer&bee=1`, { waitUntil: "networkidle" });
+  await pg.goto(`${pathToFileURL(resolve(DIR, p + ".html")).href}?bg=shimmer&bee=1&theme=${theme}`, { waitUntil: "networkidle" });
   const r = await pg.evaluate(() => {
     const bg = document.querySelector(".bg");
     const hexShapes = [...document.querySelectorAll("body *")].filter((el) => !bg.contains(el) && /polygon/.test(getComputedStyle(el).clipPath || "")).length;

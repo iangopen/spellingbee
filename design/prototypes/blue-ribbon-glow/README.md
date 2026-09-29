@@ -10,9 +10,12 @@ screenshots.
 - a decorative blue honeycomb background
 - C's race lanes for race results
 
-Still pending, both on this page:
-- the background variant (static, shimmer or reactive)
-- bee or no bee
+**Final picks (Ian, 2026-09-28):**
+- slow shimmer, at the old live site's cell size (a 28×49px tile, from `main` src/index.css:181-189)
+- with the bee
+- dark as the default theme
+
+These are now the pages' defaults (no parameters needed). The design system and build plan are in `design/PHASE3.md`.
 
 ## Files
 
@@ -25,7 +28,7 @@ Still pending, both on this page:
 | `style.css` | Tokens (dark and light), lit glass panels, focus, buttons, the answer moments, race lanes. |
 | `art.js` | Original sketches: the rosette (tick or bee centre), the bee mascot, and the bee contestants for the existing eight avatar keys. |
 | `params.js` | Turns URL parameters into `<html>` attributes before first paint. |
-| `screens/` | 52 screenshots (`design/harness/shoot-glow.mjs`); `screens/index.js` feeds the gallery. |
+| `screens/` | 64 screenshots, including `final--*`: the three screens as picked, at both widths and in both themes (`design/harness/shoot-glow.mjs`); `screens/index.js` feeds the gallery. |
 | `contrast.md` / `contrast.json` | The contrast table (`design/harness/measure.mjs`). |
 | `perf.txt` | Phone performance (`design/harness/perf-glow.mjs`). |
 | `checks.txt` | The no-yellow and decoration-only checks (`design/harness/check-glow.mjs`). |
@@ -41,7 +44,7 @@ Still pending, both on this page:
   Checked on every page (`checks.txt`).
 - **Never yellow:**
   - 0 yellow, gold, amber or honey colour literals in the source
-  - 0 such pixels across 35.2M screenshot pixels
+  - 0 such pixels across 43.3M screenshot pixels (64 screenshots)
 
   The detector's hue range (32–70°) is deliberately wide. It flags NYT's
   `#f7da21` and today's honey `#e8a63d`, and even an earlier, narrower version
@@ -132,11 +135,16 @@ unchanged.
   behind it** with the honeycomb lit to its peak everywhere. That covers both
   themes, both widths, bee and no bee, and the playing, correct and missed
   states (984 measurements).
-  - Minimums: body text 5.62:1, large text 5.76:1, control edges 4.1:1, focus
-    rings 4.86:1 (measured focused).
+  - At the old cell size, minimums are: body text 5.67:1, large text 5.61:1, control edges 4.1:1, focus
+    rings 8.52:1 (measured focused). Earlier runs gave 4.86:1 for the rings
+    because they sampled halos still fading in; zeroing transitions under
+    reduced motion made the measurement deterministic.
   - For light text, "worst" is the brightest glow; for dark text it's the
     darkest line.
-- **Reduced motion:** 8 of 8 stills match static (the `still-*` screenshots).
+- **Reduced motion:** 8 of 8 stills match static (the `still-*` screenshots), in three consecutive full runs.
+  - The prototype now has the app's single global reduced-motion block, which zeroes **transitions** as well as animations.
+  - Before that, hover and focus glows still faded for reduced-motion users.
+  - That was most likely behind an intermittent still mismatch: 2 of about 9 runs, on different screens each time, around the answer field and hovered buttons. The fix was followed by 3 clean full runs; that supports the explanation but doesn't strictly prove it.
 - **Phone** (`perf.txt`), 390×844 with the CPU slowed 4× and all three
   variants live:
   - median frame 16.7ms, 95th percentile 16.8ms, 0 frames over 25ms

@@ -88,6 +88,18 @@ svg { width: 1.15em; height: 1.15em; flex: none; }
    on both sides, whatever glow sits behind the control. */
 :root :is(a, button, input, [tabindex]):focus-visible { outline: 3px solid var(--ring); outline-offset: 3px; box-shadow: 0 0 0 7px var(--focus-moat), 0 0 0 13px var(--glow-soft); }
 
+/* Reduced motion: the same single global block the app already has
+   (src/index.css). It zeroes TRANSITIONS as well as animations, so hover and
+   focus glows snap instead of fading. Every state is still shown. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ---------------- panels: softly lit glass ---------------- */
 .panel {
   position: relative; background: var(--panel); border-radius: var(--r-lg);

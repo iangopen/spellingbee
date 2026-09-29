@@ -69,7 +69,7 @@ const rows = [];
 for (const r of RUNS) {
   const ctx = await browser.newContext({ viewport: VIEWS[r.w], deviceScaleFactor: 1, colorScheme: r.theme, reducedMotion: "reduce" });
   const p = await ctx.newPage();
-  const q = new URLSearchParams({ bg: "shimmer", peak: "1", bee: r.bee, ...(r.state ? { state: r.state } : {}) });
+  const q = new URLSearchParams({ bg: "shimmer", peak: "1", bee: r.bee, theme: r.theme, ...(r.state ? { state: r.state } : {}) });
   await p.goto(`${pathToFileURL(resolve(DIR, r.page + ".html")).href}?${q}`, { waitUntil: "networkidle" });
   await p.evaluate(() => document.fonts.ready);
   await p.waitForTimeout(300);

@@ -9,7 +9,7 @@
     (function () {
       const u = new URLSearchParams(location.search), r = document.documentElement;
       r.dataset.bg = ["static", "shimmer", "reactive"].includes(u.get("pagebg")) ? u.get("pagebg") : "static";
-      if (["dark", "light"].includes(u.get("theme"))) r.dataset.theme = u.get("theme");
+      r.dataset.theme = u.get("theme") === "light" ? "light" : "dark";
     })();
   </script>
   <link rel="stylesheet" href="honeycomb.css" />
@@ -51,7 +51,7 @@
       <p>Direction A with a decorative blue honeycomb and C's race lanes. Every frame below is the live prototype: click, tab and type in it. On the round screen, type <code>rhythm</code> and press Enter for the correct moment, or anything else to ring the bell.</p>
       <form class="controls" id="controls">
         <fieldset><legend>Theme</legend>
-          <label><input type="radio" name="theme" value="" /> Follow system</label>
+          <label><input type="radio" name="theme" value="" /> Default (dark)</label>
           <label><input type="radio" name="theme" value="dark" /> Dark</label>
           <label><input type="radio" name="theme" value="light" /> Light</label>
         </fieldset>
