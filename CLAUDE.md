@@ -909,8 +909,14 @@ Other changes this session:
   logos) was removed.
 - The README's Node floor is 22.12 because Vitest 5 requires it.
 
-Open TODOs (Ian only):
-- The deletion contact in PRIVACY.md (`TODO(Ian): contact email`).
-- The README has no user or games-played numbers. Add them only from real data.
+**Privacy contact is GitHub Issues** (2026-09-29): PRIVACY.md sends deletion and
+privacy requests to https://github.com/iangopen/spellingbee/issues, asks people
+to post nothing beyond their guest display name, and keeps Ian's email private.
+No published file (README, PRIVACY, LICENSE, public/, index.html, dist) may
+contain TODO/TBD/FIXME; leave unfinished notes here in CLAUDE.md instead.
+
+Open notes (Ian only, deliberately NOT in any published file):
+- The README has no user or games-played numbers. There is no real data yet;
+  add them only from real data.
 - When the redesign merges, PRIVACY.md and the README say "Spelling Race" and
   must be renamed with it. The screenshots will also need to be retaken.
