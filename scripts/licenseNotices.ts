@@ -18,7 +18,9 @@ import type { Plugin } from 'vite'
 const LICENCE_FILE = /^(licen[cs]e|copying)(\.(md|txt))?$/i
 
 function packageRoot(moduleId: string): string | null {
-  const id = moduleId.replace(/^\0/, '').split('?')[0].replace(/\\/g, '/')
+  // Rollup marks virtual modules with a leading NUL.
+  const raw = moduleId.startsWith('\0') ? moduleId.slice(1) : moduleId
+  const id = raw.split('?')[0].replace(/\\/g, '/')
   const at = id.lastIndexOf('/node_modules/')
   if (at === -1) return null
   const rest = id.slice(at + '/node_modules/'.length).split('/')
