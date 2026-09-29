@@ -960,6 +960,11 @@ the live site.
 
 ### Open
 - Stage 1 of `design/PHASE3.md` (tokens and the dark default) is next.
+  Since the 2026-09-29 audit follow-up (merged from `main`), `.text-input`
+  uses `--field-edge` plus a honey `:focus-visible` outline. The new palette
+  must define `--field-edge` at >=3:1 against every surface behind a text field
+  (measure with `measure.mjs`), or replace it with an equivalent. Don't fold it
+  back into `--border`.
 - A real-phone check of the shimmer (in stage 7). The perf numbers so far are
   headless Chrome with the CPU throttled 4×. The static glow is the fallback.
 - The name itself: a distinct look lowers the risk of being mistaken for NYT's

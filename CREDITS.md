@@ -28,3 +28,11 @@ The licence ships inside the package.
 The word list comes from SCOWL via the MIT-licensed `wordlist-english`
 package. Sourcing, licences and the definition rule are documented in
 `supabase/WORDLIST_SOURCES.md`.
+
+## In the built site
+
+The build writes `third-party-licenses.txt` next to `index.html` (served at
+`/spellingbee/third-party-licenses.txt`): every npm package that lands in the
+bundle with its licence text, the fonts' OFL texts, and SCOWL's notice
+(`licenses/SCOWL-Copyright.txt`). See `scripts/licenseNotices.ts`; a bundled
+package without a licence file fails the build.
