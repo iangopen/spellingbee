@@ -1,6 +1,6 @@
 # Privacy
 
-Last checked against the code: 2026-09-29.
+Last updated: 2026-09-29. Last checked against the code: 2026-09-29.
 
 Spelling Race is a free spelling game. It has no accounts, ads or analytics, and the app sets no cookies. It is not directed at children under 13.
 
@@ -18,4 +18,4 @@ Spelling Race is a free spelling game. It has no accounts, ads or analytics, and
 
 **Deletion.** Guesses are deleted within 10 minutes of a game ending. Rooms, with their scores and results, are deleted 30 days after the room was created. Your guest ID and its session are deleted once the ID is more than 30 days old and no game still refers to it. Supabase and Cloudflare keep their own request logs under their own policies.
 
-To have your data deleted sooner, contact TODO(Ian): contact email. Include your display name and room code.
+To have your data deleted sooner, or to ask a privacy question, open an issue at https://github.com/iangopen/spellingbee/issues. Include your guest display name and room code, but please don't post any other personal details in the issue, because issues are public.
