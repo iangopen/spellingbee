@@ -1,7 +1,19 @@
 # Spelling Bee: brand basics and three visual directions
 
-Status: **waiting for your pick** (2026-09-28). You can mix directions. Nothing
-here touches `src/`. The live game is unchanged.
+Status: **direction chosen (Ian, 2026-09-28):**
+- **Blue Ribbon (A)**, as the base
+- a **glowing, decoration-only blue honeycomb** behind the whole app
+- **C's race lanes** for race results
+
+Two choices are still pending:
+- the background variant: static, shimmer or reactive
+- bee or no bee
+
+Both are on `prototypes/blue-ribbon-glow/compare.html`, and that folder's
+README has the full notes and verification. Nothing here touches `src/`, and
+the live game is unchanged.
+
+The three directions below are kept as the record of what was considered.
 
 ## Brand basics
 
@@ -35,7 +47,8 @@ set.
   light and dark themes that follow the OS.
 
 **What goes:**
-- the honeycomb wallpaper
+- the *yellow* honeycomb wallpaper. It's replaced by a blue, glowing,
+  decoration-only honeycomb (Ian, 2026-09-28).
 - hexagon-clipped tier buttons
 - the hexagon favicon
 - honey yellow as the lead colour
@@ -43,9 +56,21 @@ set.
 
 ## Trademark distance: the rules every direction follows
 
-- No honeycomb letter board, no seven-hexagon layout, no hexagon grids,
-  hexagon buttons or hexagon logo. **Answers stay typed into a text field**,
-  as they are today.
+- No honeycomb letter board, no seven-hexagon layout, and no hexagon buttons
+  or hexagon logo. **Answers stay typed into a text field**, as they are today.
+- **Amended 2026-09-28 (Ian's decision):** a honeycomb is allowed as
+  **background decoration only**. It must be:
+  - blue and never yellow
+  - behind everything, `aria-hidden`, with no pointer events
+  - free of any text, letters or controls
+
+  It is never a letter board or an answer layout. The reasoning: a blue,
+  decorative honeycomb reads as this game's own, while NYT's yellow hexagon
+  letter board is theirs. `prototypes/blue-ribbon-glow/checks.txt` verifies
+  every one of these points.
+
+  Honest cost: hexagons are closer to NYT's imagery than Direction A alone
+  was.
 - No NYT Games look:
   - no yellow-and-grey palette (yellow isn't the accent of any direction)
   - no serif newspaper-style wordmark (every direction uses a sans display
@@ -54,8 +79,9 @@ set.
 - The name is always shown as a descriptive title alongside a **distinct mark**
   (rosette, clover or striped bee). It is never styled to echo another
   product's wordmark.
-- Bees, hives, flowers and honey remain fine as *themes*. Honey can appear as
-  an illustration colour. It just isn't the brand colour.
+- Bees, hives, flowers and honey remain fine as *themes*. In the chosen
+  direction **nothing is yellow**, and that includes the honey-drop and the bee
+  illustrations, which are blue.
 
 This lowers the risk of the look being mistaken for NYT's, but **it does not
 clear the name itself**: NYT holds "Spelling Bee" as a mark for its game (§C10

@@ -9,7 +9,8 @@ and oxlint reports nothing here.
 | `audit/screens/` | The current app: 16 screens × desktop/phone × dark/light (64 PNGs) |
 | `audit/current-palette.json` | The current colour pairs, measured |
 | `DIRECTIONS.md` | Phase 2: brand basics and three directions (A Blue Ribbon, B Clover Field, C Bee Line), with contrast, trademark notes and a recommendation |
-| `prototypes/<direction>/` | Static prototypes: home, round, race-results. Open straight from disk. |
+| **`prototypes/blue-ribbon-glow/`** | **The chosen direction**: Blue Ribbon + glowing blue honeycomb + C's race lanes. Start at `compare.html`; the folder's README has the notes and verification. |
+| `prototypes/<direction>/` | Phase 2 static prototypes (home, round, race-results) of A, B and C, kept as the record. |
 | `prototypes/screens/` | 3 directions × 3 screens × desktop/phone × light/dark (36 PNGs) |
 | `prototypes/palettes.json` + `contrast-report.txt` | Every palette pair and its measured WCAG ratio (69 pairs, 0 failing) |
 | `harness/` | Tooling. See below. |
@@ -20,6 +21,7 @@ The harness tooling:
 |---|---|
 | `vite.config.ts`, `main.tsx`, `mock.ts`, `stubs/` | Renders the REAL `src/` screens with mocked props. Room, Supabase and session modules are stubbed, so no guest user is ever created. |
 | `shoot.mjs` | Takes the Playwright screenshots. |
+| `shoot-glow.mjs`, `measure.mjs`, `perf-glow.mjs`, `check-glow.mjs` | Screenshots, worst-pixel contrast, phone performance, and no-yellow / decoration-only checks for the glow prototypes. |
 | `contrast.mjs` | Checks the WCAG ratios. |
 | `icons.mjs` | Emits the lucide icons inline for the prototypes. |
 

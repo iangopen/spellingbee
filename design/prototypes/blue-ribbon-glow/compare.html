@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en" data-bg="static" data-bee="0">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blue Ribbon glow: compare</title>
+  <script>
+    // Choices live in the URL (?theme=&pagebg=), so they survive reloads.
+    (function () {
+      const u = new URLSearchParams(location.search), r = document.documentElement;
+      r.dataset.bg = ["static", "shimmer", "reactive"].includes(u.get("pagebg")) ? u.get("pagebg") : "static";
+      if (["dark", "light"].includes(u.get("theme"))) r.dataset.theme = u.get("theme");
+    })();
+  </script>
+  <link rel="stylesheet" href="honeycomb.css" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .cmp { max-width: 1400px; margin: 0 auto; padding: 24px 20px 64px; }
+    .cmp h1 { font: 800 clamp(2rem, 4vw, 3rem)/1 var(--display); letter-spacing: -0.03em; margin: 0 0 8px; }
+    .cmp h2 { font: 800 1.5rem/1.1 var(--display); margin: 0 0 6px; }
+    .cmp p { margin: 0 0 12px; color: var(--muted); max-width: 75ch; }
+    .cmp a { color: var(--accent-strong); }
+    .cmp section { padding: 22px 24px; margin-top: 22px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 18px 28px; margin-top: 14px; }
+    .controls fieldset { border: 0; padding: 0; margin: 0; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .controls legend { float: left; margin-right: 8px; font-weight: 700; }
+    .controls label { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: var(--r-pill); border: 1.5px solid var(--edge); cursor: pointer; }
+    .controls input { accent-color: var(--accent); width: 18px; height: 18px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 14px; }
+    .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 14px; }
+    .cell h3, .cmp h3 { font: 700 1.05rem var(--display); margin: 0 0 4px; }
+    .cell p { font-size: 0.92rem; margin: 0 0 10px; }
+    .frame { position: relative; width: 100%; aspect-ratio: 1280 / 800; overflow: hidden; border-radius: var(--r-md); box-shadow: inset 0 0 0 1px var(--panel-edge); background: var(--bg-bottom); }
+    .frame.phone { aspect-ratio: 390 / 844; width: 260px; }
+    .frame.sheet-frame { aspect-ratio: 1100 / 150; }
+    .frame iframe { position: absolute; left: 0; top: 0; width: 1280px; height: 800px; border: 0; transform-origin: 0 0; }
+    .frame.phone iframe { width: 390px; height: 844px; }
+    .frame.sheet-frame iframe { width: 1100px; height: 150px; }
+    .row-phones { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; }
+    .shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 12px; }
+    .shots a { display: block; color: var(--text); text-decoration: none; font-size: 0.8rem; overflow-wrap: anywhere; }
+    .shots img { width: 100%; height: 140px; object-fit: cover; object-position: top; border-radius: var(--r-sm); display: block; margin-bottom: 4px; }
+    .checks { padding-left: 1.2em; margin: 8px 0 0; display: grid; gap: 6px; }
+    @media (max-width: 900px) { .grid3, .grid2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="cmp">
+    <header class="panel" style="padding: 24px">
+      <h1>Blue Ribbon, glowing</h1>
+      <p>Direction A with a decorative blue honeycomb and C's race lanes. Every frame below is the live prototype: click, tab and type in it. On the round screen, type <code>rhythm</code> and press Enter for the correct moment, or anything else to ring the bell.</p>
+      <form class="controls" id="controls">
+        <fieldset><legend>Theme</legend>
+          <label><input type="radio" name="theme" value="" /> Follow system</label>
+          <label><input type="radio" name="theme" value="dark" /> Dark</label>
+          <label><input type="radio" name="theme" value="light" /> Light</label>
+        </fieldset>
+        <fieldset><legend>This page's background</legend>
+          <label><input type="radio" name="pagebg" value="static" /> Static</label>
+          <label><input type="radio" name="pagebg" value="shimmer" /> Shimmer</label>
+          <label><input type="radio" name="pagebg" value="reactive" /> Reactive</label>
+        </fieldset>
+      </form>
+    </header>
+
+    <section class="panel" aria-labelledby="s1">
+      <h2 id="s1">1. Background variations</h2>
+      <p>The same home screen with three backgrounds (no bee). The moving light animates only transform and opacity, pauses when the tab is hidden, and is removed under reduced motion, which leaves exactly the static version.</p>
+      <div class="grid3">
+        <div class="cell"><h3>Static glow</h3><p>Gradient, glowing cell edges, cells fading toward the edges. No motion.</p><div class="frame" data-src="home.html" data-q="bg=static&bee=0"></div></div>
+        <div class="cell"><h3>Slow shimmer</h3><p>A soft band of brighter cells crosses every 18 seconds, then rests. It ramps in slowly and never flashes.</p><div class="frame" data-src="home.html" data-q="bg=shimmer&bee=0"></div></div>
+        <div class="cell"><h3>Reactive glow</h3><p>A soft light follows the mouse. On touch it rests behind the focused control and glides when focus moves.</p><div class="frame" data-src="home.html" data-q="bg=reactive&bee=0"></div></div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="s2">
+      <h2 id="s2">2. Bee or no bee</h2>
+      <p>No bee: the rosette carries a tick, and the avatars are placards with the eight glyphs. Bee: an original blue bee mascot sits on the hero panel and inside the rosette, and every contestant is a bee (the queen wears a crown, the drone has big eyes, the wasp is slim). The avatar keys don't change; only the art does.</p>
+      <div class="grid2">
+        <div class="cell"><h3>No bee: home</h3><div class="frame" data-src="home.html" data-q="bee=0"></div></div>
+        <div class="cell"><h3>With bee: home</h3><div class="frame" data-src="home.html" data-q="bee=1"></div></div>
+        <div class="cell"><h3>No bee: race results</h3><div class="frame" data-src="race-results.html" data-q="bee=0"></div></div>
+        <div class="cell"><h3>With bee: race results</h3><div class="frame" data-src="race-results.html" data-q="bee=1"></div></div>
+      </div>
+      <h3 style="margin-top:18px">All eight avatars</h3>
+      <p>No bee, then bee contestants.</p>
+      <div class="frame sheet-frame" data-w="1100" data-src="avatars.html" data-q="bee=0"></div>
+      <div class="frame sheet-frame" data-w="1100" data-src="avatars.html" data-q="bee=1" style="margin-top:10px"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="s3">
+      <h2 id="s3">3. The round and its two moments</h2>
+      <div class="grid3">
+        <div class="cell"><h3>Mid-answer</h3><p>The field glows on focus. Try typing and pressing Enter.</p><div class="frame" data-src="round.html" data-q=""></div></div>
+        <div class="cell"><h3>Correct</h3><p>The field lights up green, the placard glows, and +14 floats up.</p><div class="frame" data-src="round.html" data-q="state=correct"></div></div>
+        <div class="cell"><h3>Missed</h3><p>The bell rings, the field gives one short shake, and the word is shown.</p><div class="frame" data-src="round.html" data-q="state=incorrect"></div></div>
+      </div>
+      <h3 style="margin-top:18px">Phone width</h3>
+      <div class="row-phones">
+        <div class="frame phone" data-src="home.html" data-q="bee=1&bg=shimmer"></div>
+        <div class="frame phone" data-src="round.html" data-q="bg=shimmer"></div>
+        <div class="frame phone" data-src="race-results.html" data-q="bee=1&bg=shimmer"></div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="s4">
+      <h2 id="s4">4. Checks</h2>
+      <ul class="checks">
+        <li><b>Contrast:</b> every text element, control edge and focus ring is measured against the worst pixel behind it, with the glow at its peak, in both themes. 152 pairs, 0 failing: <a href="contrast.md">contrast.md</a>.</li>
+        <li><b>Focus rings:</b> measured in the real focused state. Each ring sits in a 7px solid moat, so no glow ever touches it.</li>
+        <li><b>Reduced motion:</b> the shimmer and reactive variants render identically to the static background (8 of 8 comparisons).</li>
+        <li><b>Phone:</b> at 390px with the CPU slowed 4×, the median frame is 16.7 ms, no frame is over 25 ms, only transform and opacity animate, and all background animation pauses in a hidden tab: <a href="perf.txt">perf.txt</a>.</li>
+        <li><b>No yellow and no letter layout:</b> <a href="checks.txt">checks.txt</a>.</li>
+      </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="s5">
+      <h2 id="s5">5. All screenshots</h2>
+      <p>Static captures from <code>design/harness/shoot-glow.mjs</code>. Select one to open it full size.</p>
+      <div class="shots" id="shots"></div>
+    </section>
+  </main>
+  <script src="screens/index.js"></script>
+  <script>
+    (function () {
+      const u = new URLSearchParams(location.search);
+      const theme = ["dark", "light"].includes(u.get("theme")) ? u.get("theme") : "";
+      const form = document.getElementById("controls");
+      form.querySelector('input[name="theme"][value="' + theme + '"]').checked = true;
+      form.querySelector('input[name="pagebg"][value="' + document.documentElement.dataset.bg + '"]').checked = true;
+      form.addEventListener("change", () => {
+        const q = new URLSearchParams();
+        const t = form.querySelector('input[name="theme"]:checked').value;
+        if (t) q.set("theme", t);
+        q.set("pagebg", form.querySelector('input[name="pagebg"]:checked').value);
+        location.search = q.toString();
+      });
+
+      // Live frames: each iframe is the real prototype, scaled to fit its box.
+      const fit = new ResizeObserver((entries) => entries.forEach((e) => {
+        const fr = e.target.querySelector("iframe");
+        const base = Number(e.target.dataset.w) || (e.target.classList.contains("phone") ? 390 : 1280);
+        if (fr) fr.style.transform = "scale(" + e.contentRect.width / base + ")";
+      }));
+      document.querySelectorAll(".frame").forEach((f) => {
+        const q = new URLSearchParams(f.dataset.q);
+        if (theme) q.set("theme", theme);
+        const fr = document.createElement("iframe");
+        fr.loading = "lazy";
+        fr.title = f.dataset.src.replace(".html", "") + " " + (f.dataset.q || "default");
+        fr.src = f.dataset.src + "?" + q.toString();
+        f.append(fr);
+        fit.observe(f);
+      });
+
+      // Screenshot gallery (the list is written by shoot-glow.mjs).
+      document.getElementById("shots").innerHTML = (window.SCREENS || [])
+        .map((n) => '<a href="screens/' + n + '.jpg"><img loading="lazy" src="screens/' + n + '.jpg" alt="" />' + n + "</a>")
+        .join("");
+    })();
+  </script>
+  <script src="honeycomb.js"></script>
+</body>
+</html>

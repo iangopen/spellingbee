@@ -1,0 +1,119 @@
+/* The glowing honeycomb: DECORATION ONLY. It sits behind everything,
+   takes no pointer events, holds no text, and is never yellow. It is built
+   from CSS gradients plus one SVG tile (generated in honeycomb.js), with no
+   canvas and no libraries.
+
+   Layer stack (z-index scale for the whole prototype):
+     -4 .bg-base      gradient: deep navy to ribbon blue (light: pale hall to ribbon blue)
+     -3 .bg-cells     the cell edges: a crisp line plus a blurred copy for the glow
+     -2 .bg-light     the moving light (shimmer sweep / reactive spot), brighter cells
+     -1 .bg-depth     vignette: cells fall away toward the edges
+      0               page content (panels carry their own scrims)
+     10               dialogs
+
+   Motion: only transform and opacity animate (compositor-only), so the
+   blurred glow is rasterised once and never repainted. Under
+   prefers-reduced-motion, the light layer is simply not shown: the still
+   version is the static glow. Nothing flashes: the sweep ramps in over
+   seconds and peaks at a low opacity. */
+
+.bg { position: fixed; inset: 0; z-index: -4; pointer-events: none; overflow: hidden; contain: strict; }
+.bg > * { position: absolute; pointer-events: none; }
+
+:root {
+  --hex-tile: none;          /* set by honeycomb.js */
+  --hex-tile-bright: none;
+  --hex-size: 64px 110.85px;
+}
+
+/* ---- base gradient ---- */
+.bg-base {
+  inset: 0;
+  background:
+    radial-gradient(90% 70% at 50% 18%, var(--bg-glow) 0%, transparent 62%),
+    radial-gradient(60% 50% at 88% 92%, var(--bg-glow-2) 0%, transparent 70%),
+    linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+}
+
+/* ---- cells: glow copy + crisp copy, faded toward the edges ---- */
+.bg-cells, .bg-cells-glow {
+  inset: 0;
+  background-image: var(--hex-tile);
+  background-size: var(--hex-size);
+  background-position: center top;
+  -webkit-mask-image: radial-gradient(75% 70% at 50% 40%, #000 25%, rgba(0,0,0,.35) 70%, transparent 100%);
+          mask-image: radial-gradient(75% 70% at 50% 40%, #000 25%, rgba(0,0,0,.35) 70%, transparent 100%);
+}
+.bg-cells { opacity: var(--cells-opacity); }
+.bg-cells-glow { filter: blur(6px); opacity: var(--cells-glow-opacity); transform: translateZ(0); }
+
+/* ---- depth: soft vignette, darkest at the corners (light theme: palest) ---- */
+/* The top band fades to the calm top colour, so the header controls never sit
+   on the brightest cells (measured: see contrast.md). */
+.bg-depth { inset: 0; background:
+  linear-gradient(180deg, var(--bg-top) 0, var(--bg-top) 56px, transparent 132px),
+  radial-gradient(120% 95% at 50% 35%, transparent 55%, var(--bg-edge) 100%); }
+
+/* ---- the moving light: a window that moves, showing BRIGHTER cells that
+   stay put (the child counter-moves with identical timing). ---- */
+.bg-light { display: none; }
+.bg-light .lit {
+  position: absolute;
+  background-image: var(--hex-tile-bright);
+  background-size: var(--hex-size);
+  background-position: center top;
+}
+.bg-light .lit-glow { filter: blur(7px); }
+
+/* shimmer: a slow, soft vertical band crossing every 18s, then resting */
+:root[data-bg="shimmer"] .bg-light.sweep { display: block; }
+.sweep { top: 0; bottom: 0; left: 0; width: 46vw; opacity: 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 50%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 50%, transparent); }
+.sweep .lit { top: 0; bottom: 0; left: 0; width: 100vw; }
+
+/* reactive: a soft spotlight that follows the pointer (desktop) or rests
+   behind the focused control (touch). Positioned by honeycomb.js. */
+:root[data-bg="reactive"] .bg-light.spot { display: block; }
+.spot { left: 0; top: 0; width: 560px; height: 560px; opacity: var(--light-peak);
+  -webkit-mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
+          mask-image: radial-gradient(closest-side, #000 20%, transparent 100%);
+  transform: translate3d(calc(var(--sx, 50vw) - 280px), calc(var(--sy, 30vh) - 280px), 0);
+  will-change: transform; }
+.spot .lit { left: 0; top: 0; width: 100vw; height: 100vh;
+  transform: translate3d(calc(280px - var(--sx, 50vw)), calc(280px - var(--sy, 30vh)), 0);
+  will-change: transform; }
+:root[data-pointer="coarse"] .spot, :root[data-pointer="coarse"] .spot .lit { transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-bg="shimmer"] .sweep { animation: sweep-window 18s cubic-bezier(0.45, 0, 0.55, 1) infinite; will-change: transform, opacity; }
+  :root[data-bg="shimmer"] .sweep .lit { animation: sweep-content 18s cubic-bezier(0.45, 0, 0.55, 1) infinite; will-change: transform; }
+}
+@keyframes sweep-window {
+  0%   { transform: translate3d(-50vw, 0, 0); opacity: 0; }
+  8%   { opacity: var(--light-peak); }
+  42%  { opacity: var(--light-peak); }
+  50%  { transform: translate3d(104vw, 0, 0); opacity: 0; }
+  100% { transform: translate3d(104vw, 0, 0); opacity: 0; }
+}
+@keyframes sweep-content {
+  0%   { transform: translate3d(50vw, 0, 0); }
+  50%  { transform: translate3d(-104vw, 0, 0); }
+  100% { transform: translate3d(-104vw, 0, 0); }
+}
+
+/* Reduced motion: no moving light at all; the still honeycomb remains. */
+@media (prefers-reduced-motion: reduce) {
+  .bg-light { display: none !important; }
+}
+:root[data-reduce-motion="true"] .bg-light { display: none !important; }
+
+/* Tab hidden: freeze everything (honeycomb.js sets this). */
+:root[data-paused] .bg * { animation-play-state: paused !important; }
+
+/* Contrast testing: every cell at the variant's peak brightness, everywhere. */
+:root[data-peak="1"] .bg-light { display: block !important; opacity: var(--light-peak) !important; animation: none !important;
+  inset: 0 !important; width: auto !important; height: auto !important; transform: none !important;
+  -webkit-mask-image: none !important; mask-image: none !important; }
+:root[data-peak="1"] .bg-light .lit { animation: none !important; transform: none !important; inset: 0 !important; width: auto !important; height: auto !important; }
+:root[data-peak="1"] .bg-light.spot { display: none !important; }
