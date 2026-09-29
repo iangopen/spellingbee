@@ -846,20 +846,24 @@ the live site.
 ### Status
 - Phase 1 (audit) and Phase 2 (brand plus three directions) are done, in
   `design/`. See `design/README.md` for the map.
-- **Direction (Ian, 2026-09-28):**
-  - Blue Ribbon (A)
-  - a glowing, decoration-only blue honeycomb behind the whole app
-  - C's race lanes for race results
+- **FINAL DIRECTION (Ian, 2026-09-28):**
+  - **Blue Ribbon:** palette, Bricolage Grotesque + Atkinson Hyperlegible,
+    rosette, contestant placards, bell
+  - a **slow-shimmer** blue honeycomb (decoration only) at the **old live
+    site's cell size** (28×49px tile, from `main` src/index.css:181-189)
+  - a **bee mascot and bee contestant avatars**
+  - **C's race lanes** for race results
+  - **dark as the default theme**
 
-  Prototypes are in `design/prototypes/blue-ribbon-glow/` (start at
-  `compare.html`).
-- **Background variant: pending** (static glow, slow shimmer, or reactive glow).
-- **Bee decision: pending** (bee mascot and bee contestants, or rosette tick and
-  glyph placards).
-- The glow is a dark-theme effect. Light is a quieter linework version; both
-  pass contrast.
-- Phase 3 (design system and staged build plan) starts after those two picks.
-  No `src/` file has changed yet.
+  Reference prototype: `design/prototypes/blue-ribbon-glow/` (its defaults
+  are these picks; start at `compare.html`).
+- **Dark default:** `resolveTheme()` becomes stored ?? `"dark"` (the OS is no
+  longer followed). The `spellingbee:theme` key and its values are unchanged,
+  so a player who chose light keeps light.
+- **Phase 3 is written:** `design/PHASE3.md` has the design system (tokens,
+  type, space, motion, the honeycomb spec, components) and the stage-by-stage
+  build plan (stages 0 to 7, one commit each). **Not implemented yet:** no
+  `src/` file has changed.
 
 ### Rules for the build, whatever the direction
 - **Presentation only.** Don't touch any of these:
@@ -910,11 +914,9 @@ the live site.
   in both palettes" and "motion only decorates a visible state".
 
 ### Open
-- Ian's picks: the background variant, and bee or no bee.
-- A real-phone check of the chosen background. The perf numbers so far are
-  headless Chrome with the CPU throttled 4×.
-- Then Phase 3: tokens, the component list and a staged plan (one commit per
-  stage: tokens, shared components, screen by screen, rename, assets, polish).
+- Ian's go-ahead to start building (stage 0 of `design/PHASE3.md`).
+- A real-phone check of the shimmer (in stage 7). The perf numbers so far are
+  headless Chrome with the CPU throttled 4×. The static glow is the fallback.
 - The name itself: a distinct look lowers the risk of being mistaken for NYT's
   game but doesn't clear the name. See HARDENING #14 / §C10.
 - Found in the audit and worth fixing in the build (presentation only):
