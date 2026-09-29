@@ -868,8 +868,52 @@ This session worked on `main`, like the hardening pass:
 - **With CAPTCHA on, no script can sign up users.** `probe.mjs` and the
   `verify_*.mjs` scripts need CAPTCHA switched off temporarily, or an existing
   session.
-- #8 (privacy note) goes in the docs session. REPORT.md's "server-authoritative
-  scoring" claim can now be restored, since the re-probe passed.
+- #8 (privacy note): done 2026-09-29, see "Docs and disclosures". REPORT.md's
+  "server-authoritative scoring" claim was restored the same day.
+
+## Docs and disclosures (2026-09-29)
+
+README.md, PRIVACY.md, LICENSE (MIT, Ian Gopen, 2026) and the GitHub About
+section were written from a fact sheet in which every item was traced to code,
+to the live site, or to a read-only query on the live project.
+
+**PRIVACY.md last checked against the code: 2026-09-29.** Any change that
+sends or stores something new MUST update PRIVACY.md in the same commit: a new
+table or column holding player input, a new third-party host, analytics,
+cookies, or a change to the 0019 retention jobs. PRIVACY.md is a policy the
+operator is bound by, so it must never promise less than the code does. What it
+rests on:
+- Singleplayer contacts only `iangopen.github.io`. This was observed on the
+  live site by playing a word in Playwright. The Supabase client is lazy
+  (`getSupabase()`), and only the multiplayer modules call it.
+- GitHub Pages logs visitor IP addresses (GitHub's "About GitHub Pages" docs).
+- Speech only ever receives the word, its lead-in, the definition or the
+  Settings sample sentence (`tts.ts`). Some browser voices are cloud voices.
+- Multiplayer: Cloudflare Turnstile, and a Supabase anonymous guest with no
+  email (live: 0 users with an email). `auth.sessions` stores the IP address
+  and user agent (live: 8 of 8), and it and `auth.identities` cascade on user
+  delete (live `pg_constraint`, confdeltype `c`).
+- Retention is exactly 0019's jobs, which were verified live on 2026-09-29.
+  Supabase's own log retention is plan-dependent, so PRIVACY.md gives no number.
+- The app code never touches `document.cookie`.
+
+In-app: a "Privacy" link on the mode screen (`ModeSelect.tsx`) opens
+PRIVACY.md on GitHub. It measured 6.85:1 dark and 4.72:1 light, has a 44px
+target, and was reached by keyboard.
+
+Other changes this session:
+- The README screenshots in `docs/screenshots/` came from a local production
+  build with a dead Supabase URL and a stubbed guest sign-in, so no live row was
+  created.
+- The unused create-vite `public/icons.svg` (Bluesky, Discord, GitHub and X
+  logos) was removed.
+- The README's Node floor is 22.12 because Vitest 5 requires it.
+
+Open TODOs (Ian only):
+- The deletion contact in PRIVACY.md (`TODO(Ian): contact email`).
+- The README has no user or games-played numbers. Add them only from real data.
+- When the redesign merges, PRIVACY.md and the README say "Spelling Race" and
+  must be renamed with it. The screenshots will also need to be retaken.
 
 ## Redesign (planning, started 2026-09-28)
 
@@ -936,6 +980,10 @@ the live site.
   - the `<h1>` in ModeSelect and DifficultySelect
   - a new web manifest, share tags and icons
   - this file's heading
+  - README.md, PRIVACY.md and the screenshots in `docs/screenshots/` (retake
+    them from a local build with a stubbed backend, never the live site)
+
+  Keep the mode screen's "Privacy" link (hardening #8).
 
   The `package.json` name stays (it isn't user-facing).
 - **Trademark distance** (see `DIRECTIONS.md`):
@@ -972,4 +1020,5 @@ the live site.
 - Found in the audit and worth fixing in the build (presentation only):
   - Race results reuse the solo results screen: they always say "new best!",
     show no winner or standings, and the secondary button is mislabelled.
-  - Lobby and Settings text inputs fail 3:1 edge contrast.
+  - ~~Lobby and Settings text inputs fail 3:1 edge contrast.~~ Fixed on `main`
+    2026-09-29 (`--field-edge`); carry it into stage 1 (see above).

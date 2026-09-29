@@ -28,6 +28,9 @@ export function ModeSelect({
           <span className="mode-blurb">Race friends in a shared room</span>
         </button>
       </div>
+      <p className="mode-footer">
+        <a href="https://github.com/iangopen/spellingbee/blob/main/PRIVACY.md">Privacy</a>
+      </p>
     </div>
   );
 }
