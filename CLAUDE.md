@@ -1,7 +1,7 @@
-# Spelling Race — CLAUDE.md
+# Spelling Bee — CLAUDE.md
 
 ## Project overview
-Word-spelling race game, built singleplayer first, multiplayer planned.
+Word-spelling game (Spelling Bee), built singleplayer first, multiplayer planned.
 Stack: Vite + React + TypeScript, deployed to GitHub Pages via GitHub Actions.
 Repo: https://github.com/iangopen/spellingbee
 Live: https://iangopen.github.io/spellingbee/
@@ -918,8 +918,14 @@ contain TODO/TBD/FIXME; leave unfinished notes here in CLAUDE.md instead.
 Open notes (Ian only, deliberately NOT in any published file):
 - The README has no user or games-played numbers. There is no real data yet;
   add them only from real data.
-- When the redesign merges, PRIVACY.md and the README say "Spelling Race" and
-  must be renamed with it. The screenshots will also need to be retaken.
+- **Renamed to Spelling Bee on `main` (2026-09-30):** page title, meta description,
+  the two `<h1>`s, README and PRIVACY.md. The game MODE "Race" keeps its name.
+  The repo slug, `/spellingbee/` and every `spellingbee:*` key are unchanged. The
+  `package.json` name stays `spelling-race` (not user-facing). There is no web
+  manifest or social/share tag yet; the redesign adds them.
+- The README screenshots in `docs/screenshots/` still show the old look and
+  heading. They are retaken after the redesign merges, because it changes every
+  screen.
 
 ## Redesign (planning, started 2026-09-28)
 
@@ -1000,13 +1006,12 @@ the live site.
   - the tier ids
   - the 8 avatar KEYS (DB CHECK); only their art changes
 - The game **mode** "Race" keeps its name.
-- **Rename scope:** every user-facing "Spelling Race" becomes "Spelling Bee":
-  - `<title>` and the meta description
-  - the `<h1>` in ModeSelect and DifficultySelect
+- **Rename scope:** the text rename is DONE on `main` (2026-09-30): title,
+  meta description, both `<h1>`s, this file's heading, README.md and
+  PRIVACY.md. What the redesign still owes:
   - a new web manifest, share tags and icons
-  - this file's heading
-  - README.md, PRIVACY.md and the screenshots in `docs/screenshots/` (retake
-    them from a local build with a stubbed backend, never the live site)
+  - the screenshots in `docs/screenshots/` (retake them from a local build
+    with a stubbed backend, never the live site)
 
   Keep the mode screen's "Privacy" link (hardening #8).
 

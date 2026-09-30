@@ -1,4 +1,4 @@
-# Spelling Race
+# Spelling Bee
 
 A timed spelling game for the browser: it reads a word aloud, you type it. Play alone or against friends in real-time multiplayer rooms.
 
