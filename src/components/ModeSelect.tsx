@@ -14,7 +14,7 @@ export function ModeSelect({
 
   return (
     <div className="mode-select">
-      <h1 ref={headingRef} tabIndex={-1}>Spelling race</h1>
+      <h1 ref={headingRef} tabIndex={-1}>Spelling Bee</h1>
       <p className="subtitle">Hear it. Spell it. Beat the clock.</p>
       <div className="mode-grid">
         <button className="mode-card" onClick={onSingle}>

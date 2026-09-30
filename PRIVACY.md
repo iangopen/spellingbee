@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-29. Last checked against the code: 2026-09-29.
 
-Spelling Race is a free spelling game. It has no accounts, ads or analytics, and the app sets no cookies. It is not directed at children under 13.
+Spelling Bee is a free spelling game. It has no accounts, ads or analytics, and the app sets no cookies. It is not directed at children under 13.
 
 **Every visit.** GitHub Pages hosts the site and logs visitors' IP addresses for security.
 

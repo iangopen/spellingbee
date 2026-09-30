@@ -22,7 +22,7 @@ export function DifficultySelect({
 
   return (
     <div className="tier-select">
-      <h1 ref={headingRef} tabIndex={-1}>Spelling race</h1>
+      <h1 ref={headingRef} tabIndex={-1}>Spelling Bee</h1>
       <p className="subtitle">Hear it. Spell it. Beat the clock.</p>
 
       <div className="mode-toggles">
