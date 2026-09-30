@@ -15,12 +15,15 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
+//   TARGET=hybrid               design/prototypes/honey-hybrid, all three
+//                               variants (?v=a|b|c), bee on, ?peak=1
+//                               -> contrast-a.md / -b.md / -c.md (+ .json)
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
-const TARGET = process.env.TARGET === "app" ? "app" : "prototype";
+const TARGET = ["app", "hybrid"].includes(process.env.TARGET) ? process.env.TARGET : "prototype";
 const VIEWS = { desktop: { width: 1280, height: 800 }, phone: { width: 390, height: 844 } };
 const THEMES = ["dark", "light"];
 
-const PROTO_DIR = resolve("design/prototypes/blue-ribbon-glow");
+const PROTO_DIR = resolve(TARGET === "hybrid" ? "design/prototypes/honey-hybrid" : "design/prototypes/blue-ribbon-glow");
 const APP_URL = process.env.APP_URL || "http://localhost:5199";
 const APP_SCREENS = ["home", "difficulty", "sp-round", "sp-correct", "sp-incorrect", "sp-results", "settings",
   "lobby", "waiting-room", "race-round", "race-locked", "race-roundend", "race-results",
@@ -31,11 +34,16 @@ if (TARGET === "prototype") {
   for (const page of ["home", "round", "race-results"]) for (const theme of THEMES) for (const w of Object.keys(VIEWS))
     for (const bee of ["0", "1"]) for (const state of page === "round" ? ["", "correct", "incorrect"] : [""])
       RUNS.push({ page, theme, w, bee, state });
+} else if (TARGET === "hybrid") {
+  // The bee is part of the brief, so only bee=1 is measured.
+  for (const v of ["a", "b", "c"]) for (const page of ["home", "round", "race-results"]) for (const theme of THEMES) for (const w of Object.keys(VIEWS))
+    for (const state of page === "round" ? ["", "correct", "incorrect"] : [""])
+      RUNS.push({ v, page, theme, w, bee: "1", state });
 } else {
   for (const page of APP_SCREENS) for (const theme of THEMES) for (const w of Object.keys(VIEWS)) RUNS.push({ page, theme, w });
 }
-const urlFor = (r) => TARGET === "prototype"
-  ? `${pathToFileURL(resolve(PROTO_DIR, r.page + ".html")).href}?${new URLSearchParams({ bg: "shimmer", peak: "1", bee: r.bee, theme: r.theme, ...(r.state ? { state: r.state } : {}) })}`
+const urlFor = (r) => TARGET !== "app"
+  ? `${pathToFileURL(resolve(PROTO_DIR, r.page + ".html")).href}?${new URLSearchParams({ ...(r.v ? { v: r.v } : {}), bg: "shimmer", peak: "1", bee: r.bee, theme: r.theme, ...(r.state ? { state: r.state } : {}) })}`
   : `${APP_URL}/?screen=${r.page}&theme=${r.theme}`;
 
 // Worst-pixel sampler, run inside the page (Playwright serialises it).
@@ -190,6 +198,7 @@ await browser.close();
 
 // One row per (theme, screen, kind, label, need): the minimum over widths,
 // bee variants and states. Rings with no outline are listed separately.
+function report(rows, v) {
 const key = (x) => [x.theme, x.page, x.kind, x.label, x.need].join("|");
 const agg = new Map();
 for (const x of rows) {
@@ -201,12 +210,15 @@ const all = [...agg.values()];
 const list = all.filter((x) => x.worst !== null).sort((a, b) => a.theme.localeCompare(b.theme) || a.page.localeCompare(b.page) || a.kind.localeCompare(b.kind) || a.worst - b.worst);
 const noOutline = all.filter((x) => x.kind === "ring" && x.worst === null);
 const fails = list.filter((x) => x.worst < x.need);
-const pages = TARGET === "prototype" ? ["home", "round", "race-results"] : APP_SCREENS;
-const title = TARGET === "prototype" ? "Contrast over the glowing honeycomb" : "Contrast baseline: the current app";
-const intro = TARGET === "prototype"
+const pages = TARGET === "app" ? APP_SCREENS : ["home", "round", "race-results"];
+const VNAME = { a: "a, Hive (the old palette throughout)", b: "b, Honey and ribbon (honey leads, ribbon blue accent)", c: "c, Split (honey glow in dark, the old flat palette in light)" };
+const title = TARGET === "hybrid" ? `Contrast over the honey honeycomb: variant ${VNAME[v]}` : TARGET === "prototype" ? "Contrast over the glowing honeycomb" : "Contrast baseline: the current app";
+const intro = TARGET === "hybrid"
+  ? "Every visible text element, control edge (including the answer field and every input border) and focus ring, measured against the **worst pixel behind it** with the honeycomb lit to its peak everywhere (`?peak=1`, the shimmer's full brightness on every cell). Each row is the minimum over desktop and phone and, on the round screen, the playing, correct and missed states. Bee on."
+  : TARGET === "prototype"
   ? "Every visible text element, control edge and focus ring, measured against the **worst pixel behind it** with the honeycomb lit to its peak everywhere (`?peak=1`, the shimmer and reactive light's full brightness). Each row is the minimum over desktop and phone, bee and no bee, and, on the round screen, the playing, correct and missed states."
   : "The REAL screens (rendered from `src/` by `design/harness`, network modules stubbed), measured the same way as the prototype: every visible text element, control edge and focus ring against the **worst pixel behind it**. Each row is the minimum over desktop and phone.";
-let md = `# ${title}\n\nGenerated by \`design/harness/measure.mjs\` (TARGET=${TARGET}). ${intro} Required: text 4.5:1, large text 3:1, edges and focus rings 3:1.\n\n**${list.length} measured pairs, ${fails.length} failing.** ${noOutline.length} focusable controls show focus without an outline (listed at the end). (${rows.length} raw measurements across ${RUNS.length} renders.)\n`;
+let md = `# ${title}\n\nGenerated by \`design/harness/measure.mjs\` (TARGET=${TARGET}). ${intro} Required: text 4.5:1, large text 3:1, edges and focus rings 3:1.\n\n**${list.length} measured pairs, ${fails.length} failing.** ${noOutline.length} focusable controls show focus without an outline (listed at the end). (${rows.length} raw measurements across ${RUNS.filter((r) => !v || r.v === v).length} renders.)\n`;
 for (const theme of THEMES) for (const page of pages) {
   const sub = list.filter((y) => y.theme === theme && y.page === page);
   if (!sub.length) continue;
@@ -218,10 +230,13 @@ if (noOutline.length) {
   md += `\n## Controls with no outline when focused\n\nFocus is shown some other way (a border colour, a background change). The contrast of that indicator isn't measured by this script.\n\n| Theme | Screen | Control |\n|---|---|---|\n`;
   for (const x of noOutline) md += `| ${x.theme} | ${x.page} | ${x.label.replace("focus ring: ", "")} |\n`;
 }
-const outDir = TARGET === "prototype" ? PROTO_DIR : resolve("design/baseline");
-const base = TARGET === "prototype" ? "contrast" : "contrast-app";
+const outDir = TARGET === "app" ? resolve("design/baseline") : PROTO_DIR;
+const base = TARGET === "hybrid" ? `contrast-${v}` : TARGET === "prototype" ? "contrast" : "contrast-app";
 mkdirSync(outDir, { recursive: true });
 writeFileSync(resolve(outDir, `${base}.md`), md);
 writeFileSync(resolve(outDir, `${base}.json`), JSON.stringify(all, null, 1));
-console.log(`${TARGET}: ${list.length} measured pairs, ${fails.length} failing, ${noOutline.length} focusable without an outline`);
+console.log(`${TARGET}${v ? " " + v : ""}: ${list.length} measured pairs, ${fails.length} failing, ${noOutline.length} focusable without an outline`);
 for (const f of fails) console.log(`FAIL ${f.theme} ${f.page} ${f.kind} "${f.label}" ${f.fg} on ${f.wp} = ${f.worst} (need ${f.need}) @ ${f.where}`);
+}
+if (TARGET === "hybrid") for (const v of ["a", "b", "c"]) report(rows.filter((x) => x.v === v), v);
+else report(rows);
