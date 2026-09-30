@@ -942,6 +942,25 @@ the live site.
 
   Reference prototype: `design/prototypes/blue-ribbon-glow/` (its defaults
   are these picks; start at `compare.html`).
+- **Honey hybrid variants: pick pending (prototyped 2026-09-29).** Ian missed
+  the old design's warmth, so three hybrids of the old honey palette with the
+  Blue Ribbon polish are in `design/prototypes/honey-hybrid/`. Start at its
+  `compare.html`, which shows the old design, plain Blue Ribbon and all three
+  side by side. Everything else in the final direction (glow treatment, bee,
+  type, lanes, dark default) carries over to whichever is picked.
+  - **a. Hive:** the old palette throughout, both themes, gentle glow.
+  - **b. Honey and ribbon:** honey leads; ribbon blue only on the award marks.
+  - **c. Split:** a rich honey glow in dark, the old flat cream in light.
+
+  Verified: 0 contrast failures (154 pairs per variant, over the glow at
+  peak), 36/36 reduced-motion stills identical to static, 0 lemon-yellow
+  pixels and 0 grey tiles. **Until Ian picks, Blue Ribbon stays the
+  direction and PHASE3 is unchanged.** If a hybrid is picked: PHASE3's tokens
+  and honeycomb spec need rewriting from `honey-hybrid/style.css`; the "blue
+  and never yellow" rule is replaced by `DIRECTIONS.md`'s "Honey hybrid: how
+  it stays distinct" (amber not lemon, no grey tiles, background only); and
+  the stage checks must use `shoot-hybrid.mjs`'s lemon test, because
+  `check-glow.mjs` flags any honey by design.
 - **Dark default:** `resolveTheme()` becomes stored ?? `"dark"` (the OS is no
   longer followed). The `spellingbee:theme` key and its values are unchanged,
   so a player who chose light keeps light.
@@ -1013,6 +1032,8 @@ the live site.
   in both palettes" and "motion only decorates a visible state".
 
 ### Open
+- **Pick between Blue Ribbon and honey hybrid a, b or c** (see Status). Stage 1
+  (tokens) depends on the answer, so it waits for the pick.
 - Stage 1 of `design/PHASE3.md` (tokens and the dark default) is next.
   Since the 2026-09-29 audit follow-up (merged from `main`), `.text-input`
   uses `--field-edge` plus a honey `:focus-visible` outline. The new palette

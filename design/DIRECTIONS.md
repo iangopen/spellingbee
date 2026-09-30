@@ -89,6 +89,41 @@ This lowers the risk of the look being mistaken for NYT's, but **it does not
 clear the name itself**: NYT holds "Spelling Bee" as a mark for its game (§C10
 and HARDENING #14 have the notes). The visual work can't answer that question.
 
+### Honey hybrid: how it stays distinct (added 2026-09-29, pick pending)
+
+Ian asked for hybrids that bring back the old live design's honey palette
+with the Blue Ribbon polish (`prototypes/honey-hybrid/`, variants a, b and c).
+Those variants deliberately break the "blue, never yellow" rule above, so this
+is what replaces it **if a hybrid is picked**. If Blue Ribbon stays, the rule
+above stands unchanged.
+
+- **Honey and amber, never lemon.** NYT's Spelling Bee yellow is a bright
+  lemon (`#f7da21`, hue 53°). Every warm colour in the hybrids sits at hue
+  30-42°: honey `#e8a63d`, the heading `#f2bd62`, the light-theme fill
+  `#e09a2c`, and deep amber `#8f5a0e` for text in light. Checked on pixels: 0
+  lemon-yellow pixels across all 102 captures, with a detector that is
+  asserted to catch NYT's yellow and pass the old honey
+  (`prototypes/honey-hybrid/checks.txt`).
+- **No yellow on flat grey.** NYT pairs its yellow with flat light-grey hexagon
+  tiles on white. The hybrids have no grey surface at all: the dark theme is a
+  warm charcoal or cocoa, the light theme is cream, and panels are warm
+  off-white. Checked: 0 neutral-grey filled elements on every page.
+- **The honeycomb is background only, as before.** It is `aria-hidden`, takes
+  no pointer events, holds no text, letters or controls, is never a letter
+  board or answer layout, and no content element is hexagon-shaped. Answers
+  are typed into a text field. It is outline-only line work, never filled
+  tiles.
+- **A distinct mark beside the name.** The rosette with a bee at its centre,
+  and a sans display face (Bricolage Grotesque). No serif wordmark and no
+  black-rule masthead.
+- **Variant b keeps a trace of the ribbon:** blue appears on the award marks
+  only, which ties the look to the "blue ribbon" contest meaning of the name.
+
+Honest cost: honey plus hexagons is closer to NYT's imagery than blue plus
+hexagons. The differences above (amber not lemon, no grey tiles,
+background-only line work, the rosette) are real but smaller than Blue
+Ribbon's. None of it clears the name itself.
+
 ---
 
 ## A. Blue Ribbon: the contest itself

@@ -11,6 +11,7 @@ and oxlint reports nothing here.
 | `DIRECTIONS.md` | Phase 2: brand basics and three directions (A Blue Ribbon, B Clover Field, C Bee Line), with contrast, trademark notes and a recommendation |
 | **`PHASE3.md`** | **The design system and the stage-by-stage build plan** for the final direction (not implemented yet). |
 | **`prototypes/blue-ribbon-glow/`** | **The chosen direction**: Blue Ribbon + glowing blue honeycomb + C's race lanes. Start at `compare.html`; the folder's README has the notes and verification. |
+| **`prototypes/honey-hybrid/`** | **Pick pending:** three hybrids (a Hive, b Honey and ribbon, c Split) of the old honey palette with the Blue Ribbon polish. Start at `compare.html`, which also shows the old design and plain Blue Ribbon. |
 | `prototypes/<direction>/` | Phase 2 static prototypes (home, round, race-results) of A, B and C, kept as the record. |
 | `prototypes/screens/` | 3 directions × 3 screens × desktop/phone × light/dark (36 PNGs) |
 | `prototypes/palettes.json` + `contrast-report.txt` | Every palette pair and its measured WCAG ratio (69 pairs, 0 failing) |
@@ -23,6 +24,7 @@ The harness tooling:
 | `vite.config.ts`, `main.tsx`, `mock.ts`, `stubs/` | Renders the REAL `src/` screens with mocked props. Room, Supabase and session modules are stubbed, so no guest user is ever created. |
 | `shoot.mjs` | Takes the Playwright screenshots. |
 | `shoot-glow.mjs`, `measure.mjs`, `perf-glow.mjs`, `check-glow.mjs` | Screenshots, worst-pixel contrast, phone performance, and no-yellow / decoration-only checks for the glow prototypes. |
+| `shoot-hybrid.mjs` | The honey hybrid's screenshots, reduced-motion stills, and its lemon-yellow, grey-tile and decoration-only checks. Its contrast runs through `measure.mjs` with `TARGET=hybrid`. |
 | `contrast.mjs` | Checks the WCAG ratios. |
 | `icons.mjs` | Emits the lucide icons inline for the prototypes. |
 
