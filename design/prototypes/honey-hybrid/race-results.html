@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#16130f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#faf3e3" media="(prefers-color-scheme: light)" />
+  <title>Spelling Bee | Race results</title>
+  <script src="params.js"></script>
+  <link rel="stylesheet" href="honeycomb.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <span class="brand"><i data-mark></i>Spelling Bee</span>
+      <button class="icon-btn" aria-label="Settings"><i data-icon="settings"></i></button>
+    </header>
+
+    <main class="results enter">
+      <section class="panel winner" data-spot-rest>
+        <i data-mark class="rosette"></i>
+        <div>
+          <p class="kicker">Race winner, Medium words</p>
+          <h1 tabindex="-1">Tomasz</h1>
+          <p>You came 2nd with 205 points, 3 behind.</p>
+        </div>
+      </section>
+
+      <ol class="panel lanes" aria-label="Final standings">
+        <li class="lane p1"><span class="pos num">1</span><span class="name"><b>Tomasz</b><span>8 of 10 spelled</span></span><span class="track"><span class="token" style="left: calc(100% - 40px)"><i data-contestant="clover"></i></span></span><span class="pts num">208</span></li>
+        <li class="lane p2 you"><span class="pos num">2</span><span class="name"><b>Maya</b><span>8 of 10 spelled</span></span><span class="track"><span class="token" style="left: calc(98% - 40px)"><i data-contestant="bee"></i></span></span><span class="pts num">205</span></li>
+        <li class="lane p3"><span class="pos num">3</span><span class="name"><b>Adaeze</b><span>6 of 10 spelled</span></span><span class="track"><span class="token" style="left: 66%"><i data-contestant="blossom"></i></span></span><span class="pts num">141</span></li>
+        <li class="lane"><span class="pos num">4</span><span class="name"><b>Rafael</b><span>3 of 10 spelled</span></span><span class="track"><span class="token" style="left: 30%"><i data-contestant="wasp"></i></span></span><span class="pts num">67</span></li>
+      </ol>
+
+      <div class="actions"><a class="btn btn-primary" href="home.html" onclick="this.href=withParams('home.html')">Back to lobby</a></div>
+    </main>
+  </div>
+  <script src="honeycomb.js"></script>
+  <script src="art.js"></script>
+  <script src="../_shared/avatars.js"></script>
+  <script src="../_shared/icons.js"></script>
+</body>
+</html>
