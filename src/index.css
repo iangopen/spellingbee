@@ -1,48 +1,101 @@
 @import './fonts.css';
 
 /* ---------------------------------------------------------------------------
-   Theme tokens.
+   Theme tokens (redesign stage 1).
 
-   Dark is the base identity and lives on :root. Light is an override, derived
-   from the same brand palette rather than an inversion: warm cream paper,
-   warm charcoal ink, and honey demoted from "background" to "accent". The bee
-   identity has to survive both, so the honey hue is constant — only its
-   lightness moves, because #e8a63d on cream is unreadable as text.
+   The palette is "honey and ribbon", homemade strength "light" (Ian, 2026-10-03):
+   the old live site's warm honey and cream, with ribbon blue ONLY on the award
+   marks (--kicker, --you, --mark-2, --ribbon-1). Source of truth for the values
+   is design/prototypes/homemade/style.css variant b plus homemade.css's "light"
+   strength, merged here into one palette; the strength is a build-time constant,
+   so there is no data-h / data-v switch to ship.
 
-   Selection order matters:
-     1. :root                        -> dark
-     2. prefers-color-scheme: light  -> light, but ONLY while no explicit
-                                        choice has been applied yet. This is
-                                        what makes the very first paint correct
-                                        before theme.ts runs, with no flash.
-     3. [data-theme="..."]           -> the explicit choice, wins over both.
+   Dark is the default and lives on :root, so the very first paint is dark with
+   no script. Light is the override on [data-theme="light"]. The OS setting is
+   deliberately NOT consulted any more: theme.ts resolves stored ?? "dark".
+
+   Every colour is a token in BOTH palettes (the standing rule). Tokens in the
+   "aliases" block keep the pre-redesign names rendering; they are deleted in
+   stage 7 once every screen has been ported.
 --------------------------------------------------------------------------- */
 :root {
   color-scheme: dark;
 
-  --bg: #16130f;
-  --surface: #211c15;
-  --border: #3a3226;
-  --field-edge: #7a6c57;   /* text-input boundary: >=3:1 on --bg and --surface (WCAG 1.4.11) */
+  /* background layers (consumed by the honeycomb, stage 2) */
+  --bg-top: #16130f; --bg-bottom: #0f0c08;
+  --bg-glow: rgba(232, 150, 50, 0.13); --bg-glow-2: rgba(92, 124, 255, 0.09);
+  --bg-edge: rgba(8, 6, 3, 0.85);
+  --cell-line: rgba(236, 170, 70, 0.26); --cell-line-bright: rgba(255, 205, 120, 0.74);
+  --cells-opacity: 1; --cells-glow-opacity: 0.3; --light-peak: 0.36;
 
-  --honey: #e8a63d;        /* accent for text, borders, headings */
-  --honey-solid: #e8a63d;  /* accent as a fill behind text */
-  --honey-dark: #9c6b1f;
-  --honey-glow: rgba(232, 166, 61, 0.36); /* the accent as a halo; needs alpha, so it is its own token */
-  --on-honey: #1a1610;     /* ink on top of --honey-solid */
+  /* surfaces */
+  --panel: rgba(33, 28, 21, 0.88); --panel-solid: #211c15;
+  --panel-edge: rgba(232, 166, 61, 0.18); --panel-highlight: rgba(255, 232, 190, 0.07);
+  --scrim: rgba(16, 13, 9, 0.76);
+  --raised: rgba(232, 166, 61, 0.13);
+  --field: #16130f;
 
-  --text: #f5efe3;
-  --muted: #a89c86;
-  --good: #4fae8c;
-  --bad: #d9645c;
+  /* ink */
+  --text: #f5efe3; --muted: #b3a68f;
+  --accent: #e8a63d; --accent-strong: #f2bd62; --accent-fill: #e8a63d; --on-accent: #1a1610;
+  --heading: #f2bd62;
+  --kicker: #a3b5ff; --you: #a3b5ff;
 
-  --shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  /* controls and focus: the ring sits inside a solid moat, the halo beyond it */
+  --edge: #9d8d70; --ring: #f5c46e; --focus-moat: #16130f; --glow-soft: rgba(232, 166, 61, 0.3);
+  --good: #5cc49c; --bad: #ec7f74;
+  --glow-accent: rgba(232, 166, 61, 0.5); --glow-good: rgba(92, 196, 156, 0.45); --glow-bad: rgba(236, 127, 116, 0.4);
 
-  --font-display: 'Space Grotesk', sans-serif;
+  /* the rosette and place ribbons: ribbon blue is the award accent */
+  --mark: #e8a63d; --mark-2: #8aa2ff; --mark-ring: #8aa2ff;
+  --ribbon-1: #8aa2ff; --ribbon-2: #cfc6b6; --ribbon-3: #c9713a;
+
+  /* the difficulty ramp: sage, olive, amber, burnt orange, honey, then master's rust */
+  --t-novice: #7fa382; --t-easy: #8fae70; --t-building: #a9ad5a; --t-medium: #c99a45;
+  --t-advanced: #d48a35; --t-hard: #d0702e; --t-expert: #e8a63d; --t-master: #d95d25;
+
+  /* bee art: a honey bee with cocoa bands */
+  --bee-body: #f0b24c; --bee-stripe: #2a2013; --bee-wing: rgba(255, 246, 228, 0.75); --bee-line: #1a1410; --bee-cheek: #ff9fb2;
+
+  --shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.8);
+
+  /* the homemade "light" strength: marker shadows, one hand-drawn outline, stickers, paper grain */
+  --sketch: rgba(244, 196, 110, 0.66); --sketch-faint: rgba(244, 196, 110, 0.32);
+  --ink-shadow: rgba(6, 4, 1, 0.75);
+  --paper-shadow: 0 14px 30px -18px rgba(0, 0, 0, 0.75);
+  --sticker-bg: #e8a63d; --sticker-ink: #1a1610;
+  --tape: rgba(232, 166, 61, 0.62); --tape-line: rgba(255, 236, 190, 0.5);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.62' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .9 0 0 0 0 .72 1.2 0 0 0 -.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --grain-bg-opacity: 0.16; --grain-panel-opacity: 0;
+
+  /* type, radius, motion (not themed, so they live on :root only) */
+  --display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --body: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --hand: 'Caveat Brush', 'Bricolage Grotesque', cursive;
+  --r-sm: 8px; --r-md: 14px; --r-lg: 22px; --r-pill: 999px;
+  --hm-r-panel: 28px 21px 26px 19px / 21px 27px 19px 25px;
+  --hm-r-btn: 15px 19px 16px 18px / 18px 15px 19px 16px;
+  --hm-r-field: 14px 17px 15px 16px / 16px 14px 17px 15px;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Session 20: elimination mode. A literal colour is invisible in one theme. */
+  --life: #d9645c;         /* a remaining life; reads as "at stake", not "error" */
+  --out: #6f6455;          /* an eliminated player: present but spent */
+  --spectate: #5b8fb0;     /* watching, not playing; cool against the honey */
+
+  /* ---- aliases: pre-redesign names, pointing at the new tokens (deleted in stage 7) ---- */
+  --bg: var(--bg-top);
+  --surface: var(--panel-solid);
+  --border: var(--panel-edge);
+  --field-edge: var(--edge);       /* text-input boundary: --edge clears WCAG 1.4.11 on every field background */
+  --honey: var(--accent);
+  --honey-solid: var(--accent-fill);
+  --honey-dark: var(--edge);
+  --honey-glow: var(--glow-accent);
+  --on-honey: var(--on-accent);
+  --font-display: 'Space Grotesk', sans-serif;  /* becomes var(--display) with the shared components, stage 3 */
   --font-body: 'Inter', sans-serif;
-
-  /* Escalating tier fills — calm sage, amber, burnt orange, then Expert
-     taking the honey accent itself so it reads as the top of the ramp. */
+  /* the old tier gradients stay until stage 4b rebuilds the bars from --t-* */
   --tier-novice-fill: linear-gradient(155deg, #232b23, #191e19);
   --tier-novice-edge: #3d5340;
   --tier-easy-fill: linear-gradient(155deg, #27311f, #1c2417);
@@ -55,93 +108,58 @@
   --tier-advanced-edge: #96631f;
   --tier-hard-fill: linear-gradient(155deg, #48301a, #301c0f);
   --tier-hard-edge: #a35f22;
-  /* The top two are SOLID saturated fills rather than muted tints — that jump
-     is what separates them from the six below at a glance. */
   --tier-expert-fill: linear-gradient(155deg, #edae47, #b97c1e);
   --tier-expert-edge: #f2c268;
   --tier-expert-ink: #241a09;
   --tier-master-fill: linear-gradient(155deg, #c4551f, #8e3a10);
   --tier-master-edge: #e0742f;
   --tier-master-ink: #fff1e4;
-
-  /* Session 20 — elimination mode. Three tokens, both palettes, because a
-     literal colour is invisible in one theme (the standing CSS rule). */
-  --life: #d9645c;         /* a remaining life; reads as "at stake", not "error" */
-  --out: #6f6455;          /* an eliminated player: present but spent */
-  --spectate: #5b8fb0;     /* watching, not playing — cool against the honey */
-}
-
-/* The light palette is written twice on purpose: once as the pre-JS fallback
-   below and once as the explicit [data-theme] override further down. CSS has no
-   way to share a declaration block across a media-query boundary, and a
-   preprocessor isn't worth adding for one duplicated block. */
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme]) {
-    color-scheme: light;
-
-    --bg: #faf3e3;
-    --surface: #fffcf5;
-    --border: #e6d6b4;
-    --field-edge: #96805a;
-
-    --honey: #9a6210;
-    --honey-solid: #e09a2c;
-    --honey-dark: #c9a05a;
-    --honey-glow: rgba(224, 154, 44, 0.42);
-    --on-honey: #2b2115;
-
-    --text: #2c2419;
-    --muted: #7b6a51;
-    --good: #2c7a60;
-    --bad: #b4423a;
-
-    --shadow: 0 6px 18px rgba(90, 66, 20, 0.12);
-
-    --tier-novice-fill: linear-gradient(155deg, #eef3ea, #dfe8da);
-    --tier-novice-edge: #aabfa2;
-    --tier-easy-fill: linear-gradient(155deg, #ecf2e1, #dae7ca);
-    --tier-easy-edge: #9cb884;
-    --tier-building-fill: linear-gradient(155deg, #f3f5da, #e6ebbd);
-    --tier-building-edge: #b5c063;
-    --tier-medium-fill: linear-gradient(155deg, #fcefd0, #f3dfaa);
-    --tier-medium-edge: #d3ad4b;
-    --tier-advanced-fill: linear-gradient(155deg, #fce5c4, #f6d39d);
-    --tier-advanced-edge: #d69b3c;
-    --tier-hard-fill: linear-gradient(155deg, #fbdfc1, #f4c691);
-    --tier-hard-edge: #d4842f;
-    --tier-expert-fill: linear-gradient(155deg, #f0ad42, #d4841a);
-    --tier-expert-edge: #a96712;
-    --tier-expert-ink: #2b2115;
-    --tier-master-fill: linear-gradient(155deg, #d2591f, #a83c11);
-    --tier-master-edge: #7d2b0b;
-    --tier-master-ink: #fff1e4;
-
-    --life: #b4423a;
-    --out: #9a8b74;
-    --spectate: #3d6c8c;
-  }
 }
 
 :root[data-theme="light"] {
   color-scheme: light;
 
-  --bg: #faf3e3;
-  --surface: #fffcf5;
-  --border: #e6d6b4;
-  --field-edge: #96805a;
+  --bg-top: #faf3e3; --bg-bottom: #f4e8cc;
+  --bg-glow: rgba(224, 154, 44, 0.16); --bg-glow-2: rgba(35, 70, 216, 0.08);
+  --bg-edge: rgba(240, 226, 196, 0.9);
+  --cell-line: rgba(201, 135, 30, 0.22); --cell-line-bright: rgba(196, 124, 20, 0.46);
+  --cells-opacity: 1; --cells-glow-opacity: 0.26; --light-peak: 0.44;
 
-  --honey: #9a6210;
-  --honey-solid: #e09a2c;
-  --honey-dark: #c9a05a;
-  --honey-glow: rgba(224, 154, 44, 0.42);
-  --on-honey: #2b2115;
+  --panel: rgba(255, 252, 245, 0.92); --panel-solid: #fffcf5;
+  --panel-edge: rgba(154, 98, 16, 0.16); --panel-highlight: rgba(255, 255, 255, 0.9);
+  --scrim: rgba(250, 243, 227, 0.84);
+  --raised: rgba(201, 135, 30, 0.13);
+  --field: #fffdf8;
 
-  --text: #2c2419;
-  --muted: #7b6a51;
-  --good: #2c7a60;
-  --bad: #b4423a;
+  --text: #2c2419; --muted: #6b5a42;
+  --accent: #8f5a0e; --accent-strong: #7a4b08; --accent-fill: #e09a2c; --on-accent: #2b2115;
+  --heading: #8f5a0e;
+  --kicker: #2346d8; --you: #2346d8;
 
-  --shadow: 0 6px 18px rgba(90, 66, 20, 0.12);
+  --edge: #7f6a48; --ring: #7a4a08; --focus-moat: #fffdf8; --glow-soft: rgba(224, 154, 44, 0.3);
+  --good: #25705a; --bad: #ad3d35;
+  --glow-accent: rgba(224, 154, 44, 0.45); --glow-good: rgba(37, 112, 90, 0.3); --glow-bad: rgba(173, 61, 53, 0.28);
+
+  --mark: #e09a2c; --mark-2: #2346d8; --mark-ring: #2346d8;
+  --ribbon-1: #2346d8; --ribbon-2: #8f887c; --ribbon-3: #b0602a;
+
+  --t-novice: #5a8a5e; --t-easy: #6b8f4e; --t-building: #8a8f35; --t-medium: #b7862a;
+  --t-advanced: #c0722a; --t-hard: #b95a22; --t-expert: #e09a2c; --t-master: #b8471a;
+
+  --bee-body: #eaa640; --bee-stripe: #2c2419; --bee-wing: rgba(255, 255, 255, 0.85); --bee-line: #2c2419; --bee-cheek: #ff9fb2;
+
+  --shadow: 0 18px 40px -22px rgba(120, 80, 20, 0.35);
+
+  --sketch: rgba(122, 75, 8, 0.6); --sketch-faint: rgba(122, 75, 8, 0.3);
+  --ink-shadow: rgba(122, 75, 8, 0.2);
+  --paper-shadow: 0 12px 26px -16px rgba(120, 80, 20, 0.45);
+  --sticker-bg: #e09a2c; --sticker-ink: #2b2115;
+  --tape: rgba(224, 154, 44, 0.6); --tape-line: rgba(255, 255, 255, 0.55);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.62' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .27 0 0 0 0 .08 1.2 0 0 0 -.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  --life: #b4423a;
+  --out: #9a8b74;
+  --spectate: #3d6c8c;
 
   --tier-novice-fill: linear-gradient(155deg, #eef3ea, #dfe8da);
   --tier-novice-edge: #aabfa2;
@@ -161,10 +179,6 @@
   --tier-master-fill: linear-gradient(155deg, #d2591f, #a83c11);
   --tier-master-edge: #7d2b0b;
   --tier-master-ink: #fff1e4;
-
-  --life: #b4423a;
-  --out: #9a8b74;
-  --spectate: #3d6c8c;
 }
 
 * { box-sizing: border-box; }

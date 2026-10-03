@@ -25,8 +25,6 @@ import {
 } from "../lib/sfx";
 import {
   applyTheme,
-  getStoredTheme,
-  onSystemThemeChange,
   resolveTheme,
   setStoredTheme,
   type Theme,
@@ -101,12 +99,6 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
     applyTheme(theme);
   }, [theme]);
 
-  // Follow the OS only while the player hasn't made an explicit choice.
-  useEffect(
-    () => onSystemThemeChange((next) => getStoredTheme() === null && setTheme(next)),
-    []
-  );
-
   // A native modal <dialog> (hardening #18). showModal() is what does the
   // accessibility work: it moves focus into the dialog, makes everything behind
   // it inert (so Tab can't wander into the page), and closes on Escape. The
@@ -141,7 +133,7 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
   }
 
   function chooseTheme(next: Theme) {
-    setStoredTheme(next); // an explicit pick opts out of following the OS
+    setStoredTheme(next);
     setTheme(next);
   }
 

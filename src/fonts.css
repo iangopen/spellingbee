@@ -147,3 +147,16 @@
   src: url('./assets/fonts/bricolage-grotesque-500-800-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+
+/* Caveat Brush (SIL OFL 1.1), for DECORATIVE TEXT ONLY: the title, section
+   headings and badges, through --hand. Never on a word, an answer, an
+   instruction, a button or a number. The file is subset to A-Z, a-z, space,
+   comma, full stop and the ellipsis (15.3 KB) and has no digits on purpose, so
+   a number can never fall back into hand lettering. */
+@font-face {
+  font-family: 'Caveat Brush';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/caveat-brush-letters.woff2') format('woff2');
+}

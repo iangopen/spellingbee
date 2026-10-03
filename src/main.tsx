@@ -5,8 +5,8 @@ import App from './App.tsx'
 import { applyTheme, resolveTheme } from './lib/theme.ts'
 import { applyReduceMotion, isReduceMotionOn } from './lib/motion.ts'
 
-// Resolve before the first React paint so the stored choice never flashes past
-// the prefers-color-scheme fallback that index.css uses until data-theme exists.
+// Resolve before the first React paint so a stored "light" never flashes past
+// the dark palette that index.css puts on :root until data-theme exists.
 applyTheme(resolveTheme())
 applyReduceMotion(isReduceMotionOn())
 

@@ -6,7 +6,7 @@ import { createRoot } from "react-dom/client";
 import { ArrowLeft } from "lucide-react";
 import "../../src/index.css";
 import "../../src/App.css";
-import { applyTheme } from "../../src/lib/theme";
+import { applyTheme, setStoredTheme } from "../../src/lib/theme";
 import { SettingsPanel } from "../../src/components/SettingsPanel";
 import { ModeSelect } from "../../src/components/ModeSelect";
 import { DifficultySelect } from "../../src/components/DifficultySelect";
@@ -21,6 +21,9 @@ import { BESTS, MOCK_PLAYERS, elimExtras, spState } from "./mock";
 const noop = () => {};
 const params = new URLSearchParams(location.search);
 const theme = params.get("theme") === "light" ? "light" : "dark";
+// The OS setting is ignored since redesign stage 1, and SettingsPanel re-applies the
+// stored theme on mount, so the harness stores its pick exactly as a player would.
+setStoredTheme(theme);
 applyTheme(theme);
 
 const SCREENS: Record<string, () => ReactNode> = {
