@@ -204,6 +204,9 @@
 /* ---- tier bars ---- */
 :root[data-h="more"] .tier-wrap:nth-child(odd) { rotate: -0.3deg; }
 :root[data-h="more"] .tier-wrap:nth-child(even) { rotate: 0.3deg; }
+/* The focused bar stands straight: a tilted rim makes the two-line focus indicator
+   (honey rim, dark moat) skew against the pixel grid and soften at its edge. */
+:root[data-h="more"] .tier-wrap:has(.tier-bar:focus-visible) { rotate: 0deg; }
 :root[data-h="more"] .tier-wrap:nth-child(3n+1) { --hex-bar: polygon(19px 1px, calc(100% - 17px) 0, calc(100% - 1px) 51%, calc(100% - 19px) 100%, 17px calc(100% - 1px), 1px 49%); }
 :root[data-h="more"] .tier-wrap:nth-child(3n+2) { --hex-bar: polygon(17px 0, calc(100% - 19px) 1px, 100% 49%, calc(100% - 17px) calc(100% - 1px), 19px 100%, 0 51%); }
 :root[data-h="more"] .tier-wrap:nth-child(3n) { --hex-bar: polygon(18px 1px, calc(100% - 18px) 0, calc(100% - 1px) 50%, calc(100% - 18px) calc(100% - 1px), 18px 100%, 0 50%); }
