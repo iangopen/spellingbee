@@ -1,16 +1,23 @@
-# Phase 3: design system and build plan (planning only; nothing implemented)
+# Phase 3: design system and build plan (stages 0 and 1 built; the rest is planned)
 
-**Final direction (Ian, 2026-09-28):**
-- **Blue Ribbon:** palette, Bricolage Grotesque + Atkinson Hyperlegible,
-  rosette, contestant placards, bell
-- **slow-shimmer honeycomb** at the old live site's cell size (28×49px tile)
-- **bee mascot and bee contestant avatars**
-- **C's race lanes** for race results
-- **dark as the default theme**
+**Direction (Ian, 2026-09-28, revised 2026-10-02 and 2026-10-03):**
+- **Honey and ribbon** (honey hybrid variant b): honey carries everything a player
+  acts on (buttons, focus, field, timer); ribbon blue appears only on the award
+  marks. The Blue Ribbon palette is closed, and so are the other three directions.
+- **Homemade strength: light** (Ian, 2026-10-03). `more` and `off` are closed:
+  no washi tape, no tilts, no grain inside panels, no double outline, no
+  irregular hexagon points, no sketched redraw of the avatars beyond the bee's
+  slight wobble. Delete those rules, never ship a `data-h` switch.
+- Bricolage Grotesque + Atkinson Hyperlegible, Caveat Brush for decorative text only
+- a slow-shimmer honeycomb at the old live site's cell size (28x49px tile), in
+  honey, as background decoration only
+- a bee mascot and bee contestant avatars; C's race lanes for race results
+- **difficulty selection follows the old live design** (the eight hexagon bars)
+- dark as the default theme
 
-Reference implementation: `design/prototypes/blue-ribbon-glow/` (`?bg=shimmer&bee=1`,
-which is now its default). Every value below comes from that prototype's
-`style.css` / `honeycomb.*` and was measured there.
+Reference implementation: `design/prototypes/homemade/` (`?h=light`, bee on). The
+token VALUES live in `src/index.css`, which is the source of truth since stage 1;
+this file describes what each group is for.
 
 ---
 
@@ -18,52 +25,44 @@ which is now its default). Every value below comes from that prototype's
 
 ### 1.1 Colour tokens
 
-Dark is the base (`:root`); light is `[data-theme="light"]`. Every token exists
-in both, per the existing CLAUDE.md rule "adding a token means adding it to
-BOTH palettes".
+**The values are in `src/index.css`** (built in stage 1), not copied here, so they
+cannot drift. Dark is the base (`:root`); light is `[data-theme="light"]`. Every
+token exists in both, per the standing rule "adding a token means adding it to
+BOTH palettes". Groups, and what each is for:
 
-| Token | Dark | Light | Used for |
-|---|---|---|---|
-| `--bg-top` / `--bg-bottom` | `#070b1c` / `#050814` | `#f4f6fd` / `#e8edfb` | background gradient ends; `--bg-top` is also the calm header band |
-| `--bg-glow`, `--bg-glow-2` | `rgba(35,70,216,.55)`, `rgba(92,124,255,.22)` | `rgba(35,70,216,.16)`, `rgba(35,70,216,.10)` | the ribbon-blue light in the gradient |
-| `--bg-edge` | `rgba(3,5,14,.85)` | `rgba(214,222,246,.9)` | depth vignette |
-| `--cell-line` / `--cell-line-bright` | `rgba(138,162,255,.34)` / `rgba(186,204,255,.85)` | `rgba(35,70,216,.20)` / `rgba(35,70,216,.55)` | honeycomb edges / the shimmer band's cells |
-| `--cells-glow-opacity`, `--light-peak` | `.55`, `.55` | `.35`, `.6` | glow copy strength, shimmer peak |
-| `--panel` / `--panel-solid` | `rgba(17,23,46,.86)` / `#121830` | `rgba(252,253,255,.9)` / `#fcfdff` | lit panels / the solid fallback |
-| `--panel-edge`, `--panel-highlight` | `rgba(160,182,255,.16)`, `rgba(210,222,255,.10)` | `rgba(35,70,216,.14)`, `rgba(255,255,255,.9)` | panel inner edge and top highlight |
-| `--scrim` | `rgba(5,8,20,.72)` | `rgba(246,248,254,.8)` | behind any text that isn't on a panel |
-| `--raised` | `rgba(138,162,255,.10)` | `rgba(35,70,216,.07)` | timer track, subtle fills |
-| `--field` | `#0c1126` | `#ffffff` | answer and text inputs; also their focus moat |
-| `--text` / `--muted` | `#eef1f8` / `#a9b1ca` | `#141a2e` / `#4a5470` | ink |
-| `--accent` / `--accent-strong` / `--on-accent` | `#8aa2ff` / `#aabcff` / `#0b1024` | `#2346d8` / `#1a37b8` / `#fcfdff` | ribbon blue |
-| `--edge` | `#8f99bb` | `#5f6886` | control edges (inputs, secondary buttons) |
-| `--ring` / `--focus-moat` / `--glow-soft` | `#b7c6ff` / `#070b1c` / `rgba(122,150,255,.32)` | `#1a37b8` / `#ffffff` / `rgba(35,70,216,.18)` | focus ring, its solid moat, and the halo beyond |
-| `--good` / `--bad` | `#5fdcaa` / `#ff8b83` | `#146b45` / `#b02f28` | correct / missed |
-| `--glow-accent` / `--glow-good` / `--glow-bad` | `rgba(122,150,255,.55)` / `rgba(95,220,170,.5)` / `rgba(255,139,131,.45)` | `rgba(35,70,216,.35)` / `rgba(20,107,69,.3)` / `rgba(176,47,40,.28)` | glows |
-| `--ribbon-2` / `--ribbon-3` | `#ff8b83` / `#d8def0` | `#b02f28` / `#6f7896` | 2nd- and 3rd-place ribbons |
-| `--bee-body` / `--bee-stripe` / `--bee-wing` / `--bee-line` / `--bee-cheek` | `#8aa2ff` / `#141a2e` / `rgba(225,233,255,.72)` / `#0b1024` / `#ff9fb2` | `#5d7cf2` / `#141a2e` / `rgba(255,255,255,.85)` / `#141a2e` / same | bee art (never yellow) |
-| `--shadow` | `0 20px 50px -24px rgba(0,0,0,.8)` | `0 18px 40px -22px rgba(35,70,216,.35)` | panel lift |
+| Group | Tokens | Used for |
+|---|---|---|
+| Background layers | `--bg-top`, `--bg-bottom`, `--bg-glow`, `--bg-glow-2`, `--bg-edge`, `--cell-line`, `--cell-line-bright`, `--cells-opacity`, `--cells-glow-opacity`, `--light-peak` | the honeycomb background (stage 2): gradient, glow, vignette, cell edges, shimmer peak |
+| Surfaces | `--panel`, `--panel-solid`, `--panel-edge`, `--panel-highlight`, `--scrim`, `--raised`, `--field` | lit panels and their solid fallback, the scrim behind loose text, timer track, inputs |
+| Ink | `--text`, `--muted`, `--accent`, `--accent-strong`, `--accent-fill`, `--on-accent`, `--heading` | body and secondary text, honey as text/border, honey as a fill, ink on that fill, headings |
+| Award accent | `--kicker`, `--you`, `--mark`, `--mark-2`, `--mark-ring`, `--ribbon-1..3` | the ONLY ribbon-blue uses: winner kicker, the "you" tag, rosette ribbon, first-place ribbon |
+| Controls | `--edge`, `--ring`, `--focus-moat`, `--glow-soft`, `--glow-accent`, `--glow-good`, `--glow-bad`, `--good`, `--bad` | control edges, focus ring + its solid moat + halo, state glows, correct / missed |
+| Difficulty ramp | `--t-novice` ... `--t-master` | the eight tier bars (stage 4b); sage to olive to amber to burnt orange to honey to rust |
+| Bee art | `--bee-body`, `--bee-stripe`, `--bee-wing`, `--bee-line`, `--bee-cheek` | the mascot and avatars |
+| Homemade (light strength) | `--sketch`, `--sketch-faint`, `--ink-shadow`, `--paper-shadow`, `--sticker-bg`, `--sticker-ink`, `--tape`, `--tape-line`, `--grain`, `--grain-bg-opacity`, `--grain-panel-opacity` | the one hand-drawn panel outline, marker shadows, the sticker, page grain. `--tape*` and `--grain-panel-opacity` (0 at light) are inherited from the prototype and unused at this strength: delete them when the stage that would consume them is built |
+| Elimination | `--life`, `--out`, `--spectate` | unchanged from Session 20 |
+| Elevation | `--shadow` | panel lift |
+| Not themed (`:root` only) | `--display`, `--body`, `--hand`, `--r-sm/md/lg/pill`, `--hm-r-panel/btn/field`, `--ease-out` | type families, radii (incl. the irregular homemade corners), easing |
 
-**Tokens being retired:**
-- `--honey*`, `--on-honey`
-- the 8 `--tier-*-fill/edge/ink` gradients
-- `--surface`, `--border`
+**Aliases (stages 1 to 6, deleted in stage 7):** `--bg`, `--surface`, `--border`,
+`--field-edge`, `--honey`, `--honey-solid`, `--honey-dark`, `--honey-glow`,
+`--on-honey` point at the new tokens so unported screens keep rendering. Two
+families are deliberately NOT aliased yet: `--font-display` / `--font-body` still
+name Space Grotesk / Inter (switched to `--display` / `--body` with the shared
+components, stage 3), and the old `--tier-*-fill/edge/ink` gradients stay until
+stage 4b rebuilds the bars from `--t-*`. `--field-edge` aliases `--edge`, which
+is at least as strong as the old value on every field background.
 
-During the transition (stages 1 to 4) they are **aliased** to the new tokens,
-so unported screens keep rendering. They're deleted in stage 7. Elimination's
-`--life`, `--out` and `--spectate` stay, re-tuned to the new palette and
-re-measured.
+**Measured at stage 1** (`design/stage-results/stage1-contrast-app.md`, the real
+app through `design/harness`, worst pixel behind each pair): 728 pairs, 11
+failing, against the stage 0 baseline of 715 pairs and 47 failing. No pair that
+passed at baseline fails now. The 11 are all pre-existing: the Master bar's
+text (4.24 dark, 3.81 light), "Championship rarities" (4.48 dark, 4.00 light),
+the eliminated player's name `--out` (2.86 to 2.88; stage 4h), the lobby's
+primary buttons in dark (3.19; stage 3's Button), and the default focus ring on
+the Settings button over a honey fill (1.82, was 2.14; stage 3's global focus
+rule). Each is owned by the stage named.
 
-**Measured** (`design/prototypes/blue-ribbon-glow/contrast.md`, at the old
-cell size): 152 text/edge/focus-ring pairs against the worst pixel behind them
-at peak glow, 0 failing. Minimums:
-
-| Kind | Minimum |
-|---|---|
-| Body text | 5.67:1 |
-| Large text | 5.61:1 |
-| Control edges | 4.1:1 |
-| Focus rings (measured focused) | 8.52:1 |
 
 ### 1.2 Type
 
@@ -159,6 +158,8 @@ light-up). The honeycomb pauses in a hidden tab.
 
 - A 28×49px pointy-top tile, generated SVG, stretched 1% vertically so the pitch
   is exactly the old site's.
+- Honey, not blue: cell edges use `--cell-line` / `--cell-line-bright` (amber at 28-42 degrees of hue). Never lemon yellow, never flat grey tiles.
+- A paper-grain layer (`.bg-grain`, peak alpha about 0.06) sits over the page background only.
 - Layers:
   - the gradient
   - the crisp cell lines plus a blurred copy (rasterised once)
@@ -167,9 +168,10 @@ light-up). The honeycomb pauses in a hidden tab.
   - the depth vignette
   - a calm band under the header
 - **Decoration only:** `aria-hidden`, no pointer events, no text or controls,
-  never a letter board or answer layout. **Never yellow.**
-- Verified by `design/harness/check-glow.mjs`: 0 yellow literals and 0 yellow
-  pixels in 43.3M.
+  never a letter board or answer layout.
+- Verified by the lemon test in `design/harness/shoot-homemade.mjs` (NYT yellow is
+  hue 53; the honey sits at 30-42). `check-glow.mjs` is for the Blue Ribbon
+  direction and fails honey by design.
 - Phone: at 390px with the CPU slowed 4×, the median frame is 16.7ms and no
   frame is over 25ms (headless; a real-phone check is still due).
 
@@ -220,7 +222,7 @@ middle stages alone would show a half-old, half-new UI.
 | # | Stage (one commit) | Files | Tests / checks added |
 |---|---|---|---|
 | 0 ✅ | **Groundwork (done 2026-09-29).** Self-host the two fonts (woff2, Latin + Latin Extended) and add `CREDITS.md` (the OFL fonts, lucide ISC). Port `measure.mjs` / `check-glow.mjs` to the real screens (`TARGET=app`, through `design/harness`), and record the baseline in `design/baseline/`. The current fonts were self-hosted on `main` first (HARDENING #24; live, 0 Google requests). | `src/fonts.css`, `src/assets/fonts/`, `CREDITS.md`, `design/harness/*`, `design/baseline/*` | prototype regression: 152 pairs, 0 failing, unchanged; app baseline: 715 pairs, 47 failing, 44 controls without an outline |
-| 1 | **Tokens + dark default.** The new token set in both themes, old tokens aliased. `theme.ts`: `resolveTheme()` becomes stored ?? **`"dark"`**; drop the OS listener in `SettingsPanel`; the pre-JS fallback becomes dark. The `spellingbee:theme` key and its values are unchanged, so a player who chose light keeps it. | `index.css`, `lib/theme.ts`, `SettingsPanel.tsx` (listener only) | new `theme.test.ts`: no stored value gives dark; stored light gives light; the OS setting is ignored |
+| 1 ✅ | **Tokens + dark default (done 2026-10-03).** The honey-and-ribbon token set (homemade `light`) in both themes in `index.css`, old tokens aliased (see 1.1). `theme.ts`: `resolveTheme()` is stored ?? `"dark"`, the OS listener and `getSystemTheme`/`onSystemThemeChange` are gone, `SettingsPanel`'s listener removed. The `spellingbee:theme` key and its values are unchanged, so a player who chose light keeps it. The harness now stores its theme pick like a player would (the OS emulation no longer selects a theme). Stage 0 gap closed: Caveat Brush added to `src/fonts.css`, `src/assets/fonts/` and `CREDITS.md`. | `index.css`, `fonts.css`, `lib/theme.ts`, `main.tsx`, `SettingsPanel.tsx`, `CREDITS.md`, `design/harness/main.tsx` | `theme.test.ts` (7 tests; negative control: following the OS again fails 2 of them); contrast 728 pairs / 11 failing vs baseline 47, no new failure |
 | 2 | **Honeycomb background.** The `HoneycombBackground` component + CSS (28×49 tile, glow, shimmer, vignette, header band), replacing `body::before`. The shimmer is hidden under the OS setting AND the in-app override. | `components/HoneycombBackground.tsx`, `index.css` | render test (`aria-hidden`, no text, no focusables); check-glow on the app; the perf script at 390px |
 | 3 | **Shared components.** Panel, Button, AnswerField (moat + states), TextInput/Select, Placard, Rosette, BeeMascot, AvatarArt, Clock/TimerBar and Tally restyles; the global focus-moat rule. | new `components/ui/*`, `AvatarPicker.tsx`, `TimerBar.tsx` (CSS only), `ScoreBar.tsx`, `lib/avatars.ts` (art mapping only) | `AVATAR_KEYS` unchanged (unit test pins the list); TimerBar tests unchanged and green; focus-ring contrast |
 | 4a | **Home** (ModeSelect): hero panel + mascot + best-scores panel (from `getAllBests()`) | `ModeSelect.tsx`, `App.tsx` (pass bests only) | keyboard: heading focus via `useScreenFocus` is unchanged |
@@ -276,7 +278,7 @@ the stages below like this:
 | Stage | What the tweaks change |
 |---|---|
 | 0 (built) | **Add one font:** Caveat Brush (OFL), subset to A-Z, a-z, space, comma, full stop and the ellipsis (15.3 KB woff2, no digits). `src/fonts.css` gets one `@font-face`, `src/assets/fonts/` gets the file and `OFL-CaveatBrush.txt`. Total redesign fonts 126.9 KB, inside the 150 KB budget. Nothing already built is undone. |
-| 1 Tokens | The token source is now `prototypes/homemade/style.css` variant **b** (not Blue Ribbon). New tokens, both palettes: `--sketch`, `--sketch-faint`, `--ink-shadow`, `--paper-shadow`, `--sticker-bg`, `--sticker-ink`, `--tape`, `--tape-line`, `--grain`. Radius tokens for the irregular corners (`--hm-r-panel`, `--hm-r-btn`, `--hm-r-field`). `--hand` joins the type tokens. The homemade strength is a build-time constant once Ian picks light or more: delete the other strength's rules rather than shipping a `data-h` switch. |
+| 1 Tokens | The token source is now `prototypes/homemade/style.css` variant **b** (not Blue Ribbon). New tokens, both palettes: `--sketch`, `--sketch-faint`, `--ink-shadow`, `--paper-shadow`, `--sticker-bg`, `--sticker-ink`, `--tape`, `--tape-line`, `--grain`. Radius tokens for the irregular corners (`--hm-r-panel`, `--hm-r-btn`, `--hm-r-field`). `--hand` joins the type tokens. **Ian picked `light` (2026-10-03)**, so the strength is a build-time constant: `more` and `off` rules are deleted, never switched. Stage 1 is built this way. |
 | 2 Honeycomb | The grain layer (`.bg-grain`) joins the background component, and the two SVG wobble filters mount once in `Shell`. The shimmer peak is calmer (`--light-peak` 0.36 light, 0.30 more in dark). |
 | 3 Shared components | Panel gets the irregular corners, the drawn outline (`::after`, wobble filter) and, at "more", the grain `::before`. Button gets the hard marker shadow and irregular corners. **The global focus rule must outrank the strength rules** (a bug caught by measuring: the marker shadows silently replaced the focus moat). `AvatarArt` and the rosette take the rough drawing (`art.js`: jittered blobs, seeded per avatar key, so each avatar is drawn the same way every time); `AVATAR_KEYS` unchanged. New `Sticker` and `Tape` bits (decorative, `aria-hidden`). |
 | 4a Home | Hand-lettered title, "Your best scores" heading and a sticker on the hero card; the hero gets extra top padding for the sticker; the mascot sits lower on phones so it never touches the Settings button's focus ring. |

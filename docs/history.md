@@ -47,3 +47,28 @@ summary line in `checks.txt` (0 failures: 680 pairs + 12 focus configs). The fou
 side-by-sides were missing because an interrupted run had wiped `screens/` while
 `checks.txt` kept its old success text; the script now writes to `screens.new`,
 swaps on success and asserts the files exist. The light/more pick is still open.
+
+## 2026-10-03: homemade `light` picked, stage 1 built, package renamed
+
+Ian's decisions: homemade strength `light` (`more` and `off` closed), the difficulty
+screen follows the old live design, and the npm package is `spelling-bee`.
+
+**The focus checker was proven able to fail before anything was built.** The tier-bar
+focus check was moved out of `shoot-homemade.mjs` into `design/harness/tier-focus.mjs`
+(the shoot script calls it), with `check-tier-focus.mjs` to run it alone on any copy
+of the prototype folder. On a temporary copy in the scratchpad:
+- real files: 12/12 PASS, lowest 7.35:1;
+- focus rim removed (focused bar keeps its normal look): 0/12 PASS, 1.00:1, exit 1;
+- rim present but the same colour as its moat: 0/4 PASS at `light`, 1.00:1, exit 1;
+- copy restored (byte-identical to the original): 4/4 PASS, lowest 7.35:1, exit 0.
+The 1.00:1 in the first mutant comes from the "rim colour not found" branch; the
+second mutant exercises the ratio branch. The repo's prototype files were never edited.
+
+**Stage 1** (tokens and dark default): see CLAUDE.md "Build progress" and PHASE3 1.1.
+Things found by measuring: (1) once the OS is ignored, the harness's
+`colorScheme: "light"` stopped producing light screens (SettingsPanel re-applies the
+stored theme on mount), so every "light" measurement silently ran dark until the
+harness stored its pick like a player; (2) measuring overwrites `design/baseline/`,
+so stage results go to `design/stage-results/` and the baseline is restored.
+Caveat Brush, which the 2026-10-02 plan said stage 0 would carry, had never been
+added; stage 1 added it.
