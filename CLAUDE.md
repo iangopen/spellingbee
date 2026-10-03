@@ -979,9 +979,18 @@ the live site.
   - **more:** all of light plus a double outline, faint grain in panels, washi
     tape, small tilts, irregular tier-bar hexagons, wobbly icons, a sketched bee
     and avatars.
-  Both: contrast 0 failing over texture and glow (`contrast-off|light|more.md`),
-  reduced-motion stills identical to static, the hand face only on decorative
-  text. **Until Ian picks, the build plan carries no homemade rules**; stage 0
+  Both, re-run 2026-10-03: `checks.txt` ends with one line, **0 failures**: 680
+  contrast pairs over texture and glow (`contrast-off|light|more.md`) plus 12/12
+  tier-bar focus configurations (lowest 7.35:1); reduced-motion stills 48/48
+  identical to static; the hand face only on decorative text. The earlier "0
+  failing" claim left the focus check out, and that check read 8/12. Its "more"
+  failures were mostly the checker finding the rim by colour (it also matched the
+  neighbouring Expert/Master bars); it now samples fixed band centres. The
+  focused bar also drops its tilt at "more". `shoot-homemade.mjs` now builds
+  `screens/` in `screens.new` and swaps it in only on success (a killed run had
+  left a half-empty folder and a stale `checks.txt`, which is why the four
+  side-by-sides were missing). **The pick between light and more is still Ian's.**
+  **Until Ian picks, the build plan carries no homemade rules**; stage 0
   (built) is the only stage it touches (one added font, see PHASE3's
   "Adjustments from the homemade pass").
   - **Fonts rule:** hand lettering (Caveat Brush, OFL, subset to letters, 15.3 KB)

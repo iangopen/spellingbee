@@ -36,3 +36,14 @@ contrast pairs, 0.06 passes; (2) the marker-style button shadows silently
 replaced the focus moat until the global focus rule was made to outrank them;
 (3) a sticker hung off the winner card's top edge sat on the phone Settings
 button's focus ring, so it moved to the bottom edge.
+
+## 2026-10-03: homemade prototype gaps closed
+
+The 10-02 prototype was committed as it stood, then: the tier-bar focus check
+(8/12, 1.10:1 at "more") was found to be partly a measurement fault (it located the
+rim by colour and matched neighbouring Expert/Master bars) and is now geometric;
+the focused bar drops its tilt at "more". Result 12/12, lowest 7.35:1, and a single
+summary line in `checks.txt` (0 failures: 680 pairs + 12 focus configs). The four
+side-by-sides were missing because an interrupted run had wiped `screens/` while
+`checks.txt` kept its old success text; the script now writes to `screens.new`,
+swaps on success and asserts the files exist. The light/more pick is still open.
