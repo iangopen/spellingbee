@@ -15,13 +15,17 @@
 //   5. the tier bars' focus indicator (a thickened rim; a clip-path hides any
 //      outline) against the band just inside it and the pixels just outside it
 //   6. side-by-sides of the old live difficulty screen and the new ones
-import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
 const DIR = resolve("design/prototypes/homemade");
-const OUT = resolve(DIR, "screens");
+// Written to screens.new and swapped in only when the whole run succeeds. Wiping
+// screens/ up front left a half-populated folder (and a stale checks.txt that still
+// claimed success) whenever a run was killed part-way.
+const FINAL = resolve(DIR, "screens");
+const OUT = resolve(DIR, "screens.new");
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 
@@ -236,19 +240,19 @@ for (const h of STRENGTHS) for (const theme of THEMES) for (const w of Object.ke
       const ratio = (a, b) => (Math.max(L(a), L(b)) + 0.05) / (Math.min(L(a), L(b)) + 0.05);
       const at = (px, py) => [...x.getImageData(Math.round(px), Math.round(py), 1, 1).data].slice(0, 3);
       let rimFill = Infinity, rimOut = Infinity;
-      // The hexagon edges can sit a pixel off at "more" (irregular points), so the
-      // rim is FOUND, not assumed: scan down through the top edge and up through
-      // the bottom edge, take the rows that are the rim colour, and compare the
-      // pixel just outside the band and the pixel just inside it.
+      // The bands have fixed geometry (outer moat 3px, rim 5px, inner moat 3px, measured
+      // from the bar's top and bottom edge), so each is sampled at its CENTRE row, which
+      // tolerates the 1px the irregular "more" hexagon points can drift. The sample is
+      // asserted to BE the focus colour; finding the rim by colour alone matched the
+      // neighbouring Expert/Master bars (whose rims are near the focus colour) and
+      // reported 1.00:1 for a ring that was fine.
       const want = rect.rim.match(/[\d.]+/g).slice(0, 3).map(Number);
       const isRim = (c) => Math.max(...c.map((v, n) => Math.abs(v - want[n]))) <= 12;
       for (let k = 0; k < 24; k++) {
         const px = rect.l + 40 + (k / 23) * (rect.r - rect.l - 80);
-        for (const [y0, dir] of [[rect.t - 6, 1], [rect.b + 6, -1]]) {
-          let first = null, last = null;
-          for (let n = 0; n <= 22; n++) { const y = Math.round(y0 + dir * n); if (isRim(at(px, y))) { if (first === null) first = y; last = y; } }
-          if (first === null) { rimFill = 1; rimOut = 1; continue; }
-          const rim = at(px, first), out = at(px, first - dir), inn = at(px, last + dir);
+        for (const [edge, dir] of [[rect.t, 1], [rect.b - 1, -1]]) {
+          const rim = at(px, edge + dir * 2), out = at(px, edge - dir * 2), inn = at(px, edge + dir * 6);
+          if (!isRim(rim)) { rimFill = 1; rimOut = 1; continue; }
           rimFill = Math.min(rimFill, ratio(rim, inn)); rimOut = Math.min(rimOut, ratio(rim, out));
         }
       }
@@ -281,14 +285,37 @@ for (const w of Object.keys(W)) for (const theme of THEMES) {
   const name = `side-by-side--difficulty--${w}--${theme}`;
   await pg.screenshot({ path: resolve(OUT, `${name}.jpg`), type: "jpeg", quality: 90, fullPage: true });
   await ctx.close();
+  // Report only what is really on disk: this line once read "wrote" for files that were not there.
+  if (!existsSync(resolve(OUT, `${name}.jpg`))) throw new Error(`side-by-side not written: ${name}.jpg`);
   log(`wrote ${name}.jpg`);
 }
 rmSync(resolve(OUT, "_sbs.html"), { force: true });
 await browser.close();
 
 for (const s of stills) bufs.delete(`${s}--ref`);
+// One number for everything the page measures: the contrast pairs (measure.mjs,
+// TARGET=homemade) plus the tier-bar focus configurations above.
+{
+  let pairs = 0, pairFails = 0;
+  const missing = [];
+  for (const h of STRENGTHS) {
+    const f = resolve(DIR, `contrast-${h}.md`);
+    const m = existsSync(f) ? readFileSync(f, "utf8").match(/(\d+) measured pairs, (\d+) failing/) : null;
+    if (!m) { missing.push(h); continue; }
+    pairs += +m[1]; pairFails += +m[2];
+  }
+  log("\n## Summary of everything measured");
+  if (missing.length) log(`FAIL contrast tables missing for ${missing.join(", ")}: run measure.mjs with TARGET=homemade first`);
+  const total = pairFails + focusFails + missing.length;
+  log(`${total === 0 ? "PASS" : "FAIL"} ${total} failures: ${pairs} contrast pairs (${pairFails} failing) + ${focusN} tier-bar focus configurations (${focusFails} failing; lowest ${focusMin.toFixed(2)}:1)`);
+}
 const names = readdirSync(OUT).filter((f) => f.endsWith(".jpg")).map((f) => f.slice(0, -4)).sort();
 writeFileSync(resolve(OUT, "index.js"), `// Written by design/harness/shoot-homemade.mjs\nwindow.SCREENS = ${JSON.stringify(names, null, 1)};\n`);
-log(`\ncaptured ${names.length} screenshots -> ${OUT}`);
+log(`\ncaptured ${names.length} screenshots -> ${FINAL}`);
 log(`page errors: ${errors.length}${errors.length ? "\n  " + errors.join("\n  ") : ""}`);
 writeFileSync(resolve(DIR, "checks.txt"), out.join("\n") + "\n");
+// Swap in only now, after every step above has finished.
+rmSync(FINAL, { recursive: true, force: true });
+renameSync(OUT, FINAL);
+const onDisk = readdirSync(FINAL).filter((f) => f.endsWith(".jpg")).length;
+if (onDisk !== names.length) throw new Error(`reported ${names.length} screenshots, found ${onDisk} on disk`);
