@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#16130f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#faf3e3" media="(prefers-color-scheme: light)" />
+  <title>Spelling Bee | Medium, word 4 of 10</title>
+  <script src="params.js"></script>
+  <link rel="stylesheet" href="honeycomb.css" />
+  <link rel="stylesheet" href="fonts.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="homemade.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="link-back" href="difficulty.html" onclick="this.href=withParams('difficulty.html')"><i data-icon="arrow-left"></i>Quit</a>
+      <button class="icon-btn" aria-label="Settings"><i data-icon="settings"></i></button>
+    </header>
+
+    <main class="round enter">
+      <div class="round-head panel">
+        <span class="tier-name" data-tier="medium"><i class="swatch" aria-hidden="true"></i>Medium</span>
+        <div class="placard"><b class="num">4</b><span>of 10 words</span></div>
+        <div class="clock num" aria-label="9 seconds left">9<small>s</small></div>
+      </div>
+
+      <section class="panel pronouncer" aria-labelledby="word-h">
+        <i class="tape" aria-hidden="true"></i>
+        <p class="who" id="word-h"><i data-icon="mic"></i>Your word is…</p>
+        <p class="definition">“A strong, regular repeated pattern of sound”</p>
+        <button class="chip-btn" data-ui="Hear-again button edge"><i data-icon="volume-2"></i>Hear it again</button>
+      </section>
+
+      <form class="panel answer" id="answer-form">
+        <label for="guess">Spell it</label>
+        <div class="field-wrap">
+          <input class="answer-field" id="guess" value="rhyt" autocomplete="off" autocapitalize="off" spellcheck="false" data-ui="Answer field edge" data-spot-rest />
+          <span class="outcome-icon ok"><i data-icon="check"></i></span>
+          <span class="outcome-icon miss"><i data-icon="x"></i></span>
+          <span class="float-points num" aria-hidden="true">+14</span>
+        </div>
+        <div class="timer" aria-hidden="true"><i></i></div>
+        <p class="feedback" id="feedback"></p>
+      </form>
+
+      <div class="round-foot panel">
+        <div class="tally">
+          <span><b class="num" id="score">58</b>points</span>
+          <span><b class="num" id="streak">3</b>in a row</span>
+        </div>
+        <button class="text-btn" type="button">Skip this word</button>
+      </div>
+      <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" id="status"></p>
+    </main>
+  </div>
+  <script src="honeycomb.js"></script>
+  <script src="homemade.js"></script>
+  <script src="art.js"></script>
+  <script src="../_shared/icons.js"></script>
+  <script>
+    // Prototype-only answer check, to demo the two outcome moments.
+    // Type "rhythm" + Enter for correct; anything else rings the bell.
+    (function () {
+      const root = document.documentElement, input = document.getElementById("guess");
+      const fb = document.getElementById("feedback"), status = document.getElementById("status");
+      const set = (id, v) => (document.getElementById(id).textContent = v);
+      function show(state) {
+        root.dataset.state = state;
+        if (state === "correct") {
+          fb.textContent = "Correct. 2.1 seconds, 57 words a minute.";
+          status.textContent = "Correct. Score 72.";
+          set("score", "72"); set("streak", "4");
+        } else {
+          fb.innerHTML = '<span class="bell">' + ICONS.bell + "</span>Missed. The word was “rhythm”.";
+          status.textContent = "Incorrect: rhythm. Score 58.";
+          set("streak", "0");
+        }
+      }
+      if (root.dataset.state) show(root.dataset.state);
+      else input.focus({ preventScroll: true }); // the game focuses the answer field on every word
+      document.getElementById("answer-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        delete root.dataset.state;
+        void input.offsetWidth; // restart the CSS animations
+        show(input.value.trim().toLowerCase() === "rhythm" ? "correct" : "incorrect");
+      });
+    })();
+  </script>
+</body>
+</html>

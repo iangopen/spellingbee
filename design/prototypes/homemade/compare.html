@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en" data-v="b" data-h="light" data-bg="static" data-bee="1">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Homemade: compare</title>
+  <script>
+    // Choices live in the URL (?theme=&screen=), so they survive reloads.
+    (function () {
+      const u = new URLSearchParams(location.search), r = document.documentElement;
+      r.dataset.theme = u.get("theme") === "light" ? "light" : "dark";
+    })();
+  </script>
+  <link rel="stylesheet" href="honeycomb.css" />
+  <link rel="stylesheet" href="fonts.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="homemade.css" />
+  <style>
+    .cmp { max-width: 1480px; margin: 0 auto; padding: 24px 20px 64px; }
+    .cmp h1 { font: 400 clamp(3rem, 6vw, 4.6rem)/0.95 var(--hand); letter-spacing: 0.01em; margin: 0 0 10px; color: var(--heading); }
+    .cmp h2 { font: 400 2rem/1.05 var(--hand); letter-spacing: 0.01em; margin: 0 0 6px; color: var(--heading); }
+    .cmp h3 { font: 700 1.05rem var(--display); margin: 0 0 4px; }
+    .cmp p { margin: 0 0 12px; color: var(--muted); max-width: 80ch; }
+    .cmp a { color: var(--accent); }
+    .cmp section { padding: 24px 26px; margin-top: 30px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 18px 28px; margin-top: 14px; }
+    .controls fieldset { border: 0; padding: 0; margin: 0; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .controls legend { float: left; margin-right: 8px; font-weight: 700; }
+    .controls label { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: var(--r-pill); border: 1.5px solid var(--edge); cursor: pointer; }
+    .controls input { accent-color: var(--accent-fill); width: 18px; height: 18px; }
+    .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 14px; }
+    .phones { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 14px; }
+    .phones figure { margin: 0; width: 250px; }
+    .phones figcaption { font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; }
+    .cell p { font-size: 0.92rem; margin-bottom: 8px; }
+    .frame { position: relative; width: 100%; aspect-ratio: 1280 / 800; overflow: hidden; border-radius: var(--r-md); box-shadow: inset 0 0 0 1px var(--panel-edge); background: var(--bg-bottom); }
+    .frame.tall { aspect-ratio: 1280 / 960; }
+    .frame.phone { aspect-ratio: 390 / 844; }
+    .frame.phone.tall { aspect-ratio: 390 / 1000; }
+    .frame iframe { position: absolute; left: 0; top: 0; width: 1280px; height: 800px; border: 0; transform-origin: 0 0; }
+    .frame.tall iframe { height: 960px; }
+    .frame.phone iframe { width: 390px; height: 844px; }
+    .frame.phone.tall iframe { height: 1000px; }
+    .frame img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+    .tag { display: inline-block; font: 700 0.8rem var(--body); padding: 2px 10px; border-radius: var(--r-pill); border: 1.5px solid var(--edge); margin-left: 6px; vertical-align: 4px; }
+    .variant ul, .checks { margin: 4px 0 8px; padding-left: 1.2em; color: var(--text); max-width: 92ch; display: grid; gap: 6px; }
+    .shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 12px; }
+    .shots a { display: block; color: var(--text); text-decoration: none; font-size: 0.8rem; overflow-wrap: anywhere; }
+    .shots img { width: 100%; height: 130px; object-fit: cover; object-position: top; border-radius: var(--r-sm); display: block; margin-bottom: 4px; }
+    .shots-group h3 { margin-top: 18px; }
+    .sbs img { width: 100%; height: auto; border-radius: var(--r-md); display: block; margin-top: 10px; }
+    .font-sample { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 12px; }
+    .font-sample div { padding: 14px 16px; border-radius: var(--r-md); background: var(--field); box-shadow: inset 0 0 0 1px var(--panel-edge); }
+    .font-sample .hand { font: 400 2rem/1 var(--hand); color: var(--heading); margin: 0 0 6px; }
+    .font-sample .read { font: 700 1.6rem/1.1 var(--body); letter-spacing: 0.08em; margin: 0 0 6px; color: var(--text); }
+    .font-sample small { color: var(--muted); }
+    @media (max-width: 900px) { .three { grid-template-columns: 1fr; } .phones figure { width: calc(50% - 9px); } }
+  </style>
+</head>
+<body>
+  <main class="cmp">
+    <header class="panel" style="padding: 26px">
+      <h1>Homemade, two strengths</h1>
+      <p>The honey and ribbon hybrid you picked (variant b), with the difficulty screen from the old live design, at three levels of homemade feel: <b>off</b> (the hybrid as picked), <b>light</b> and <b>more</b>. Every frame below is the live prototype: tab, hover and type in it. On the round screen, type <code>rhythm</code> and press Enter for the correct moment, anything else for the miss.</p>
+      <form class="controls" id="controls">
+        <fieldset><legend>Theme</legend>
+          <label><input type="radio" name="theme" value="dark" /> Dark (default)</label>
+          <label><input type="radio" name="theme" value="light" /> Light</label>
+        </fieldset>
+        <fieldset><legend>Screen</legend>
+          <label><input type="radio" name="screen" value="home" /> Home</label>
+          <label><input type="radio" name="screen" value="difficulty" /> Difficulty</label>
+          <label><input type="radio" name="screen" value="round" /> Round, mid-answer</label>
+          <label><input type="radio" name="screen" value="race-results" /> Race results</label>
+        </fieldset>
+      </form>
+    </header>
+
+    <section class="panel" aria-labelledby="s1">
+      <h2 id="s1">1. Off, light and more, side by side</h2>
+      <p>Desktop first, then phone width. Switch the screen and theme above.</p>
+      <div class="three" id="three"></div>
+      <h3 style="margin-top:22px">Phone width</h3>
+      <div class="phones" id="phones"></div>
+    </section>
+
+    <section class="panel variant" aria-labelledby="s2">
+      <h2 id="s2">2. The difficulty screen is the old design again</h2>
+      <p>The tier selection returns to the old live screen: eight elongated hexagon bars in one stacked column, the sage, olive, amber, burnt-orange, honey and rust ramp, "Best" scores on the right, the Practice mode and Hide definition chips with the hint line, and a rim that thickens on focus (an outline would be clipped by the hexagon). It is eight tier <em>buttons</em>, one per row, never a letter board.</p>
+      <ul>
+        <li><b>Restyled with the hybrid's palette:</b> the bar tints now come from the hybrid's tier tokens over the hybrid's panel colour, and the focused rim uses the hybrid's focus colour with its soft honey glow. Expert is the honey accent itself and Master is ember, as before.</li>
+        <li><b>One change to the layout:</b> the title, tagline, chips and hint sit on one lit panel instead of bare background, because text may not sit on the bare honeycomb at its peak (the same rule every other screen follows).</li>
+        <li><b>At "more"</b> the bars take slightly irregular hexagon points and tiny alternating tilts. At "light" they are exactly the old shape.</li>
+      </ul>
+      <div class="sbs" id="sbs"></div>
+    </section>
+
+    <section class="panel variant" aria-labelledby="s3">
+      <h2 id="s3">3. What "light" and "more" change <span class="tag">pick pending</span></h2>
+      <ul>
+        <li><b>Light:</b> softly wobbly corners on panels, buttons and fields; one thin hand-drawn outline round each panel; the title, headings and badges in a hand-lettered face with a drawn underline; one tilted sticker on the home and results cards; paper grain on the page behind the panels only; hard marker-style shadows on buttons instead of gloss; a calmer honeycomb glow; the bee redrawn with a slightly wobbly line.</li>
+        <li><b>More:</b> all of light, plus a double hand-drawn outline, grain inside the panels (very faint), washi tape on three cards, panels, tier bars and avatar tokens tilted by up to three degrees, an irregular hexagon on the tier bars, wobbly icon strokes, and a sketched bee and avatars: wobbly double outline with the colour fill nudged off the line.</li>
+        <li><b>Unchanged in both:</b> the correct-answer light-up, the bell and shake, the screen transitions, the shimmering honeycomb (calmer), the visible focus moat and ring, 44px targets, the single global reduced-motion block.</li>
+      </ul>
+      <div class="font-sample" aria-label="Where each font is used">
+        <div><p class="hand">Spelling Bee</p><small>Hand-lettered (Caveat Brush): the title, section headings and badges only.</small></div>
+        <div><p class="read">rhythm</p><small>Atkinson Hyperlegible: the spelling words, the answer field, instructions, buttons and every number. Handwriting fonts blur l, I and 1, so none of those use the hand face.</small></div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="s4">
+      <h2 id="s4">4. The answer moments</h2>
+      <p>Correct: the field lights up green, a tick appears, the placard glows and +14 floats up. Missed: the bell rings, the field gives one short shake, the edge turns red and the word is shown. Both survive at every strength.</p>
+      <div class="three" id="moments"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="s5">
+      <h2 id="s5">5. Checks</h2>
+      <ul class="checks">
+        <li><b>Contrast over the glow and the texture:</b> every text element, control edge and focus ring against the worst pixel behind it, honeycomb at its peak, grain on, both themes, both widths, on all four screens. Off, light and more each have <b>0 failing</b>: <a href="contrast-off.md">off</a>, <a href="contrast-light.md">light</a>, <a href="contrast-more.md">more</a>.</li>
+        <li><b>Tier bar focus:</b> a clipped hexagon cannot show an outline, so the rim thickens and takes the focus colour; it is measured against the fill inside it and the background outside it: <a href="checks.txt">checks.txt</a>.</li>
+        <li><b>Reduced motion:</b> the shimmer is removed and the still page is pixel-identical to the static page at every strength, screen, width and theme. The wobbles, tilts and textures are static by nature; nothing new animates: <a href="checks.txt">checks.txt</a>.</li>
+        <li><b>Fonts:</b> the hand face appears only on the title, headings and badges and never on a digit, input, button, label or instruction; the readable face is confirmed on the words, answers, instructions and buttons: <a href="checks.txt">checks.txt</a>.</li>
+        <li><b>Distinct from NYT's look:</b> 0 lemon-yellow pixels, 0 grey tiles, honeycomb is background only, and the only hexagon-shaped content anywhere is the stack of eight tier bars (one column, never a board): <a href="checks.txt">checks.txt</a>.</li>
+      </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="s6">
+      <h2 id="s6">6. All screenshots</h2>
+      <p>Static captures from <code>design/harness/shoot-homemade.mjs</code>: each strength's four screens at two widths and two themes, both answer moments, keyboard focus on a tier bar, the reduced-motion stills and the side-by-sides. Select one to open it full size.</p>
+      <div id="shots"></div>
+    </section>
+  </main>
+  <script src="screens/index.js"></script>
+  <script>
+    (function () {
+      const u = new URLSearchParams(location.search);
+      const theme = document.documentElement.dataset.theme;
+      const SCREENS = ["home", "difficulty", "round", "race-results"];
+      const screen = SCREENS.includes(u.get("screen")) ? u.get("screen") : "home";
+      const form = document.getElementById("controls");
+      form.querySelector('input[name="theme"][value="' + theme + '"]').checked = true;
+      form.querySelector('input[name="screen"][value="' + screen + '"]').checked = true;
+      form.addEventListener("change", () => {
+        const q = new URLSearchParams();
+        q.set("theme", form.querySelector('input[name="theme"]:checked').value);
+        q.set("screen", form.querySelector('input[name="screen"]:checked').value);
+        location.search = q.toString();
+      });
+      const tall = screen === "difficulty" ? " tall" : "";
+      const designs = [
+        { h: "off", name: "Off: the hybrid as picked", note: "Honey and ribbon (b), clean edges." },
+        { h: "light", name: "Light", note: "Wobbly corners, one hand-drawn outline, hand-lettered headings, a sticker, page grain." },
+        { h: "more", name: "More", note: "Double outline, tape, tilts, sketched bee and icons, faint grain in panels." },
+      ];
+      const frame = (d, phone) => `<div class="frame${phone ? " phone" : ""}${tall}" data-src="${screen}.html" data-q="h=${d.h}&bg=shimmer"></div>`;
+      document.getElementById("three").innerHTML = designs.map((d) => `<div class="cell"><h3>${d.name}</h3><p>${d.note}</p>${frame(d, false)}</div>`).join("");
+      document.getElementById("phones").innerHTML = designs.map((d) => `<figure><figcaption>${d.name}</figcaption>${frame(d, true)}</figure>`).join("");
+      document.getElementById("moments").innerHTML = designs.map((d) =>
+        `<div class="cell"><h3>${d.h}: correct</h3><div class="frame" data-src="round.html" data-q="h=${d.h}&bg=shimmer&state=correct"></div><h3 style="margin-top:10px">${d.h}: missed</h3><div class="frame" data-src="round.html" data-q="h=${d.h}&bg=shimmer&state=incorrect"></div></div>`).join("");
+
+      // Old live difficulty screen next to the new ones (static captures; the
+      // new ones are also live in section 1 with the Difficulty control).
+      const all = window.SCREENS || [];
+      document.getElementById("sbs").innerHTML = ["desktop", "phone"].map((w) => {
+        const n = `side-by-side--difficulty--${w}--${theme}`;
+        return all.includes(n) ? `<h3 style="margin-top:14px">${w === "phone" ? "Phone" : "Desktop"}, ${theme}: old live design, then off, light, more</h3><a href="screens/${n}.jpg"><img loading="lazy" src="screens/${n}.jpg" alt="The old live difficulty screen beside the new difficulty screen at off, light and more, ${w}, ${theme}" /></a>` : "";
+      }).join("");
+
+      const fit = new ResizeObserver((entries) => entries.forEach((e) => {
+        const fr = e.target.querySelector("iframe");
+        const base = e.target.classList.contains("phone") ? 390 : 1280;
+        if (fr) fr.style.transform = "scale(" + e.contentRect.width / base + ")";
+      }));
+      document.querySelectorAll(".frame[data-src]").forEach((f) => {
+        const q = new URLSearchParams(f.dataset.q);
+        q.set("theme", theme);
+        const fr = document.createElement("iframe");
+        fr.loading = "lazy";
+        fr.title = f.dataset.src.replace(".html", "") + " " + f.dataset.q;
+        fr.src = f.dataset.src + "?" + q.toString();
+        f.append(fr);
+        fit.observe(f);
+      });
+
+      document.getElementById("shots").innerHTML = ["off", "light", "more", "side-by-side"].map((v) =>
+        `<div class="shots-group"><h3>${v === "side-by-side" ? "Old live design beside the new difficulty screens" : "Strength: " + v}</h3><div class="shots">` +
+        all.filter((n) => n.startsWith(v + "--")).map((n) => '<a href="screens/' + n + '.jpg"><img loading="lazy" src="screens/' + n + '.jpg" alt="" />' + n + "</a>").join("") +
+        "</div></div>").join("");
+    })();
+  </script>
+  <script src="honeycomb.js"></script>
+  <script src="homemade.js"></script>
+</body>
+</html>

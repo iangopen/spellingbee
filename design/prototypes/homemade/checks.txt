@@ -1,0 +1,165 @@
+Detector sanity: flags #f7da21 (NYT Spelling Bee yellow); passes #e8a63d (old honey), #f2bd62 (heading), #e09a2c (light fill), #f5c46e (focus ring), #edae47 (expert bar).
+
+## Reduced motion: shimmer under reduced motion vs the static background (tolerance 8/255 per channel)
+STILL OK  off--still-home--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-home--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-home--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-home--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-difficulty--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-difficulty--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-difficulty--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-difficulty--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-round--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-round--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-round--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-round--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-race-results--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-race-results--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-race-results--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  off--still-race-results--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-home--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-home--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-home--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-home--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-difficulty--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-difficulty--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-difficulty--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-difficulty--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-round--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-round--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-round--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-round--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-race-results--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-race-results--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-race-results--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  light--still-race-results--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-home--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-home--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-home--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-home--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-difficulty--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-difficulty--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-difficulty--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-difficulty--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-round--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-round--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-round--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-round--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-race-results--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-race-results--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-race-results--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  more--still-race-results--phone--light: max channel diff 0/255, pixels over tolerance 0
+Reduced-motion stills identical to static: 48/48
+
+## Colour: lemon-yellow pixels (must be 0) and honey pixels, per strength, over every saved capture (lossless)
+strength off: 30,583,360 px in 42 captures; lemon yellow 0; honey/amber 8,660,842 (28.3%)
+strength light: 30,583,360 px in 42 captures; lemon yellow 0; honey/amber 8,957,299 (29.3%)
+strength more: 30,583,360 px in 42 captures; lemon yellow 0; honey/amber 9,253,106 (30.3%)
+
+## Structure and fonts
+OK   off home (dark, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=0
+OK   off home (dark, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=0
+OK   off home (light, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=0
+OK   off home (light, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=0
+OK   off difficulty (dark, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; tier bars=8, one column: same left=true, same width=true, one per row=true; hand-lettered elements=0
+OK   off difficulty (dark, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; tier bars=8, one column: same left=true, same width=true, one per row=true; hand-lettered elements=0
+OK   off difficulty (light, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; tier bars=8, one column: same left=true, same width=true, one per row=true; hand-lettered elements=0
+OK   off difficulty (light, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; tier bars=8, one column: same left=true, same width=true, one per row=true; hand-lettered elements=0
+OK   off round (dark, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=0
+OK   off round (dark, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=0
+OK   off round (light, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=0
+OK   off round (light, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=0
+OK   off race-results (dark, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=0
+OK   off race-results (dark, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=0
+OK   off race-results (light, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=0
+OK   off race-results (light, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=0
+OK   light home (dark, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=4
+OK   light home (dark, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=4
+OK   light home (light, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=4
+OK   light home (light, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=4
+OK   light difficulty (dark, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; tier bars=8, one column: same left=true, same width=true, one per row=true; hand-lettered elements=1
+OK   light difficulty (dark, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; tier bars=8, one column: same left=true, same width=true, one per row=true; hand-lettered elements=1
+OK   light difficulty (light, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; tier bars=8, one column: same left=true, same width=true, one per row=true; hand-lettered elements=1
+OK   light difficulty (light, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; tier bars=8, one column: same left=true, same width=true, one per row=true; hand-lettered elements=1
+OK   light round (dark, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=1
+OK   light round (dark, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=1
+OK   light round (light, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=1
+OK   light round (light, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=1
+OK   light race-results (dark, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=3
+OK   light race-results (dark, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=3
+OK   light race-results (light, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=3
+OK   light race-results (light, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=3
+OK   more home (dark, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=4
+OK   more home (dark, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=4
+OK   more home (light, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=4
+OK   more home (light, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=4
+OK   more difficulty (dark, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; tier bars=8, one column: same left=true, same width=true, one per row=true; hand-lettered elements=1
+OK   more difficulty (dark, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; tier bars=8, one column: same left=true, same width=true, one per row=true; hand-lettered elements=1
+OK   more difficulty (light, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; tier bars=8, one column: same left=true, same width=true, one per row=true; hand-lettered elements=1
+OK   more difficulty (light, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; tier bars=8, one column: same left=true, same width=true, one per row=true; hand-lettered elements=1
+OK   more round (dark, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=1
+OK   more round (dark, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=1
+OK   more round (light, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=1
+OK   more round (light, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=1
+OK   more race-results (dark, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=3
+OK   more race-results (dark, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=3
+OK   more race-results (light, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=3
+OK   more race-results (light, phone): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=3
+Answers are typed into a standard text input on the round screen; the difficulty screen is eight tier buttons stacked one per row. No screen has a letter board or letter tiles.
+
+## Fonts: where the hand-lettered face (Caveat Brush) is used, and the readable faces confirmed
+strength off: hand-lettered text across all 16 page views: none
+   READABLE OK instructions and hints: 20 elements, font Bricolage Grotesque / Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK buttons: 36 elements, font Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK numbers: 116 elements, font Bricolage Grotesque / Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK tier names and blurbs: 96 elements, font Bricolage Grotesque / Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK the answer field: 4 elements, font Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK the definition: 4 elements, font Bricolage Grotesque, hand-lettered 0
+   READABLE OK form labels: 4 elements, font Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK standings and names: 20 elements, font Bricolage Grotesque, hand-lettered 0
+   fonts loaded in every view: Atkinson true, Bricolage true, Caveat Brush false
+strength light: hand-lettered text across all 16 page views: h1 "Spelling Bee", h2 "Your best scores", p "Race winner, Medium words", p "Your word is…", span "Race over", span "Solo or with friends", span "Spelling Bee"
+   READABLE OK instructions and hints: 20 elements, font Bricolage Grotesque / Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK buttons: 36 elements, font Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK numbers: 116 elements, font Bricolage Grotesque / Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK tier names and blurbs: 96 elements, font Bricolage Grotesque / Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK the answer field: 4 elements, font Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK the definition: 4 elements, font Bricolage Grotesque, hand-lettered 0
+   READABLE OK form labels: 4 elements, font Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK standings and names: 20 elements, font Bricolage Grotesque, hand-lettered 0
+   fonts loaded in every view: Atkinson true, Bricolage true, Caveat Brush true
+strength more: hand-lettered text across all 16 page views: h1 "Spelling Bee", h2 "Your best scores", p "Race winner, Medium words", p "Your word is…", span "Race over", span "Solo or with friends", span "Spelling Bee"
+   READABLE OK instructions and hints: 20 elements, font Bricolage Grotesque / Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK buttons: 36 elements, font Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK numbers: 116 elements, font Bricolage Grotesque / Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK tier names and blurbs: 96 elements, font Bricolage Grotesque / Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK the answer field: 4 elements, font Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK the definition: 4 elements, font Bricolage Grotesque, hand-lettered 0
+   READABLE OK form labels: 4 elements, font Atkinson Hyperlegible, hand-lettered 0
+   READABLE OK standings and names: 20 elements, font Bricolage Grotesque, hand-lettered 0
+   fonts loaded in every view: Atkinson true, Bricolage true, Caveat Brush true
+Hand-font rule: passed in all 48 views (hand lettering only on the title, headings and badges, never on a digit, input, button, label or instruction)
+
+## Tier bar focus indicator (a thickened rim in the focus colour; an outline would be clipped by the hexagon)
+PASS off, dark, desktop: focused rim vs the moat band just inside it 11.47:1, vs the moat just outside it 11.47:1 (need 3:1), worst of all 8 bars
+PASS off, dark, phone: focused rim vs the moat band just inside it 11.47:1, vs the moat just outside it 11.47:1 (need 3:1), worst of all 8 bars
+PASS off, light, desktop: focused rim vs the moat band just inside it 7.35:1, vs the moat just outside it 7.35:1 (need 3:1), worst of all 8 bars
+PASS off, light, phone: focused rim vs the moat band just inside it 7.35:1, vs the moat just outside it 7.35:1 (need 3:1), worst of all 8 bars
+PASS light, dark, desktop: focused rim vs the moat band just inside it 11.47:1, vs the moat just outside it 11.47:1 (need 3:1), worst of all 8 bars
+PASS light, dark, phone: focused rim vs the moat band just inside it 11.47:1, vs the moat just outside it 11.47:1 (need 3:1), worst of all 8 bars
+PASS light, light, desktop: focused rim vs the moat band just inside it 7.35:1, vs the moat just outside it 7.35:1 (need 3:1), worst of all 8 bars
+PASS light, light, phone: focused rim vs the moat band just inside it 7.35:1, vs the moat just outside it 7.35:1 (need 3:1), worst of all 8 bars
+FAIL more, dark, desktop: focused rim vs the moat band just inside it 1.10:1, vs the moat just outside it 2.35:1 (need 3:1), worst of all 8 bars
+FAIL more, dark, phone: focused rim vs the moat band just inside it 1.15:1, vs the moat just outside it 2.37:1 (need 3:1), worst of all 8 bars
+FAIL more, light, desktop: focused rim vs the moat band just inside it 1.12:1, vs the moat just outside it 4.08:1 (need 3:1), worst of all 8 bars
+FAIL more, light, phone: focused rim vs the moat band just inside it 1.18:1, vs the moat just outside it 4.09:1 (need 3:1), worst of all 8 bars
+Tier bar focus: 8/12 configurations pass; lowest ratio 1.10:1
+
+## Side-by-side: old live difficulty screen and the new ones
+wrote side-by-side--difficulty--desktop--dark.jpg
+wrote side-by-side--difficulty--desktop--light.jpg
+wrote side-by-side--difficulty--phone--dark.jpg
+wrote side-by-side--difficulty--phone--light.jpg
+
+captured 130 screenshots -> C:\devwork\github projects\spellingbee\design\prototypes\homemade\screens
+page errors: 0

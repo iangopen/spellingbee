@@ -183,7 +183,7 @@ light-up). The honeycomb pauses in a hidden tab.
 | Back link / quit | `.back-link`, `.exit-confirm` | pill on a scrim; the two-step confirm is unchanged |
 | `AnswerField` | `.guess-input` (RoundScreen, TurnScreen) | moat + state glows; tick/cross icon; keeps `readOnly` (not `disabled`) during feedback |
 | `TextInput`, `Select` | `.text-input`, native `<select>` | edge `--edge` (fixes the audit's 1.47:1 inputs); explicit select colours for Windows dark |
-| **Tier selector** | the hex `.tier-bar` stack | 8 ribbon-marked rows (placard number + name + blurb + best), no clip-path. Keep one scrolling stack and ≥44px targets; the practice / hide-definition chips stay. |
+| **Tier selector** | the hex `.tier-bar` stack | **Changed 2026-10-02 (Ian): the OLD hexagon bars return**, restyled with the hybrid's tokens (prototype: `prototypes/homemade/difficulty.html`). 8 bars in one scrolling stack, ≥44px targets, the rim that thickens on focus, the practice / hide-definition chips. Replaces the earlier "ribbon-marked rows, no clip-path" plan. Never a letter board. |
 | `Placard` | new | word counter ("4 of 10 words"); in Race/Elimination, the player's seat |
 | `Rosette` | favicon, results trophy | petal ring + tails; bee at the centre (bee chosen) |
 | `BeeMascot` | new | home hero and rosette; idle hover |
@@ -224,7 +224,7 @@ middle stages alone would show a half-old, half-new UI.
 | 2 | **Honeycomb background.** The `HoneycombBackground` component + CSS (28×49 tile, glow, shimmer, vignette, header band), replacing `body::before`. The shimmer is hidden under the OS setting AND the in-app override. | `components/HoneycombBackground.tsx`, `index.css` | render test (`aria-hidden`, no text, no focusables); check-glow on the app; the perf script at 390px |
 | 3 | **Shared components.** Panel, Button, AnswerField (moat + states), TextInput/Select, Placard, Rosette, BeeMascot, AvatarArt, Clock/TimerBar and Tally restyles; the global focus-moat rule. | new `components/ui/*`, `AvatarPicker.tsx`, `TimerBar.tsx` (CSS only), `ScoreBar.tsx`, `lib/avatars.ts` (art mapping only) | `AVATAR_KEYS` unchanged (unit test pins the list); TimerBar tests unchanged and green; focus-ring contrast |
 | 4a | **Home** (ModeSelect): hero panel + mascot + best-scores panel (from `getAllBests()`) | `ModeSelect.tsx`, `App.tsx` (pass bests only) | keyboard: heading focus via `useScreenFocus` is unchanged |
-| 4b | **Difficulty:** the new tier selector + the modifier chips | `DifficultySelect.tsx` | tap-target measurement (every row ≥44px); `TIER_ORDER` / `TIER_META` untouched |
+| 4b | **Difficulty:** the OLD hexagon tier bars restyled with the new tokens (see 1.6 and `prototypes/homemade/`) + the modifier chips, with the header on a lit panel | `DifficultySelect.tsx`, `App.css` (`.tier-bar` rules adapted, not deleted) | tap-target measurement with `elementFromPoint` probes (every bar ≥44px, the clip-path IS the target); focus rim contrast (`shoot-homemade.mjs` section 5); `TIER_ORDER` / `TIER_META` untouched |
 | 4c | **Round** (solo + race): the pronouncer panel, placard, clock, answer moments (light-up, bell + shake), "+14" | `RoundScreen.tsx` (markup/classes) | existing `RoundScreen.test.tsx` green, especially: no word reveal while `awaitingOthers`, `readOnly` focus kept, `role="status"` text unchanged |
 | 4d | **Solo results:** the rosette moment on a new best | `ResultsScreen.tsx` | "new best" only when it truly is (solo) |
 | 4e | **Race results:** the new `RaceResults` (winner + lanes). `App.tsx` routes race to it. This fixes the audit bugs: no false "new best!", a real winner and standings, and the button says what it does. | `components/RaceResults.tsx`, `App.tsx` (routing line only) | unit test: order by score, the "you" row, ties, 2 to 8 players; lane positions ∝ score |
@@ -264,3 +264,33 @@ middle stages alone would show a half-old, half-new UI.
 - **Multiplayer screens** will be tested locally against the real backend with
   localhost added to the Turnstile widget. This also needs
   `VITE_TURNSTILE_SITE_KEY` in `.env.local`.
+
+## Adjustments from the homemade pass (Ian, 2026-10-02)
+
+Ian picked **honey hybrid b (Honey and ribbon)** and asked for two tweaks before
+the build. Prototype: `design/prototypes/homemade/` (start at `compare.html`).
+Nothing is in `src/`. Stage 0 (commit `c80cc61`, the self-hosted fonts and the
+measurement baseline) is the only stage built, and the tweaks change it and
+the stages below like this:
+
+| Stage | What the tweaks change |
+|---|---|
+| 0 (built) | **Add one font:** Caveat Brush (OFL), subset to A-Z, a-z, space, comma, full stop and the ellipsis (15.3 KB woff2, no digits). `src/fonts.css` gets one `@font-face`, `src/assets/fonts/` gets the file and `OFL-CaveatBrush.txt`. Total redesign fonts 126.9 KB, inside the 150 KB budget. Nothing already built is undone. |
+| 1 Tokens | The token source is now `prototypes/homemade/style.css` variant **b** (not Blue Ribbon). New tokens, both palettes: `--sketch`, `--sketch-faint`, `--ink-shadow`, `--paper-shadow`, `--sticker-bg`, `--sticker-ink`, `--tape`, `--tape-line`, `--grain`. Radius tokens for the irregular corners (`--hm-r-panel`, `--hm-r-btn`, `--hm-r-field`). `--hand` joins the type tokens. The homemade strength is a build-time constant once Ian picks light or more: delete the other strength's rules rather than shipping a `data-h` switch. |
+| 2 Honeycomb | The grain layer (`.bg-grain`) joins the background component, and the two SVG wobble filters mount once in `Shell`. The shimmer peak is calmer (`--light-peak` 0.36 light, 0.30 more in dark). |
+| 3 Shared components | Panel gets the irregular corners, the drawn outline (`::after`, wobble filter) and, at "more", the grain `::before`. Button gets the hard marker shadow and irregular corners. **The global focus rule must outrank the strength rules** (a bug caught by measuring: the marker shadows silently replaced the focus moat). `AvatarArt` and the rosette take the rough drawing (`art.js`: jittered blobs, seeded per avatar key, so each avatar is drawn the same way every time); `AVATAR_KEYS` unchanged. New `Sticker` and `Tape` bits (decorative, `aria-hidden`). |
+| 4a Home | Hand-lettered title, "Your best scores" heading and a sticker on the hero card; the hero gets extra top padding for the sticker; the mascot sits lower on phones so it never touches the Settings button's focus ring. |
+| 4b Difficulty | **Rebuilt:** see the table row above. |
+| 4c Round | "Your word is..." is hand-lettered; everything the player reads or types stays Atkinson. The placard tilts. |
+| 4e Race results | The winner kicker is hand-lettered; a "Race over" sticker hangs off the winner card's bottom edge (not the top, where on phones it met the Settings focus ring). |
+| 5 to 7 | No change, except stage 6's favicon and share card should use the same sketched bee as the in-page art if "light" or "more" wins. |
+
+**New measurement rules learned here (keep for the build's gates):**
+- Texture is measured by the worst pixel, so its peak alpha matters, not its
+  average. The first grain (peak alpha about 0.4) failed 30 pairs; at about 0.06
+  it passes everything.
+- `measure.mjs` switches `rotate` off under `?peak=1`, because the bounding
+  box of rotated text takes in pixels that are not under any letter. Tilts are
+  5 degrees or less.
+- A clip-path hides outlines, so the tier bars' focus indicator needs its own
+  measurement (`shoot-homemade.mjs`, section 5).

@@ -1,0 +1,241 @@
+/* Homemade layer, on top of style.css (the honey-and-ribbon hybrid, variant b).
+   Loaded after style.css. Two parts:
+
+   1. The difficulty screen, rebuilt from the OLD live design (main
+      src/App.css:44-275): elongated hexagon tier bars in one stacked column,
+      the sage -> olive -> amber -> burnt-orange -> honey -> rust ramp, the
+      title/tagline/toggle header, and the rim that thickens on focus. Always on,
+      whatever the strength. It is a stack of tier BUTTONS and never a seven-cell
+      letter board: one bar per row, same x, no honeycomb arrangement.
+   2. The homemade feel, chosen by ?h= (params.js sets data-h on <html>):
+        off    the hybrid exactly as picked (this file's section 2 does nothing)
+        light  wobbly panel and button corners, one hand-drawn outline, hand-lettered
+               title and headings, a sticker, paper grain on the page behind the
+               panels only, hard "marker" shadows instead of gloss, a calmer glow
+        more   all of light, plus: a double hand-drawn outline, grain inside panels,
+               washi tape, small tilts on panels, tier bars and tokens, an irregular
+               hexagon, wobbly icons, and a sketched redraw of the bee and avatars (art.js)
+
+   Rules both strengths keep:
+   - Hand lettering is for DECORATIVE text only: the title, section headings and
+     badges (--hand). The spelling words, the answer field, instructions, buttons
+     and every number stay in Atkinson Hyperlegible / Bricolage, because handwriting
+     fonts blur l, I and 1. homemade check: design/harness/shoot-homemade.mjs.
+   - Texture sits on the page background and (in "more") at 3-4% inside panels. It
+     is measured, with the honeycomb at its peak, by measure.mjs (TARGET=homemade).
+   - Nothing here animates except what style.css already did. Under reduced
+     motion every wobble, tilt and texture is static anyway, so the stills are
+     the same page. */
+
+/* ============ 1. difficulty screen (always on) ============ */
+.tier-select { max-width: 480px; margin: 0 auto; text-align: center; padding-top: 8px; }
+.tier-head { padding: 24px 20px 18px; margin-bottom: 28px; }
+.tier-select h1 { font: 800 clamp(2.5rem, 8vw, 3.2rem)/1.05 var(--display); letter-spacing: -0.03em; margin: 0; color: var(--heading); }
+.subtitle { color: var(--muted); margin: 8px 0 20px; }
+.mode-toggles { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
+.mode-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: var(--r-pill); border: 1.5px solid var(--edge); background: var(--field); color: var(--text); font-size: 0.95rem; transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.2s ease; }
+.mode-chip svg { width: 1.05em; height: 1.05em; color: var(--accent); }
+.mode-chip:hover { border-color: var(--accent); box-shadow: 0 0 18px -6px var(--glow-accent); }
+.mode-chip[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent-fill); color: var(--on-accent); }
+.mode-chip[aria-pressed="true"] svg { color: var(--on-accent); }
+.mode-hint { margin: 0; font-size: 0.9rem; color: var(--muted); min-height: 1.3em; }
+
+/* Eight bars in one plain page-scrolling stack (old Session 15 rule). */
+.tier-stack { display: flex; flex-direction: column; gap: 6px; max-width: 420px; margin: 0 auto; }
+.tier-wrap {
+  /* the hexagon lives on the wrapper so the focus moat (::before) and the bar share it */
+  --hex-bar: polygon(18px 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 18px 100%, 0 50%);
+  position: relative; display: block; transition: filter 0.2s ease;
+}
+.tier-wrap::before { content: ""; position: absolute; inset: -3px; clip-path: var(--hex-bar); background: var(--focus-moat); display: none; }
+.tier-wrap:has(.tier-bar:focus-visible)::before { display: block; }
+.tier-wrap:has(.tier-bar:focus-visible) { filter: drop-shadow(0 0 9px var(--glow-accent)); }
+.tier-bar {
+  /* Elongated hexagon: flat top and bottom, points left and right, fixed 18px so
+     the shape is the same at every width. The clip-path IS the tap target. */
+  --fill: linear-gradient(155deg, color-mix(in srgb, var(--t) 26%, var(--panel-solid)), color-mix(in srgb, var(--t) 11%, var(--panel-solid)));
+  --rim: color-mix(in srgb, var(--t) 66%, var(--panel-solid));
+  --ink: var(--text); --ink-2: var(--muted);
+  position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; min-width: 0; min-height: 58px; padding: 8px 30px; border: 0; text-align: left;
+  background: var(--rim); color: var(--ink); clip-path: var(--hex-bar);
+  transition: transform 0.15s var(--ease-out), filter 0.15s ease;
+}
+/* The rim is the element's own background showing around an inset ::before that
+   carries the fill; a real border would be cut off by the angled ends. */
+.tier-bar::before { content: ""; position: absolute; inset: 2px; clip-path: var(--hex-bar); background: var(--fill); z-index: 0; }
+.tier-bar > * { position: relative; z-index: 1; }
+.tier-bar:hover { transform: translateX(3px); filter: brightness(1.08); }
+.tier-bar:active { transform: translateX(0) scale(0.99); }
+/* An outline or shadow would be clipped with the rest of the box, so focus
+   thickens the rim and turns it the focus colour; the wrapper adds the glow. */
+:root .tier-wrap .tier-bar:focus-visible { outline: none; box-shadow: none; background: var(--ring); }
+/* Focus is three bands, outside in: a 2px moat (the wrapper's ::before, a hexagon 3px bigger),
+   the 5px focus-colour rim, then a 3px moat band, then the fill. The moats are what
+   keep the rim above 3:1 on the Expert bar, whose fill is nearly the focus colour. */
+.tier-bar::after { content: ""; position: absolute; inset: 8px; clip-path: var(--hex-bar); background: var(--fill); z-index: 0; display: none; }
+.tier-bar:focus-visible::before { inset: 5px; background: var(--focus-moat); }
+.tier-bar:focus-visible::after { display: block; }
+.tier-label { display: block; font: 700 1.05rem/1.1 var(--display); color: inherit; }
+.tier-blurb { display: block; font-size: 0.8rem; line-height: 1.25; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tier-bar-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tier-best { flex: none; font: 700 0.75rem/1 var(--display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); white-space: nowrap; }
+/* Expert is the honey accent itself; master goes past it into ember. Solid
+   rather than tinted: the visual break that sets the top two apart. */
+.tier-bar[data-tier="expert"] { --fill: linear-gradient(155deg, #edae47, #b97c1e); --rim: #f2c268; --ink: #241a09; --ink-2: #241a09; }
+.tier-bar[data-tier="master"] { --fill: linear-gradient(155deg, #b94e1a, #8a3610); --rim: #e0742f; --ink: #fff1e4; --ink-2: #fff1e4; }
+:root[data-theme="light"] .tier-bar { --ink-2: #5a4a33; --fill: linear-gradient(155deg, color-mix(in srgb, var(--t) 18%, #fffcf5), color-mix(in srgb, var(--t) 30%, #fff6e4)); --rim: color-mix(in srgb, var(--t) 70%, #fffcf5); }
+:root[data-theme="light"] .tier-bar[data-tier="expert"] { --fill: linear-gradient(155deg, #f0ad42, #d4841a); --rim: #a96712; --ink: #2b2115; --ink-2: #2b2115; }
+:root[data-theme="light"] .tier-bar[data-tier="master"] { --fill: linear-gradient(155deg, #bf4d17, #962f0c); --rim: #7d2b0b; --ink: #fff1e4; --ink-2: #fff1e4; }
+
+/* ============ 2. the homemade feel ============ */
+:root { --hand: "Caveat Brush", "Bricolage Grotesque", cursive; }
+.sticker, .tape { display: none; }
+
+/* ---- tokens (both strengths) ---- */
+:root[data-h="light"], :root[data-h="more"] {
+  --hm-r-panel: 28px 21px 26px 19px / 21px 27px 19px 25px;
+  --hm-r-btn: 15px 19px 16px 18px / 18px 15px 19px 16px;
+  --hm-r-field: 14px 17px 15px 16px / 16px 14px 17px 15px;
+  --sketch: rgba(244, 196, 110, 0.66); --sketch-faint: rgba(244, 196, 110, 0.32);
+  --ink-shadow: rgba(6, 4, 1, 0.75);
+  --paper-shadow: 0 14px 30px -18px rgba(0, 0, 0, 0.75);
+  --sticker-bg: #e8a63d; --sticker-ink: #1a1610;
+  --tape: rgba(232, 166, 61, 0.62); --tape-line: rgba(255, 236, 190, 0.5);
+  /* paper grain: noise as a data URI, warm cream speckle in dark, brown in light */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.62' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .9 0 0 0 0 .72 1.2 0 0 0 -.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --grain-bg-opacity: 0.16; --grain-panel-opacity: 0;
+  /* the calmer glow: the same honeycomb, less bloom, a lower shimmer peak */
+  --bg-glow: rgba(232, 150, 50, 0.13); --cells-glow-opacity: 0.3; --light-peak: 0.36;
+}
+:root[data-h="light"][data-theme="light"], :root[data-h="more"][data-theme="light"] {
+  --sketch: rgba(122, 75, 8, 0.6); --sketch-faint: rgba(122, 75, 8, 0.3);
+  --ink-shadow: rgba(122, 75, 8, 0.2);
+  --paper-shadow: 0 12px 26px -16px rgba(120, 80, 20, 0.45);
+  --sticker-bg: #e09a2c; --sticker-ink: #2b2115;
+  --tape: rgba(224, 154, 44, 0.6); --tape-line: rgba(255, 255, 255, 0.55);
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.62' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .27 0 0 0 0 .08 1.2 0 0 0 -.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --bg-glow: rgba(224, 154, 44, 0.16); --cells-glow-opacity: 0.26; --light-peak: 0.44;
+}
+:root[data-h="more"] { --grain-bg-opacity: 0.24; --grain-panel-opacity: 0.12; --light-peak: 0.3; }
+:root[data-h="more"][data-theme="light"] { --light-peak: 0.38; }
+
+:root[data-h="off"] .bg-grain { display: none; }
+.bg-grain { inset: 0; background-image: var(--grain); background-size: 200px 200px; opacity: var(--grain-bg-opacity); }
+
+/* ---- hand lettering: decorative text only ---- */
+:root:is([data-h="light"], [data-h="more"]) :is(.brand .word, .hero h1, .tier-select h1, .bests h2, .pronouncer .who, .winner .kicker, .sticker) {
+  font-family: var(--hand); font-weight: 400; letter-spacing: 0.012em;
+}
+:root:is([data-h="light"], [data-h="more"]) .brand .word { font-size: 1.65rem; line-height: 1; }
+:root:is([data-h="light"], [data-h="more"]) .hero h1 { font-size: clamp(3.6rem, 8.4vw, 6.3rem); line-height: 0.9; letter-spacing: 0.005em; rotate: -1.4deg; transform-origin: 0 80%; }
+:root:is([data-h="light"], [data-h="more"]) .tier-select h1 { font-size: clamp(3.4rem, 11vw, 4.4rem); line-height: 0.95; rotate: -1deg; }
+:root:is([data-h="light"], [data-h="more"]) .bests h2 { font-size: 2rem; line-height: 1; }
+:root:is([data-h="light"], [data-h="more"]) .pronouncer .who { font-size: 1.7rem; line-height: 1; }
+:root:is([data-h="light"], [data-h="more"]) .winner .kicker { font-size: 1.7rem; line-height: 1; }
+/* a hand-drawn underline under headings, drawn as a mask so it takes the heading colour */
+:root:is([data-h="light"], [data-h="more"]) :is(.hero h1, .tier-select h1, .bests h2, .winner h1)::after {
+  content: ""; display: block; height: 10px; width: min(11ch, 78%); margin-top: 0.3em; background: var(--heading); opacity: 0.75;
+  -webkit-mask: var(--squiggle) left center / 100% 100% no-repeat; mask: var(--squiggle) left center / 100% 100% no-repeat;
+}
+:root :is(.tier-select h1)::after { margin-inline: auto; }
+:root { --squiggle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M2 6.5C20 2 32 9 52 5.5S84 2.5 104 6 140 8.5 160 4.2 190 5.5 198 3.5' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"); }
+:root[data-h="more"] .hero h1::after, :root[data-h="more"] .tier-select h1::after { height: 14px; }
+/* a hero or winner h1 that ends in a descender-heavy name keeps its room */
+:root:is([data-h="light"], [data-h="more"]) .winner h1 { font-family: var(--display); }
+
+/* ---- stickers (badges) ---- */
+:root:is([data-h="light"], [data-h="more"]) .sticker {
+  display: inline-block; position: absolute; z-index: 2; background: var(--sticker-bg); color: var(--sticker-ink);
+  font-size: 1.4rem; line-height: 1; padding: 11px 17px 11px; border-radius: 12px 16px 13px 15px / 15px 12px 16px 13px;
+  box-shadow: inset 0 0 0 2px var(--sticker-bg), inset 0 0 0 3.5px rgba(26, 22, 16, 0.3), 2px 3px 0 var(--ink-shadow); rotate: -5deg;
+}
+:root:is([data-h="light"], [data-h="more"]) .hero { padding-top: 56px; }
+.hero .sticker { left: 18px; top: -19px; }
+.winner .sticker { right: 22px; bottom: -15px; rotate: 4deg; }
+
+/* ---- panels ---- */
+:root:is([data-h="light"], [data-h="more"]) .panel {
+  isolation: isolate; border-radius: var(--hm-r-panel);
+  box-shadow: inset 0 0 0 1px var(--panel-edge), var(--paper-shadow);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+:root:is([data-h="light"], [data-h="more"]) :is(.round-head, .round-foot) { border-radius: var(--r-pill); }
+/* the hand-drawn outline: a border drawn on a pseudo-element and wobbled by an SVG filter */
+:root:is([data-h="light"], [data-h="more"]) .panel::after {
+  content: ""; position: absolute; inset: -3px; border: 2px solid var(--sketch); border-radius: inherit; pointer-events: none;
+  filter: url(#hm-wobble-s);
+}
+:root[data-h="more"] .panel::after { inset: -4px; outline: 1.5px solid var(--sketch-faint); outline-offset: 3px; filter: url(#hm-wobble); }
+:root[data-h="more"] .panel::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; pointer-events: none;
+  background-image: var(--grain); background-size: 200px 200px; opacity: var(--grain-panel-opacity);
+}
+:root[data-h="more"] :is(.hero, .pronouncer, .winner, .lanes, .tier-head) { rotate: -0.28deg; }
+:root[data-h="more"] :is(.bests, .round-foot) { rotate: 0.3deg; }
+/* washi tape on a few panels (more only) */
+:root[data-h="more"] .tape {
+  display: block; position: absolute; z-index: 2; width: 84px; height: 24px; top: -13px; pointer-events: none;
+  background: repeating-linear-gradient(115deg, var(--tape) 0 9px, var(--tape-line) 9px 11px);
+  box-shadow: 0 2px 4px -2px var(--ink-shadow); clip-path: polygon(0 8%, 3% 0, 6% 10%, 9% 0, 100% 0, 97% 25%, 100% 50%, 97% 75%, 100% 100%, 9% 100%, 6% 88%, 3% 100%, 0 92%, 2% 50%);
+}
+.bests .tape { left: calc(50% - 42px); rotate: 3deg; }
+.winner .tape { left: 26px; rotate: -8deg; }
+.pronouncer .tape { right: 30px; rotate: 5deg; }
+
+/* ---- buttons, chips, fields: irregular corners, marker shadows ---- */
+:root:is([data-h="light"], [data-h="more"]) .btn { border-radius: var(--hm-r-btn); }
+:root:is([data-h="light"], [data-h="more"]) .btn-primary { box-shadow: inset 0 0 0 1px rgba(255, 244, 220, 0.14), 3px 4px 0 var(--ink-shadow); }
+:root:is([data-h="light"], [data-h="more"]) .btn-primary:hover { transform: translate(-1px, -1px); box-shadow: inset 0 0 0 1px rgba(255, 244, 220, 0.2), 4px 5px 0 var(--ink-shadow); }
+:root:is([data-h="light"], [data-h="more"]) .btn-primary:active { transform: translate(2px, 3px); box-shadow: inset 0 0 0 1px rgba(255, 244, 220, 0.14), 1px 1px 0 var(--ink-shadow); }
+:root:is([data-h="light"], [data-h="more"]) .btn-secondary { box-shadow: 3px 4px 0 var(--ink-shadow); }
+:root:is([data-h="light"], [data-h="more"]) .btn-secondary:hover { box-shadow: 4px 5px 0 var(--ink-shadow); }
+:root:is([data-h="light"], [data-h="more"]) .btn-secondary:active { transform: translate(2px, 3px); box-shadow: 1px 1px 0 var(--ink-shadow); }
+:root:is([data-h="light"], [data-h="more"]) :is(.chip-btn, .mode-chip) { border-radius: var(--hm-r-btn); }
+:root:is([data-h="light"], [data-h="more"]) .icon-btn { border-radius: 16px 14px 17px 15px / 14px 17px 15px 16px; box-shadow: 2px 3px 0 var(--ink-shadow); }
+:root:is([data-h="light"], [data-h="more"]) .answer-field { border-radius: var(--hm-r-field); }
+:root:is([data-h="light"], [data-h="more"]) .placard { rotate: -1.6deg; border-radius: 7px 9px 6px 10px / 9px 6px 10px 7px; box-shadow: 2px 3px 0 var(--ink-shadow); }
+:root:is([data-h="light"], [data-h="more"]) .token { border-radius: 10px 12px 9px 13px / 12px 9px 13px 10px; }
+:root[data-h="more"] .token { rotate: -3deg; }
+:root[data-h="more"] .lane:nth-child(even) .token { rotate: 3deg; }
+:root[data-h="more"] .btn:hover { rotate: -0.6deg; }
+/* the focus glow stays: the focus ring is the one place nothing is toned down */
+
+/* ---- tier bars ---- */
+:root[data-h="more"] .tier-wrap:nth-child(odd) { rotate: -0.3deg; }
+:root[data-h="more"] .tier-wrap:nth-child(even) { rotate: 0.3deg; }
+:root[data-h="more"] .tier-wrap:nth-child(3n+1) { --hex-bar: polygon(19px 1px, calc(100% - 17px) 0, calc(100% - 1px) 51%, calc(100% - 19px) 100%, 17px calc(100% - 1px), 1px 49%); }
+:root[data-h="more"] .tier-wrap:nth-child(3n+2) { --hex-bar: polygon(17px 0, calc(100% - 19px) 1px, 100% 49%, calc(100% - 17px) calc(100% - 1px), 19px 100%, 0 51%); }
+:root[data-h="more"] .tier-wrap:nth-child(3n) { --hex-bar: polygon(18px 1px, calc(100% - 18px) 0, calc(100% - 1px) 50%, calc(100% - 18px) calc(100% - 1px), 18px 100%, 0 50%); }
+:root:is([data-h="light"], [data-h="more"]) .mode-toggles + .mode-hint { margin-top: 2px; }
+
+/* ---- icons (more): a hand-wobbled stroke ---- */
+:root[data-h="more"] :is(.icon-btn, .btn, .chip-btn, .mode-chip, .link-back, .who, .outcome-icon, .bell) svg { filter: url(#hm-wobble-s); }
+:root[data-h="more"] svg { stroke-linecap: round; }
+
+/* ---- bee art (art.js draws the rough version when data-h is light or more) ---- */
+.mark-svg, .mascot svg, .token svg { overflow: visible; }
+
+/* ---- rosette float on the home "bests" card ---- */
+:root:is([data-h="light"], [data-h="more"]) .rosette-float { filter: drop-shadow(2px 4px 0 var(--ink-shadow)); }
+
+/* ---- phone ---- */
+@media (max-width: 760px) {
+  .tier-head { padding: 20px 14px 16px; }
+  .hero .sticker { left: 12px; top: -17px; font-size: 1.25rem; }
+  :root:is([data-h="light"], [data-h="more"]) .hero { padding-top: 54px; }
+  :root:is([data-h="light"], [data-h="more"]) .hero .mascot { top: -58px; }
+  .winner .sticker { right: 14px; }
+  :root:is([data-h="light"], [data-h="more"]) .hero h1 { font-size: clamp(3.4rem, 17vw, 4.6rem); }
+}
+
+/* ---- focus (must come last, and outrank the strength rules above) ---- */
+/* The shadows above would otherwise replace style.css's focus moat: the solid
+   7px ring-colour gap the focus ring sits in, which is what keeps the ring
+   above 3:1 over any glow or texture. The tier bars are excluded (clip-path
+   hides outlines; their focus is the thickened rim). */
+:root:is([data-h="light"], [data-h="more"]) :is(a, button, input, [tabindex]):focus-visible:not(.tier-bar, .answer-field) { outline: 3px solid var(--ring); outline-offset: 3px; box-shadow: 0 0 0 7px var(--focus-moat), 0 0 0 13px var(--glow-soft); }
+/* Measuring (?peak=1): rotations off. A rotated text's bounding box takes in
+   pixels that are not under any letter (the plate's edge, the panel behind), so
+   the check would measure the wrong thing. The tilts are 5 degrees or less. */
+:root[data-peak="1"] * { rotate: none !important; }

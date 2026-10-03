@@ -10,6 +10,10 @@
 //                               first; APP_URL overrides http://localhost:5199)
 //                               -> design/baseline/contrast-app.md / .json
 //
+//   TARGET=homemade             design/prototypes/homemade, strengths ?h=off|light|more
+//                               (variant b, bee on, ?peak=1), 4 screens including the
+//                               difficulty screen -> contrast-off.md / -light.md / -more.md
+//
 //   PW_MODULE=<playwright/index.mjs> [TARGET=app] node design/harness/measure.mjs
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -19,11 +23,14 @@ import { pathToFileURL } from "node:url";
 //                               variants (?v=a|b|c), bee on, ?peak=1
 //                               -> contrast-a.md / -b.md / -c.md (+ .json)
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
-const TARGET = ["app", "hybrid"].includes(process.env.TARGET) ? process.env.TARGET : "prototype";
+const TARGET = ["app", "hybrid", "homemade"].includes(process.env.TARGET) ? process.env.TARGET : "prototype";
 const VIEWS = { desktop: { width: 1280, height: 800 }, phone: { width: 390, height: 844 } };
+// The difficulty screen is taller than a phone. Measurement only sees the pixels
+// in the viewport, so it gets a viewport tall enough to hold every bar.
+const viewFor = (r) => (r.page === "difficulty" ? (r.w === "phone" ? { width: 390, height: 1000 } : { width: 1280, height: 960 }) : VIEWS[r.w]);
 const THEMES = ["dark", "light"];
 
-const PROTO_DIR = resolve(TARGET === "hybrid" ? "design/prototypes/honey-hybrid" : "design/prototypes/blue-ribbon-glow");
+const PROTO_DIR = resolve(TARGET === "hybrid" ? "design/prototypes/honey-hybrid" : TARGET === "homemade" ? "design/prototypes/homemade" : "design/prototypes/blue-ribbon-glow");
 const APP_URL = process.env.APP_URL || "http://localhost:5199";
 const APP_SCREENS = ["home", "difficulty", "sp-round", "sp-correct", "sp-incorrect", "sp-results", "settings",
   "lobby", "waiting-room", "race-round", "race-locked", "race-roundend", "race-results",
@@ -39,11 +46,15 @@ if (TARGET === "prototype") {
   for (const v of ["a", "b", "c"]) for (const page of ["home", "round", "race-results"]) for (const theme of THEMES) for (const w of Object.keys(VIEWS))
     for (const state of page === "round" ? ["", "correct", "incorrect"] : [""])
       RUNS.push({ v, page, theme, w, bee: "1", state });
+} else if (TARGET === "homemade") {
+  for (const h of ["off", "light", "more"]) for (const page of ["home", "difficulty", "round", "race-results"]) for (const theme of THEMES) for (const w of Object.keys(VIEWS))
+    for (const state of page === "round" ? ["", "correct", "incorrect"] : [""])
+      RUNS.push({ h, page, theme, w, bee: "1", state });
 } else {
   for (const page of APP_SCREENS) for (const theme of THEMES) for (const w of Object.keys(VIEWS)) RUNS.push({ page, theme, w });
 }
 const urlFor = (r) => TARGET !== "app"
-  ? `${pathToFileURL(resolve(PROTO_DIR, r.page + ".html")).href}?${new URLSearchParams({ ...(r.v ? { v: r.v } : {}), bg: "shimmer", peak: "1", bee: r.bee, theme: r.theme, ...(r.state ? { state: r.state } : {}) })}`
+  ? `${pathToFileURL(resolve(PROTO_DIR, r.page + ".html")).href}?${new URLSearchParams({ ...(r.v ? { v: r.v } : {}), ...(r.h ? { h: r.h } : {}), bg: "shimmer", peak: "1", bee: r.bee, theme: r.theme, ...(r.state ? { state: r.state } : {}) })}`
   : `${APP_URL}/?screen=${r.page}&theme=${r.theme}`;
 
 // Worst-pixel sampler, run inside the page (Playwright serialises it).
@@ -99,7 +110,7 @@ const browser = await chromium.launch();
 const rows = [];
 
 for (const r of RUNS) {
-  const ctx = await browser.newContext({ viewport: VIEWS[r.w], deviceScaleFactor: 1, colorScheme: r.theme, reducedMotion: "reduce" });
+  const ctx = await browser.newContext({ viewport: viewFor(r), deviceScaleFactor: 1, colorScheme: r.theme, reducedMotion: "reduce" });
   const p = await ctx.newPage();
   await p.goto(urlFor(r), { waitUntil: "networkidle" });
   await p.evaluate(() => document.fonts.ready);
@@ -210,10 +221,13 @@ const all = [...agg.values()];
 const list = all.filter((x) => x.worst !== null).sort((a, b) => a.theme.localeCompare(b.theme) || a.page.localeCompare(b.page) || a.kind.localeCompare(b.kind) || a.worst - b.worst);
 const noOutline = all.filter((x) => x.kind === "ring" && x.worst === null);
 const fails = list.filter((x) => x.worst < x.need);
-const pages = TARGET === "app" ? APP_SCREENS : ["home", "round", "race-results"];
+const pages = TARGET === "app" ? APP_SCREENS : TARGET === "homemade" ? ["home", "difficulty", "round", "race-results"] : ["home", "round", "race-results"];
 const VNAME = { a: "a, Hive (the old palette throughout)", b: "b, Honey and ribbon (honey leads, ribbon blue accent)", c: "c, Split (honey glow in dark, the old flat palette in light)" };
-const title = TARGET === "hybrid" ? `Contrast over the honey honeycomb: variant ${VNAME[v]}` : TARGET === "prototype" ? "Contrast over the glowing honeycomb" : "Contrast baseline: the current app";
-const intro = TARGET === "hybrid"
+const HNAME = { off: "off (the honey-and-ribbon hybrid as picked, plus the old difficulty screen)", light: "light", more: "more" };
+const title = TARGET === "homemade" ? `Contrast over the honeycomb and the paper texture: homemade strength ${HNAME[v]}` : TARGET === "hybrid" ? `Contrast over the honey honeycomb: variant ${VNAME[v]}` : TARGET === "prototype" ? "Contrast over the glowing honeycomb" : "Contrast baseline: the current app";
+const intro = TARGET === "homemade"
+  ? "Every visible text element (the hand-lettered title, headings and badges included), control edge (the answer field, the buttons and the mode chips) and focus ring, measured against the **worst pixel behind it** with the honeycomb lit to its peak everywhere (`?peak=1`) and the paper grain on. The tier bars' focus indicator (a thickened rim, since an outline would be clipped by the hexagon) is measured by `measure-tier-focus` in `design/harness/shoot-homemade.mjs`. Each row is the minimum over desktop and phone width and, on the round screen, the playing, correct and missed states."
+  : TARGET === "hybrid"
   ? "Every visible text element, control edge (including the answer field and every input border) and focus ring, measured against the **worst pixel behind it** with the honeycomb lit to its peak everywhere (`?peak=1`, the shimmer's full brightness on every cell). Each row is the minimum over desktop and phone and, on the round screen, the playing, correct and missed states. Bee on."
   : TARGET === "prototype"
   ? "Every visible text element, control edge and focus ring, measured against the **worst pixel behind it** with the honeycomb lit to its peak everywhere (`?peak=1`, the shimmer and reactive light's full brightness). Each row is the minimum over desktop and phone, bee and no bee, and, on the round screen, the playing, correct and missed states."
@@ -231,12 +245,13 @@ if (noOutline.length) {
   for (const x of noOutline) md += `| ${x.theme} | ${x.page} | ${x.label.replace("focus ring: ", "")} |\n`;
 }
 const outDir = TARGET === "app" ? resolve("design/baseline") : PROTO_DIR;
-const base = TARGET === "hybrid" ? `contrast-${v}` : TARGET === "prototype" ? "contrast" : "contrast-app";
+const base = TARGET === "homemade" ? `contrast-${v}` : TARGET === "hybrid" ? `contrast-${v}` : TARGET === "prototype" ? "contrast" : "contrast-app";
 mkdirSync(outDir, { recursive: true });
 writeFileSync(resolve(outDir, `${base}.md`), md);
 writeFileSync(resolve(outDir, `${base}.json`), JSON.stringify(all, null, 1));
 console.log(`${TARGET}${v ? " " + v : ""}: ${list.length} measured pairs, ${fails.length} failing, ${noOutline.length} focusable without an outline`);
 for (const f of fails) console.log(`FAIL ${f.theme} ${f.page} ${f.kind} "${f.label}" ${f.fg} on ${f.wp} = ${f.worst} (need ${f.need}) @ ${f.where}`);
 }
-if (TARGET === "hybrid") for (const v of ["a", "b", "c"]) report(rows.filter((x) => x.v === v), v);
+if (TARGET === "homemade") for (const h of ["off", "light", "more"]) report(rows.filter((x) => x.h === h), h);
+else if (TARGET === "hybrid") for (const v of ["a", "b", "c"]) report(rows.filter((x) => x.v === v), v);
 else report(rows);
