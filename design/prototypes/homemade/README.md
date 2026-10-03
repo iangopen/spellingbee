@@ -94,7 +94,13 @@ and `PW_MODULE=... node design/harness/shoot-homemade.mjs`.
   | more | 4.52:1 | 5.05:1 | 3.14:1 | 7.06:1 |
 
 - **Tier bar focus:** the rim is measured against the pixels just inside and just
-  outside it (section "Tier bar focus indicator" of `checks.txt`).
+  outside it (section "Tier bar focus indicator" of `checks.txt`): 12/12
+  configurations pass, lowest 7.35:1. `checks.txt` ends with one summary line
+  covering these and the contrast tables (0 failures). At "more" the focused bar
+  drops its tilt. An earlier version of the check reported 8/12 (1.10:1 at
+  "more"); that came from locating the rim by colour, which also matched the
+  neighbouring Expert/Master bars, so the checker now samples fixed band centres
+  and asserts the sample is the focus colour.
 - **Reduced motion:** 48 of 48 stills (3 strengths x 4 screens x 2 widths x 2
   themes) are pixel-identical to the static background.
 - **Fonts:** `checks.txt` lists every hand-lettered string (title, headings,

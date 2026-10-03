@@ -52,9 +52,9 @@ STILL OK  more--still-race-results--phone--light: max channel diff 0/255, pixels
 Reduced-motion stills identical to static: 48/48
 
 ## Colour: lemon-yellow pixels (must be 0) and honey pixels, per strength, over every saved capture (lossless)
-strength off: 30,583,360 px in 42 captures; lemon yellow 0; honey/amber 8,660,842 (28.3%)
-strength light: 30,583,360 px in 42 captures; lemon yellow 0; honey/amber 8,957,299 (29.3%)
-strength more: 30,583,360 px in 42 captures; lemon yellow 0; honey/amber 9,253,106 (30.3%)
+strength off: 30,583,360 px in 42 captures; lemon yellow 0; honey/amber 8,660,843 (28.3%)
+strength light: 30,583,360 px in 42 captures; lemon yellow 0; honey/amber 8,957,308 (29.3%)
+strength more: 30,583,360 px in 42 captures; lemon yellow 0; honey/amber 9,252,907 (30.3%)
 
 ## Structure and fonts
 OK   off home (dark, desktop): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0; hexagon-shaped content other than tier bars=0; grey tiles=0; hand-lettered elements=0
@@ -149,17 +149,20 @@ PASS light, dark, desktop: focused rim vs the moat band just inside it 11.47:1, 
 PASS light, dark, phone: focused rim vs the moat band just inside it 11.47:1, vs the moat just outside it 11.47:1 (need 3:1), worst of all 8 bars
 PASS light, light, desktop: focused rim vs the moat band just inside it 7.35:1, vs the moat just outside it 7.35:1 (need 3:1), worst of all 8 bars
 PASS light, light, phone: focused rim vs the moat band just inside it 7.35:1, vs the moat just outside it 7.35:1 (need 3:1), worst of all 8 bars
-FAIL more, dark, desktop: focused rim vs the moat band just inside it 1.10:1, vs the moat just outside it 2.35:1 (need 3:1), worst of all 8 bars
-FAIL more, dark, phone: focused rim vs the moat band just inside it 1.15:1, vs the moat just outside it 2.37:1 (need 3:1), worst of all 8 bars
-FAIL more, light, desktop: focused rim vs the moat band just inside it 1.12:1, vs the moat just outside it 4.08:1 (need 3:1), worst of all 8 bars
-FAIL more, light, phone: focused rim vs the moat band just inside it 1.18:1, vs the moat just outside it 4.09:1 (need 3:1), worst of all 8 bars
-Tier bar focus: 8/12 configurations pass; lowest ratio 1.10:1
+PASS more, dark, desktop: focused rim vs the moat band just inside it 11.47:1, vs the moat just outside it 11.47:1 (need 3:1), worst of all 8 bars
+PASS more, dark, phone: focused rim vs the moat band just inside it 11.47:1, vs the moat just outside it 11.47:1 (need 3:1), worst of all 8 bars
+PASS more, light, desktop: focused rim vs the moat band just inside it 7.35:1, vs the moat just outside it 7.35:1 (need 3:1), worst of all 8 bars
+PASS more, light, phone: focused rim vs the moat band just inside it 7.35:1, vs the moat just outside it 7.35:1 (need 3:1), worst of all 8 bars
+Tier bar focus: 12/12 configurations pass; lowest ratio 7.35:1
 
 ## Side-by-side: old live difficulty screen and the new ones
 wrote side-by-side--difficulty--desktop--dark.jpg
 wrote side-by-side--difficulty--desktop--light.jpg
 wrote side-by-side--difficulty--phone--dark.jpg
 wrote side-by-side--difficulty--phone--light.jpg
+
+## Summary of everything measured
+PASS 0 failures: 680 contrast pairs (0 failing) + 12 tier-bar focus configurations (0 failing; lowest 7.35:1)
 
 captured 130 screenshots -> C:\devwork\github projects\spellingbee\design\prototypes\homemade\screens
 page errors: 0
