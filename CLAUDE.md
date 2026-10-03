@@ -948,25 +948,48 @@ the live site.
 
   Reference prototype: `design/prototypes/blue-ribbon-glow/` (its defaults
   are these picks; start at `compare.html`).
-- **Honey hybrid variants: pick pending (prototyped 2026-09-29).** Ian missed
-  the old design's warmth, so three hybrids of the old honey palette with the
-  Blue Ribbon polish are in `design/prototypes/honey-hybrid/`. Start at its
-  `compare.html`, which shows the old design, plain Blue Ribbon and all three
-  side by side. Everything else in the final direction (glow treatment, bee,
-  type, lanes, dark default) carries over to whichever is picked.
-  - **a. Hive:** the old palette throughout, both themes, gentle glow.
-  - **b. Honey and ribbon:** honey leads; ribbon blue only on the award marks.
-  - **c. Split:** a rich honey glow in dark, the old flat cream in light.
-
-  Verified: 0 contrast failures (154 pairs per variant, over the glow at
-  peak), 36/36 reduced-motion stills identical to static, 0 lemon-yellow
-  pixels and 0 grey tiles. **Until Ian picks, Blue Ribbon stays the
-  direction and PHASE3 is unchanged.** If a hybrid is picked: PHASE3's tokens
-  and honeycomb spec need rewriting from `honey-hybrid/style.css`; the "blue
-  and never yellow" rule is replaced by `DIRECTIONS.md`'s "Honey hybrid: how
-  it stays distinct" (amber not lemon, no grey tiles, background only); and
-  the stage checks must use `shoot-hybrid.mjs`'s lemon test, because
-  `check-glow.mjs` flags any honey by design.
+- **Honey hybrid picked: variant b, Honey and ribbon (Ian, 2026-10-02).** Honey
+  carries everything a player acts on (buttons, focus, field, timer); ribbon blue
+  appears only on the award marks. The other three directions are closed. The
+  hybrid prototypes are in `design/prototypes/honey-hybrid/` (the record) and the
+  working prototype is now `design/prototypes/homemade/` (below). Consequences,
+  all in force:
+  - the "blue and never yellow" rule is replaced by `DIRECTIONS.md`'s "Honey
+    hybrid: how it stays distinct" (amber not lemon, no grey tiles, honeycomb
+    background only);
+  - stage checks use `shoot-hybrid.mjs` / `shoot-homemade.mjs`'s lemon test, not
+    `check-glow.mjs`'s no-yellow check, which fails honey by design;
+  - **PHASE3's tokens and honeycomb spec still describe Blue Ribbon and must be
+    rewritten from `homemade/style.css` variant b before stage 1** (open).
+- **Difficulty selection returns to the old design (Ian, 2026-10-02).** The eight
+  elongated hexagon tier bars come back in one stacked column: the old shapes,
+  the sage-to-rust ramp, "Best n" on the right, the Practice mode / Hide
+  definition chips, and the rim that thickens on focus. Restyled with the
+  hybrid's tokens, with the header on a lit panel (text may not sit on bare
+  honeycomb). It stays tier BUTTONS, never a letter board: `shoot-homemade.mjs`
+  asserts eight bars, one per row, same left edge and width. PHASE3 1.6 and
+  stage 4b are updated. Reference: `homemade/difficulty.html`.
+- **Homemade strength: pick pending (prototyped 2026-10-02).** Ian wants the look
+  slightly more warm and handmade than strictly professional. Two strengths to
+  compare, beside `off` (the hybrid as picked), in `design/prototypes/homemade/`
+  (start at `compare.html`, `?h=off|light|more`):
+  - **light:** wobbly corners, one hand-drawn panel outline, hand-lettered
+    title/headings/badges, one sticker per card, page grain behind the panels,
+    marker-style hard shadows instead of gloss, calmer glow, a slightly wobbly bee.
+  - **more:** all of light plus a double outline, faint grain in panels, washi
+    tape, small tilts, irregular tier-bar hexagons, wobbly icons, a sketched bee
+    and avatars.
+  Both: contrast 0 failing over texture and glow (`contrast-off|light|more.md`),
+  reduced-motion stills identical to static, the hand face only on decorative
+  text. **Until Ian picks, the build plan carries no homemade rules**; stage 0
+  (built) is the only stage it touches (one added font, see PHASE3's
+  "Adjustments from the homemade pass").
+  - **Fonts rule:** hand lettering (Caveat Brush, OFL, subset to letters, 15.3 KB)
+    only for the title, section headings and badges. The spelling words, the
+    answer field, instructions, buttons and every number stay in Atkinson /
+    Bricolage (handwriting blurs l, I and 1). The subset has no digits on purpose.
+  - **Texture rule:** measured by the worst pixel, so peak alpha matters. Grain
+    peak is about 0.06 in the page layer and 0.04 in panels.
 - **Dark default:** `resolveTheme()` becomes stored ?? `"dark"` (the OS is no
   longer followed). The `spellingbee:theme` key and its values are unchanged,
   so a player who chose light keeps light.
@@ -1037,8 +1060,8 @@ the live site.
   in both palettes" and "motion only decorates a visible state".
 
 ### Open
-- **Pick between Blue Ribbon and honey hybrid a, b or c** (see Status). Stage 1
-  (tokens) depends on the answer, so it waits for the pick.
+- **Pick the homemade strength: off, light or more** (see Status), then rewrite
+  PHASE3's tokens from `homemade/style.css` variant b. Stage 1 (tokens) waits for both.
 - Stage 1 of `design/PHASE3.md` (tokens and the dark default) is next.
   Since the 2026-09-29 audit follow-up (merged from `main`), `.text-input`
   uses `--field-edge` plus a honey `:focus-visible` outline. The new palette
