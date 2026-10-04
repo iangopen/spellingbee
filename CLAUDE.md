@@ -1034,11 +1034,24 @@ the live site.
       `lib/avatars.ts` is still the ONE list of keys (the DB CHECK).
     - Panel, Sticker, Placard, BeeMascot and Rosette have no screen yet; their
       first consumers are 4a, 4c, 4d and 4e.
+  - **Stages 4a-4d are done (2026-10-03):** home, difficulty, round (solo + race)
+    and solo results are on panels. Rules they keep:
+    - Every line of text is on a `Panel` (or a scrim pill), never on the bare
+      honeycomb. A new screen is not done until it measures 0.
+    - `.prompt-card`, `.lead-in`, `.feedback`, `.timer-track`, `.stat`, `.score-bar`
+      still serve TurnScreen and stay as they are until 4h; new round styling is
+      scoped under `.round-screen`.
+    - `isNewBest` is decided in `App` against the PREVIOUS stored best. Never
+      derive it as `score >= best` in a screen (ties, practice, races).
+    - A pill or button must leave >= 24px before the next panel: the 7px focus moat
+      plus the panel's drawn outline would otherwise overlap and fail contrast.
+    - `design/harness/check-tier-bars.mjs` is the gate for the difficulty screen
+      (tap target by `elementFromPoint`, rim contrast on the real app).
   - **App-wide contrast failures, the merge gate (must reach 0):** stage 1: 11;
-    stage 2: 265; stage 3: 217 (7 are not honeycomb: Master bar, "Championship
-    rarities", the eliminated name). The rest is loose text on bare honeycomb and
-    clears when each screen moves onto a Panel in stage 4. Every focus ring passes.
-    Results are in `design/stage-results/`; `design/baseline/` is untouched.
+    stage 2: 265; stage 3: 217; 4a: 212; 4b: 187; 4c: 90; 4d: 64. The 64 left are
+    exactly the unported screens: elimination 46 (4h), lobby 10 and waiting room 8
+    (4g). Every focus ring passes. Results are in `design/stage-results/`;
+    `design/baseline/` is untouched.
   - `design/harness/check-tier-focus.mjs` runs only the tier-bar focus check
     against any copy of the prototype (`HM_DIR`). It was proven able to fail on
     2026-10-03 (see docs/history.md), and exits 1 on any failing configuration.
@@ -1100,12 +1113,13 @@ the live site.
   in both palettes" and "motion only decorates a visible state".
 
 ### Open
-- Stage 4 (a to h) is next, then 5 to 7. Each 4x moves one screen onto `Panel` so
-  its text is no longer on bare honeycomb, and re-measures; the total must reach 0.
+- Stages 4e to 4h are next (race results, settings, lobby + waiting room,
+  elimination), then 5 to 7. Each moves its screens onto `Panel` and re-measures;
+  the total must reach 0 (64 now).
   `.text-input` uses `--field-edge` (aliased to `--edge`, >=3:1 on every field
   surface); do not fold it back into `--border`.
-- Still failing after stage 3 (7, not honeycomb): the Master bar and "Championship
-  rarities" (stage 4b), the eliminated name's `--out` (2.86 to 2.88:1, stage 4h).
+- Still failing after 4d (64): the unported screens. Includes the eliminated
+  name's `--out` (2.86 to 2.88:1, 4h). The Master bar is fixed.
 - A real-phone check of the shimmer (in stage 7). The perf numbers so far are
   headless Chrome with the CPU throttled 4×. The static glow is the fallback.
 - The name itself: a distinct look lowers the risk of being mistaken for NYT's

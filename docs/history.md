@@ -95,3 +95,26 @@ stage 2, 217 after stage 3; the target is 0 before merge.
 - Found and fixed while checking: the correct/incorrect answer field kept the
   honey focus outline around a green or red border; the outline now takes the
   state colour.
+
+## 2026-10-03: stages 4a to 4d
+
+Home, difficulty, round and solo results moved onto panels. Contrast failures:
+217 (stage 3), 212, 187, 90, 64 after 4a, 4b, 4c, 4d. The 64 are elimination,
+lobby and waiting room.
+
+- **A scripted edit deleted a span of App.css, and the next measurement exposed it.**
+  Replacing the back link, `s.index(".back-link {")` matched
+  `.round-exit .back-link {` first and cut everything up to `.sp-home`, taking the
+  exit-confirm, results and the new home rules with it. The tier bars then
+  measured as transparent (their CSS was gone too). Caught because a focus-ring
+  probe showed a 24px-high link where 44px was set; restored from git and redone
+  with exact anchors. The lesson is in the commit trail, not a rule: after any
+  scripted multi-rule edit, diff the stat and read the removed selectors.
+- **The Modes link's focus ring failed (2.08:1)** because 12px below it sat the
+  next panel's drawn outline, inside the ring's 3 to 6px band. The fix is spacing
+  (24px), not a thicker moat.
+- **"New best" was wrong in three cases** (ties, practice runs against an empty
+  best, every race). It is now decided once, in `App`, and passed in.
+- **I replaced a rule by renaming it, then had to undo it:** a stray script line
+  renamed `.replay-btn`, which TurnScreen still uses. Reverted before the commit.
+

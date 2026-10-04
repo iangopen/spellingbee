@@ -241,10 +241,10 @@ middle stages alone would show a half-old, half-new UI.
 | 1 ✅ | **Tokens + dark default (done 2026-10-03).** The honey-and-ribbon token set (homemade `light`) in both themes in `index.css`, old tokens aliased (see 1.1). `theme.ts`: `resolveTheme()` is stored ?? `"dark"`, the OS listener and `getSystemTheme`/`onSystemThemeChange` are gone, `SettingsPanel`'s listener removed. The `spellingbee:theme` key and its values are unchanged, so a player who chose light keeps it. The harness now stores its theme pick like a player would (the OS emulation no longer selects a theme). Stage 0 gap closed: Caveat Brush added to `src/fonts.css`, `src/assets/fonts/` and `CREDITS.md`. | `index.css`, `fonts.css`, `lib/theme.ts`, `main.tsx`, `SettingsPanel.tsx`, `CREDITS.md`, `design/harness/main.tsx` | `theme.test.ts` (7 tests; negative control: following the OS again fails 2 of them); contrast 728 pairs / 11 failing vs baseline 47, no new failure |
 | 2 ✅ | **Honeycomb background (done 2026-10-03).** `HoneycombBackground` + `src/honeycomb.css`, mounted once in `Shell`, replacing `body::before`. The 28x49 tile is an SVG used as a CSS MASK painted with `--cell-line` / `--cell-line-bright`, so both palettes and every theme switch work with no JavaScript. Layers: gradient, blurred + crisp cells (faded by `--hex-mask`), paper grain, the shimmer (a window over brighter cells, transform and opacity only), a calm header band and vignette. It lives at `z-index: -1` INSIDE `.app-shell`: z-index 0 painted it over the in-flow screen and hid every screen (caught by the first measurement, which reported 371 failures that were really the background). The shimmer is removed under the OS setting and the in-app override; the tab being hidden freezes it. `?peak=1` (harness only) shows every bright cell at once. | `components/HoneycombBackground.tsx`, `honeycomb.css`, `index.css`, `App.tsx`, `design/harness/*` | render test (aria-hidden, no text, no focusables, pause/resume/cleanup); lemon pixels 0 of 1.02M on home and round, both themes; phone, CPU 4x: median frame 16.7ms, p95 16.8ms, worst 49.9ms (one-off, headless) |
 | 3 ✅ | **Shared components (done 2026-10-03).** `components/ui/`: `Button` (primary / secondary / text / danger, `sm` size; replaced `.primary-btn`, `.secondary-btn`, `.ghost-btn`, `.danger-btn`, all 18 call sites; disabled is a dashed muted outline, not a faded fill), `TextInput` / `Select` (`--edge`, native option colours for Windows dark), `AnswerField` (replaced `.guess-input` in both screens; moat + state glows, tick/cross, `readOnly` kept), `Panel`, `Sticker`, `Placard`, `WobbleFilters` (mounted in Shell), and `Art` (`AvatarArt`, `BeeMascot`, `Rosette`) drawn by `lib/beeArt.ts` from tokens, seeded per avatar key. `AvatarPicker` / `AvatarBadge` now draw the bee contestants; `lib/avatars.ts` lost its lucide icons and keeps the keys. The global focus rule (`ui.css`) outranks the marker shadows. `--tape*` / `--grain-panel-opacity` deleted. Panel, Sticker, Placard, BeeMascot and Rosette are built and tested but have no screen yet: their first consumers are stages 4a (home), 4c (round), 4d and 4e (results). | `components/ui/*`, `ui.css`, `lib/beeArt.ts`, `lib/avatars.ts`, `AvatarPicker.tsx`, call sites, `App.css` (old rules removed) | `ui.test.tsx` (12), `AVATAR_KEYS` pinned; focus rings 0 failing (Settings 11.47 / 7.35, was 1.82); lobby buttons 7.06 / 6.47 (was 3.19) |
-| 4a | **Home** (ModeSelect): hero panel + mascot + best-scores panel (from `getAllBests()`) | `ModeSelect.tsx`, `App.tsx` (pass bests only) | keyboard: heading focus via `useScreenFocus` is unchanged |
-| 4b | **Difficulty:** the OLD hexagon tier bars restyled with the new tokens (see 1.6 and `prototypes/homemade/`) + the modifier chips, with the header on a lit panel | `DifficultySelect.tsx`, `App.css` (`.tier-bar` rules adapted, not deleted) | tap-target measurement with `elementFromPoint` probes (every bar ≥44px, the clip-path IS the target); focus rim contrast (`shoot-homemade.mjs` section 5); `TIER_ORDER` / `TIER_META` untouched |
-| 4c | **Round** (solo + race): the pronouncer panel, placard, clock, answer moments (light-up, bell + shake), "+14" | `RoundScreen.tsx` (markup/classes) | existing `RoundScreen.test.tsx` green, especially: no word reveal while `awaitingOthers`, `readOnly` focus kept, `role="status"` text unchanged |
-| 4d | **Solo results:** the rosette moment on a new best | `ResultsScreen.tsx` | "new best" only when it truly is (solo) |
+| 4a ✅ | **Home** (ModeSelect): hero panel + mascot + best-scores panel (from `getAllBests()`) | `ModeSelect.tsx`, `App.tsx` (pass bests only) | keyboard: heading focus via `useScreenFocus` is unchanged |
+| 4b ✅ | **Difficulty:** the OLD hexagon tier bars restyled with the new tokens (see 1.6 and `prototypes/homemade/`) + the modifier chips, with the header on a lit panel | `DifficultySelect.tsx`, `App.css` (`.tier-bar` rules adapted, not deleted) | tap-target measurement with `elementFromPoint` probes (every bar ≥44px, the clip-path IS the target); focus rim contrast (`shoot-homemade.mjs` section 5); `TIER_ORDER` / `TIER_META` untouched |
+| 4c ✅ | **Round** (solo + race): the pronouncer panel, placard, clock, answer moments (light-up, bell + shake), "+14" | `RoundScreen.tsx` (markup/classes) | existing `RoundScreen.test.tsx` green, especially: no word reveal while `awaitingOthers`, `readOnly` focus kept, `role="status"` text unchanged |
+| 4d ✅ | **Solo results:** the rosette moment on a new best | `ResultsScreen.tsx` | "new best" only when it truly is (solo) |
 | 4e | **Race results:** the new `RaceResults` (winner + lanes). `App.tsx` routes race to it. This fixes the audit bugs: no false "new best!", a real winner and standings, and the button says what it does. | `components/RaceResults.tsx`, `App.tsx` (routing line only) | unit test: order by score, the "you" row, ties, 2 to 8 players; lane positions ∝ score |
 | 4f | **Settings dialog** restyle (the theme picker stays Light/Dark) | `SettingsPanel.tsx` (classes), CSS | a dialog test: focus in / trap / Escape / restore, still green in Chrome |
 | 4g | **Lobby + waiting room:** panels side by side at desktop, new inputs (fixes the 1.47:1 edges), avatar picker with bee contestants | `LobbyScreen.tsx`, `WaitingRoom.tsx` | contrast of every input edge; name validation copy unchanged |
@@ -312,3 +312,40 @@ the stages below like this:
   5 degrees or less.
 - A clip-path hides outlines, so the tier bars' focus indicator needs its own
   measurement (`shoot-homemade.mjs`, section 5).
+
+## Stage 4a to 4d: what was built (2026-10-03)
+
+Contrast failures after each screen (peak shimmer, real app, `design/stage-results/`):
+
+| After | Failing | Screens still failing |
+|---|---|---|
+| Stage 3 | 217 | everything |
+| 4a home | 212 | home: 0 |
+| 4b difficulty | 187 | difficulty: 0 |
+| 4c round | 90 | all four round states (solo correct / wrong, race locked / round end): 0 |
+| 4d solo results | 64 (race results: 0 too) | elimination 46, lobby 10, waiting room 8 |
+
+The 64 left are exactly the screens not yet ported: elimination (4h), lobby and
+waiting room (4g). Race results already pass because it shares `ResultsScreen`;
+4e still owes it a winner and standings.
+
+- **4a:** hero panel (hand-lettered title and underline, sticker, mascot), "Your
+  best scores" panel (rosette), Privacy link inside the hero. The phone mascot sits
+  clear of the fixed Settings button.
+- **4b:** the old hexagon bars on `--t-*`; header on a panel; `.back-link` is now a
+  scrim pill with 24px below it (a 12px gap let the focus ring touch the next
+  panel's drawn outline). Master's gradient was darkened (4.24:1 became passing).
+  `check-tier-bars.mjs` measures the real app: 8 bars, one per row, tap target
+  58px tall at the centre, focus rim 11.47 / 7.35:1. The old `--tier-*` gradients
+  are deleted except Expert and Master, which are fixed solid bars.
+- **4c:** `ScoreBar` is now a pill (tally, placard, clock) and is RoundScreen-only;
+  the pronouncer and answer are panels; the draining bar stays welded to the input;
+  "+N" (derived from the score prop) and a bell on a miss; `.round-screen` max width
+  720. `.prompt-card`, `.lead-in`, `.feedback`, `.timer-track`, `.stat`, `.score-bar`
+  are untouched and still serve TurnScreen until 4h.
+- **4d:** `ResultsScreen` is one panel. "New best" is decided by `App` (previous
+  stored best beaten) and passed as `isNewBest`; it used to be `score >= best`,
+  which also fired on ties, on practice runs against an empty best, and on every
+  race. Practice runs say they do not set best scores; the race shows no best line.
+- Phones: `.app-shell` has 76px top padding so no first row sits under the fixed
+  Settings button.
