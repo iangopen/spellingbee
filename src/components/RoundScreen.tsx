@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Volume2 } from "lucide-react";
+import { ArrowLeft, BellRing, Volume2 } from "lucide-react";
 import type { GameState } from "../types";
 import { repeatWord, stopSpeaking } from "../lib/tts";
 import { playSubmit } from "../lib/sfx";
@@ -11,6 +11,7 @@ import { ScoreBar } from "./ScoreBar";
 import { TimerBar } from "./TimerBar";
 import { Button } from "./ui/Button";
 import { AnswerField } from "./ui/AnswerField";
+import { Panel } from "./ui/Panel";
 
 /** Unlock a submitted answer that never got a verdict (the request failed). */
 const PENDING_TIMEOUT_MS = 5000;
@@ -91,6 +92,15 @@ export function RoundScreen({
   // conditional return changes hook order between renders.
   useSfxForOutcome(wordId, state.status);
 
+  // Points gained on the word that just resolved, for the floating "+N". Derived
+  // from the score prop alone: the score as it stood while the word was live is
+  // remembered, and the difference is shown once it resolves correct. Nothing
+  // here decides an outcome or touches the engine. Shown only when positive, so
+  // a race whose server score lands a beat after the verdict simply omits it.
+  const liveScore = useRef(state.score);
+  if (state.status === "playing") liveScore.current = state.score;
+  const gained = state.status === "correct" ? state.score - liveScore.current : 0;
+
   const scrollInputIntoView = () => {
     inputRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
   };
@@ -114,7 +124,7 @@ export function RoundScreen({
       {onExit && (
         <div className="round-exit">
           {confirmingExit ? (
-            <div className="exit-confirm">
+            <Panel className="exit-confirm">
               <span className="exit-confirm-text">Quit? This game won't be scored.</span>
               <div className="exit-confirm-actions">
                 <Button variant="danger" size="sm" onClick={handleExit}>
@@ -124,7 +134,7 @@ export function RoundScreen({
                   Keep playing
                 </Button>
               </div>
-            </div>
+            </Panel>
           ) : (
             <button className="back-link" onClick={() => setConfirmingExit(true)}>
               <ArrowLeft size={15} aria-hidden />
@@ -151,13 +161,19 @@ export function RoundScreen({
         untimed={state.untimed}
       />
 
-      {/* Mirrors what the narrator just said, so the audio and the screen agree. */}
-      {leadIn && <p className="lead-in">{leadIn}</p>}
-
-      <div className="prompt-card">
+      {/* The pronouncer: the narrator's lead-in (mirrors what was just spoken, so
+          the audio and the screen agree), the definition and "Hear it again", all
+          on one panel. */}
+      <Panel as="section" className="pronouncer">
+        {leadIn && (
+          <p className="lead-in who">
+            <Volume2 aria-hidden />
+            {leadIn}
+          </p>
+        )}
         {/* Hide-definition mode: the definition is simply not rendered, so the
             only clue is the audio. The replay button matters much more here,
-            which is why the card keeps its shape rather than collapsing. */}
+            which is why the panel keeps its shape rather than collapsing. */}
         {state.hideDefinition ? (
           <p className="definition-hidden">Listen carefully — no definition this round.</p>
         ) : (
@@ -168,88 +184,102 @@ export function RoundScreen({
             delay in front of the thing you asked for. The lead-in line above
             stays on screen, because it still describes the announcement that
             introduced this word. */}
-        <button className="replay-btn" onClick={() => repeatWord(state.currentWord!.word)}>
-          <Volume2 size={16} aria-hidden />
+        <button className="chip-btn" onClick={() => repeatWord(state.currentWord!.word)}>
+          <Volume2 aria-hidden />
           Hear it again
         </button>
-      </div>
+      </Panel>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          // One answer per word: a second Enter while the first is in flight
-          // used to send a second request, whose already_submitted reply could
-          // overwrite the first one's verdict.
-          if (state.status !== "playing" || pending) return;
-          setSubmittedFor(wordId ?? null);
-          playSubmit();
-          onSubmit(guess);
-        }}
-      >
-        <AnswerField
-          inputRef={inputRef}
-          state={feedback}
-          value={guess}
-          onChange={(e) => setGuess(e.target.value)}
-          onFocus={scrollInputIntoView}
-          // readOnly, NOT disabled, during the feedback beat: disabling the
-          // focused input drops focus to <body>, so the next word arrived with
-          // the keyboard user's place lost (hardening #19). readOnly keeps focus
-          // here, the submit handler above already ignores non-"playing"
-          // states, and aria-disabled tells assistive tech it's inactive.
-          readOnly={state.status !== "playing" || pending}
-          aria-disabled={state.status !== "playing" || pending}
-          autoComplete="off"
-          autoCapitalize="off"
-          autoCorrect="off"
-          spellCheck={false}
-          placeholder="Type the word you hear"
-        />
-      </form>
-
-      {/* Draining timer bar — extracted to TimerBar in Session 20 and shared
-          with the elimination turn screen. Same component, same rules; see
-          TimerBar for why its scale comes from the state rather than a
-          constant. */}
-      <TimerBar wordId={wordId} timeLeft={state.timeLeft} untimed={state.untimed} />
-
-      {/* Sent, verdict not back yet. Says only that it was SENT, never whether
-          it was right — the same rule TurnScreen's "Checking…" follows. */}
-      {pending && <p className="feedback waiting">Checking…</p>}
-
-      {/* Answered, round still live: no reveal — others are still racing. */}
-      {awaitingOthers && (
-        <p className="feedback waiting">Answer locked in — waiting for the other players…</p>
-      )}
-
-      {/* Session 23: the response detail EXTENDS this line rather than adding a
-          second feedback element, and it is omitted entirely when there is no
-          measured time (a timeout, a skip, or a mode that can't supply one). */}
-      {!awaitingOthers && feedback === "correct" && (
-        <p className="feedback correct">
-          Correct!
-          {responseDetail && <span className="feedback-detail"> — {responseDetail}</span>}
-        </p>
-      )}
-      {!awaitingOthers && feedback === "incorrect" && (
-        <p className="feedback incorrect">The word was "{state.currentWord.word}"</p>
-      )}
-      {!awaitingOthers && resultNote && <p className="result-note">{resultNote}</p>}
-
-      {state.status === "playing" && canSkip && (
-        <Button
-          variant="text"
-          className="skip-btn"
-          onClick={() => {
-            onSkip();
-            // This button unmounts as the word resolves; keep the keyboard on
-            // the input rather than letting focus fall to <body>.
-            inputRef.current?.focus();
+      {/* The answer, its draining timer (welded to the input: it drains under the
+          thing it is timing), and the outcome. One panel, so none of that text
+          sits on the bare honeycomb. */}
+      <Panel as="section" className="answer">
+        {gained > 0 && (
+          <span className="float-points" aria-hidden="true">
+            +{gained}
+          </span>
+        )}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            // One answer per word: a second Enter while the first is in flight
+            // used to send a second request, whose already_submitted reply could
+            // overwrite the first one's verdict.
+            if (state.status !== "playing" || pending) return;
+            setSubmittedFor(wordId ?? null);
+            playSubmit();
+            onSubmit(guess);
           }}
         >
-          Skip
-        </Button>
-      )}
+          <AnswerField
+            inputRef={inputRef}
+            state={feedback}
+            aria-label="Your spelling"
+            value={guess}
+            onChange={(e) => setGuess(e.target.value)}
+            onFocus={scrollInputIntoView}
+            // readOnly, NOT disabled, during the feedback beat: disabling the
+            // focused input drops focus to <body>, so the next word arrived with
+            // the keyboard user's place lost (hardening #19). readOnly keeps focus
+            // here, the submit handler above already ignores non-"playing"
+            // states, and aria-disabled tells assistive tech it's inactive.
+            readOnly={state.status !== "playing" || pending}
+            aria-disabled={state.status !== "playing" || pending}
+            autoComplete="off"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck={false}
+            placeholder="Type the word you hear"
+          />
+        </form>
+
+        {/* Draining timer bar — extracted to TimerBar in Session 20 and shared
+            with the elimination turn screen. Same component, same rules; see
+            TimerBar for why its scale comes from the state rather than a
+            constant. */}
+        <TimerBar wordId={wordId} timeLeft={state.timeLeft} untimed={state.untimed} />
+
+        {/* Sent, verdict not back yet. Says only that it was SENT, never whether
+            it was right — the same rule TurnScreen's "Checking…" follows. */}
+        {pending && <p className="feedback waiting">Checking…</p>}
+
+        {/* Answered, round still live: no reveal — others are still racing. */}
+        {awaitingOthers && (
+          <p className="feedback waiting">Answer locked in — waiting for the other players…</p>
+        )}
+
+        {/* Session 23: the response detail EXTENDS this line rather than adding a
+            second feedback element, and it is omitted entirely when there is no
+            measured time (a timeout, a skip, or a mode that can't supply one). */}
+        {!awaitingOthers && feedback === "correct" && (
+          <p className="feedback correct">
+            Correct!
+            {responseDetail && <span className="feedback-detail"> — {responseDetail}</span>}
+          </p>
+        )}
+        {!awaitingOthers && feedback === "incorrect" && (
+          <p className="feedback incorrect">
+            <BellRing className="bell" aria-hidden />
+            The word was "{state.currentWord.word}"
+          </p>
+        )}
+        {!awaitingOthers && resultNote && <p className="result-note">{resultNote}</p>}
+
+        {state.status === "playing" && canSkip && (
+          <Button
+            variant="text"
+            className="skip-btn"
+            onClick={() => {
+              onSkip();
+              // This button unmounts as the word resolves; keep the keyboard on
+              // the input rather than letting focus fall to <body>.
+              inputRef.current?.focus();
+            }}
+          >
+            Skip
+          </Button>
+        )}
+      </Panel>
     </div>
   );
 }

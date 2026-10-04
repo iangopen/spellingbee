@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import { Panel, Placard } from "./ui/Panel";
 
+// The round's header strip: the tally (score and streak), the contestant's
+// placard (words left) and the clock, on one lit pill. It is the only user of
+// these class names, so unlike the old `.score-bar` / `.stat` rules (still shared
+// with TurnScreen's own header) it can be restyled freely.
 export function ScoreBar({
   score,
   streak,
@@ -29,34 +34,33 @@ export function ScoreBar({
   }, [streak]);
 
   return (
-    <div className="score-bar">
-      <div className="stat">
-        <span className="stat-value">{score}</span>
-        <span className="stat-label">score</span>
+    <Panel className="round-head">
+      <div className="tally">
+        <div>
+          <b>{score}</b>
+          <span>score</span>
+        </div>
+        <div>
+          <b key={pulseKey} className={pulseKey > 0 ? "pulse" : undefined}>
+            {streak}
+          </b>
+          <span>streak</span>
+        </div>
       </div>
-      <div className="stat">
-        <span key={pulseKey} className={`stat-value${pulseKey > 0 ? " pulse" : ""}`}>
-          {streak}
-        </span>
-        <span className="stat-label">streak</span>
-      </div>
+      <Placard value={wordsRemaining} label="to go" />
       {untimed ? (
         // Replaces the countdown rather than leaving a frozen "0s left", which
         // would read as a bug.
-        <div className="stat">
-          <span className="stat-value">∞</span>
-          <span className="stat-label">practice</span>
+        <div className="clock">
+          <b>∞</b>
+          <small>practice</small>
         </div>
       ) : (
-        <div className="stat timer" data-low={timeLeft <= 5}>
-          <span className="stat-value">{timeLeft}s</span>
-          <span className="stat-label">left</span>
+        <div className="clock" data-low={timeLeft <= 5}>
+          <b>{timeLeft}s</b>
+          <small>left</small>
         </div>
       )}
-      <div className="stat">
-        <span className="stat-value">{wordsRemaining}</span>
-        <span className="stat-label">to go</span>
-      </div>
-    </div>
+    </Panel>
   );
 }
