@@ -27,6 +27,7 @@ import { friendlyRoomError } from "../lib/roomErrors";
 
 import { TIERS, TIER_META } from "../lib/tiers";
 import { Button } from "./ui/Button";
+import { Panel } from "./ui/Panel";
 import { Select, TextInput } from "./ui/TextInput";
 
 // The lobby now only gets you INTO a room; the room itself (waiting room, then
@@ -141,8 +142,10 @@ export function LobbyScreen({
   if (!ready) {
     return (
       <div className="lobby">
-        <p className="lobby-status">Connecting…</p>
-        <div ref={captchaSlot} className="captcha-slot" />
+        <Panel className="lobby-you">
+          <p className="lobby-status">Connecting…</p>
+          <div ref={captchaSlot} className="captcha-slot" />
+        </Panel>
       </div>
     );
   }
@@ -154,7 +157,9 @@ export function LobbyScreen({
           <ArrowLeft size={15} aria-hidden />
           Modes
         </button>
-        <p className="lobby-error">Couldn't sign in: {authError ?? "unknown error"}</p>
+        <Panel className="lobby-you">
+          <p className="lobby-error">Couldn't sign in: {authError ?? "unknown error"}</p>
+        </Panel>
       </div>
     );
   }
@@ -165,6 +170,8 @@ export function LobbyScreen({
         <ArrowLeft size={15} aria-hidden />
         Modes
       </button>
+      <div className="lobby-grid">
+      <Panel as="section" className="lobby-you">
       <h2 ref={headingRef} tabIndex={-1}>Multiplayer</h2>
 
       <label className="field">
@@ -180,7 +187,11 @@ export function LobbyScreen({
 
       <AvatarPicker value={avatar} onChange={setAvatar} />
 
-      <div className="lobby-panel">
+      {!nameCheck.ok && <p className="hint">{displayNameProblemText(nameCheck.problem)}</p>}
+      {error && <p className="lobby-error">{error}</p>}
+      </Panel>
+
+      <Panel as="section" className="lobby-create">
         <h3>Create a room</h3>
 
         {/* Mode is a two-way choice, so two buttons rather than a select: it
@@ -254,11 +265,9 @@ export function LobbyScreen({
         >
           {busy === "create" ? "Creating…" : "Create room"}
         </Button>
-      </div>
+      </Panel>
 
-      <div className="lobby-divider">or</div>
-
-      <div className="lobby-panel">
+      <Panel as="section" className="lobby-join">
         <h3>Join a room</h3>
         <label className="field">
           <span className="field-label">Room code</span>
@@ -304,10 +313,8 @@ export function LobbyScreen({
         >
           {busy === "join" ? "Joining…" : "Join room"}
         </Button>
+      </Panel>
       </div>
-
-      {!nameCheck.ok && <p className="hint">{displayNameProblemText(nameCheck.problem)}</p>}
-      {error && <p className="lobby-error">{error}</p>}
     </div>
   );
 }

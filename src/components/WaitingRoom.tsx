@@ -19,6 +19,7 @@ import { AvatarBadge, AvatarPicker } from "./AvatarPicker";
 import { TIER_META } from "../lib/tiers";
 import { useScreenFocus } from "../hooks/useScreenFocus";
 import { Button } from "./ui/Button";
+import { Panel } from "./ui/Panel";
 
 export function WaitingRoom({
   room,
@@ -121,9 +122,10 @@ export function WaitingRoom({
         Leave room
       </button>
 
+      <Panel as="section" className="room-code-block">
       <h2 ref={headingRef} tabIndex={-1}>Waiting room</h2>
 
-      <div className="room-code-block">
+      <div className="room-code-card">
         <span className="room-code-label">Room code — share to invite</span>
         <span className="room-code">{room.code}</span>
         <span className="room-tier">{TIER_META[room.tier].label} words</span>
@@ -141,14 +143,17 @@ export function WaitingRoom({
           standing wins.
         </p>
       )}
+      </Panel>
 
       {/* Change your avatar without leaving the room. Same preset set as the
           lobby (lib/avatars.ts), same component — no second list, no new art.
           Everyone else sees the change over the existing room_players realtime
           subscription, which already re-fetches on any UPDATE. */}
-      <AvatarPicker value={myAvatar} onChange={handleAvatarChange} label="Your avatar" />
+      <Panel className="waiting-panel">
+        <AvatarPicker value={myAvatar} onChange={handleAvatarChange} label="Your avatar" />
+      </Panel>
 
-      <div className="player-list">
+      <Panel as="section" className="player-list">
         <span className="player-list-label">
           Players ({players.length})
         </span>
@@ -158,7 +163,7 @@ export function WaitingRoom({
             const isRoomHost = hostId != null && p.player_id === hostId;
             return (
               <li key={p.player_id} className="player-row">
-                <AvatarBadge avatar={coerceAvatar(p.avatar)} size={16} />
+                <AvatarBadge avatar={coerceAvatar(p.avatar)} size={30} />
                 <span className="player-name">{p.display_name}</span>
                 <span className="player-tags">
                   {isRoomHost && <span className="tag tag-host">host</span>}
@@ -169,10 +174,11 @@ export function WaitingRoom({
           })}
           {players.length === 0 && <li className="player-empty">No one here yet…</li>}
         </ul>
-      </div>
+      </Panel>
 
+      <Panel className="waiting-panel host-controls">
       {isHost && (
-        <div className="host-controls">
+        <div>
           <Button variant="primary" className="btn-block" onClick={handleStart} disabled={!canStart || starting}>
             {starting ? "Starting…" : "Start game"}
           </Button>
@@ -186,6 +192,7 @@ export function WaitingRoom({
       {!isHost && (
         <p className="hint">Waiting for the host to start the game…</p>
       )}
+      </Panel>
     </div>
   );
 }
