@@ -602,9 +602,11 @@ that costs nothing, because the database lives in that region anyway and a game 
 without it.
 
 What changes in the spec:
-- **D20 is resolved:** pinning is no longer "if available". It is **required** for the latency
-  credit in §4.5, because echo stamps and answer stamps must come from the same clock pool to be
-  comparable.
+- **D20 is resolved:** pinning is no longer "if available". It is **required**. Every player's answer
+  stamp must come from one regional clock pool, so the stamps are comparable. Also, the echo (§4.5)
+  runs in the database's region, so a pinned answer path crosses the same network leg the echo
+  measured. (Third pass: the echo is now a database RPC, which is in the project's region by
+  construction and needs no pinning itself.)
 - **Use the query parameter,** not the header. `callEdge` (`src/lib/rooms.ts:286-322`) calls `fetch`
   directly, and a new custom header would need adding to the functions' CORS allow-list. A query
   parameter needs no CORS change. Preflights aren't billed in any case (Supabase usage docs).
@@ -650,48 +652,70 @@ before any reaction time).
 network. Without this, upload latency (player → edge) is the one network delay §4.2 and §4.4 B
 still count.
 
-**How the server measures each player's round trip itself:**
+**How the server measures each player's round trip itself** (revised 2026-10-04, third pass):
 
-1. **The echo endpoint.** A new edge function, `echo`, pinned to the DB region (§4.4.1).
-   - **First line of the handler:** `T2 = Date.now()`, before auth or anything that awaits.
-   - **Auth:** verify the caller's JWT (needed to bind the sample to a player).
-   - **Then, if the request carries a challenge token:** verify its HMAC-SHA256 signature. The secret
-     is a new edge secret, `ECHO_SECRET`, and the token binds `room_id`, `player_id` and the
-     server's `T1`.
-     - If it verifies, the sample is `rtt = T2 − T1`.
-     - Return a **signed sample receipt** `{room_id, player_id, T1, T2}`.
-   - **Last line before responding:** `T1' = Date.now()`, put into a fresh signed challenge.
+The echo is a **database RPC, not an Edge Function.** The first draft made it an edge function.
+That was wrong for this project, because Supabase bills an Edge Function invocation "regardless of
+the response status code" (Supabase docs, Edge Function invocations). Every call a hostile client
+sends counts against the 500,000-a-month Free quota, **even one the function rejects in its first
+line**. A rate limit inside the function would cap what is *served*, never what is *spent*.
 
-   **Both ends of every sample are server stamps.** The sample spans "server sent the challenge" to
-   "server received it back", which is one network round trip plus the client's turnaround. Auth
-   time falls outside it.
-2. **When it runs.** During the 1.1 s feedback window and the 1.5 s "Get ready" countdown before
-   each reveal (§4.2), the client chains 6 echo calls back to back, giving 5 samples. It answers each
-   challenge immediately. These windows are dead time for the player anyway.
-3. **What is subtracted.**
-   - With the answer, the client sends its latest receipts.
-   - The submit edge function verifies each receipt's signature, room and player, and that its `T2`
-     is in the 15 s before this answer's `received_at`.
-   - It takes the **median** of the valid `rtt`s and computes
-     `credit = min(median_rtt / 2, CAP)`, with `CAP = 100 ms`.
-   - It passes `p_latency_credit_ms` to SQL.
-   - With **fewer than 3 valid receipts, the credit is 0.** There is no credit without evidence, and
-     an honest client always has 5.
-4. **Adjusted time** = `(p_received_at − reveal) − credit`, floored at 0. It is compared with the
-   human floor (§4.4) and used for the Dash winner and Hourglass charges. Spotlight doesn't use it:
-   no answer is ever compared with another player's, and its 750 ms grace already covers the
-   deadline.
-5. **Stores nothing.** Receipts are stateless signed tokens that live in the client for 15 s. No
-   table, no new retention job, nothing for PRIVACY.md. `round_scores` records the applied
-   `credit_ms` beside `response_time_ms`, so stage 7's test can study it.
+A PostgREST RPC (`/rest/v1/rpc/echo`) spends nothing from that quota: the Free plan has "Unlimited
+API requests" (Supabase pricing page, 2026-10-04). It also lives in the database's own region,
+so it needs no pinning. §4.5.1 has the arithmetic.
+
+1. **`public.echo(p_room_id uuid) returns jsonb`.**
+   - SECURITY DEFINER with `search_path` pinned.
+   - Granted to `authenticated` only and revoked from `public` and `anon` (the grants test list grows
+     by one).
+   - The acting player is always `auth.uid()`, never a parameter, so it can't impersonate.
+   - In order:
+     1. `T2 := clock_timestamp()` as the first statement.
+     2. The §4.5.1 checks: runtime flag, membership, window, rate limits, under
+        `lock_for('echo', auth.uid())`.
+     3. If this player's previous sample for the same upcoming round is still open (it has a `t1`
+        and no `rtt_ms`), close it: `rtt_ms := T2 − t1`.
+     4. Insert a new open sample. **Its `t1 := clock_timestamp()` is the last statement before
+        returning.**
+   - **Both ends of every sample are server stamps from one clock.** A sample spans "the server
+     answered" to "the server heard the next call", which is one network round trip plus the
+     client's turnaround.
+2. **Samples are stored briefly, server-side** in `private.echo_samples`:
+   - Columns: `room_id`, `round_num` (the upcoming round), `player_id`, `seq`, `t1`, `rtt_ms`.
+   - The `private` schema isn't exposed by PostgREST, and no client role can read it (the 0018 / 0019
+     pattern).
+   - `room_id` cascades from `rooms` and `player_id` from `auth.users`.
+   - The round's close function deletes its rows. A 10-minute job (`purge_echo_samples()`, next to
+     `purge_finished_round_attempts`) removes anything older than 10 minutes.
+   - Nothing is ever kept past the word it was measured for, apart from the summary
+     `round_scores.credit_ms`. That replaces the signed tokens of the previous pass: no `ECHO_SECRET`
+     and no HMAC.
+3. **When it runs.** The client chains 6 calls back to back during the 1.1 s feedback window and the
+   1.5 s "Get ready" countdown before each reveal (§4.2), giving 5 samples. These windows are dead time
+   for the player.
+4. **What is subtracted.**
+   - Inside the submit transaction, SQL reads this player's closed samples for this round and takes
+     the **median** `rtt_ms`.
+   - `credit = min(median / 2, CAP)`, with CAP = 100 ms.
+   - **With fewer than 3 samples, the credit is 0.**
+   - No client value is involved anywhere: the submit request is unchanged
+     (`{room_id, round_num, guess}`).
+5. **Adjusted time** = `(p_received_at − reveal) − credit`, floored at 0. It is compared with the human
+   floor (§4.4) and used for the Dash winner and Hourglass charges. Spotlight doesn't use it: no answer
+   is compared with another player's.
+
+`round_scores.credit_ms` records the applied credit, so stage 7's test can study it.
 
 **Exposure (stated plainly):**
-- A hostile client cannot make a sample *shorter* than its real network round trip. It can't answer
-  a challenge before receiving it, and both stamps are inside the server's signature.
-- It **can** make samples longer by holding each challenge before replying, and so claim a credit up
-  to the cap however good its connection is.
-- **Its gain per round is at most `CAP − its true one-way delay` ≤ 100 ms.** Replaying another
-  player's receipts fails the player binding, and stale receipts fail the 15 s window.
+- A hostile client cannot fake a sample: both stamps are the server's own. It has two levers, and
+  neither touches any other player:
+  - **Sending the next call before the previous answer arrives (pipelining).** The per-player lock
+    serialises the calls, so this produces a near-zero sample, which only *lowers* its own credit.
+  - **Waiting before replying.** That inflates samples, and so claims a credit up to the cap however
+    good its connection is.
+- **Its gain per round is at most `CAP − its true one-way delay` ≤ 100 ms.** Samples are keyed to
+  `auth.uid()` and to the upcoming round, so they can't be borrowed from another player or carried
+  over from an earlier round.
 
 **Choosing the cap and the dead band together.** The dead band (200 ms, Ian's decision) is the
 difference Hourglass treats as noise. The rule is that a cheater's maximum gain, plus the honest
@@ -704,16 +728,17 @@ band would otherwise count.
 | Error of the RTT/2 one-way estimate for an honest player | 30 | Up/down asymmetry; the median of 5 rejects outliers |
 | Device start skew from clock sync (5-sample min-RTT) | 20 | §4.2 |
 | Edge stamp jitter within one pinned region | 10 | Different machines, NTP-synced |
-| **Total** | **160** | |
-| **Dead band** | **200** | **Margin: 40 ms** |
+| Path difference: echo via the API gateway and PostgREST vs. the answer via the pinned edge | 10 | Same region, a little more server hop time on the echo, so the credit runs slightly high, never low |
+| **Total** | **170** | |
+| **Dead band** | **200** | **Margin: 30 ms** |
 
 Why 100 and not another cap:
 
 | CAP | Who is fully compensated (one-way = RTT/2) | Budget total | Fits 200 ms? |
 |---|---|---|---|
-| 50 ms | Wired and Wi-Fi only (one-way 10–50) | 110 | Yes, but 4G players keep up to ~30 ms of uncompensated delay |
-| **100 ms** | **Wired, Wi-Fi and typical 4G/5G (one-way 30–80)** | **160** | **Yes** |
-| 150 ms | Also poor mobile | 210 | **No**: a cheater plus normal error can exceed the band |
+| 50 ms | Wired and Wi-Fi only (one-way 10–50) | 120 | Yes, but 4G players keep up to ~30 ms of uncompensated delay |
+| **100 ms** | **Wired, Wi-Fi and typical 4G/5G (one-way 30–80)** | **170** | **Yes** |
+| 150 ms | Also poor mobile | 220 | **No**: a cheater plus normal error can exceed the band |
 
 Planning figures for one-way delay to a same-continent region:
 - wired 10–30 ms;
@@ -732,18 +757,137 @@ is compensated 100 ms and keeps the rest: still better than today, where they ke
   close rounds, and only those. The 150 ms settle window (§3.1) is what makes the credit usable in
   Dash: the winner is picked by adjusted time once every answer that could still win has arrived.
 
-**Cost in Edge Function invocations.** Each echo is an invocation; Supabase counts 500,000 a month on
-Free and 2,000,000 on Pro, and doesn't bill preflights. Per player per round: 6 echo calls plus
-1 submit, about 7; plus about 2 `close-round` calls per room per round.
+#### 4.5.1 Protecting the echo, and its budget (added 2026-10-04, third pass)
 
-| Game | Invocations | Games a month on Free | on Pro |
+**Checks, in this order.** Every rejection returns before any write. The only work a rejected call
+causes is one short read-only transaction.
+
+| # | Check | Rejection |
+|---|---|---|
+| 1 | **A valid user token.** `echo` is granted to `authenticated` only. Anon and a missing or expired JWT are refused by PostgREST before the function runs. | 401 / 42501 |
+| 2 | **Runtime flag `echo_enabled`** (§4.5.2) | `{ok:false, error:"disabled"}` |
+| 3 | **Membership:** `is_room_member(p_room_id)` (`0002:32-51`), **and** the caller can still answer: a standing player in Hourglass, a contender in Dash sudden death | `not_a_member` / `not_playing` |
+| 4 | **The pre-start window only.** The room is `active`, its mode is `dash` or `hourglass`, and either the current round has closed (`ended_at` set, the feedback window) or its reveal is still in the future (`now() < turn_started_at`, the countdown). Never while a word is live, never in a lobby, a finished room, or a Spotlight / Race / Elimination room. | `outside_window` |
+| 5 | **Rate limits**, counted under `lock_for('echo', auth.uid())` so parallel calls can't race past them (the 0019 lock helper) | `throttled` |
+
+**Limits** (in `abuse_limits()`, next to the existing ones; the numbers are chosen against the
+legitimate maximum below):
+
+| Limit | Value | Legitimate maximum it must allow |
+|---|---|---|
+| Per player, per upcoming round | **8** served calls | 6 (a chain of 6 calls gives 5 samples), plus 2 retries |
+| Per player, per rolling minute, all rooms | **120** | 108: at most 18 rounds a minute, because the fastest possible round is 1.5 s countdown + 0.45 s floor + 0.15 s settle + 1.1 s feedback = 3.2 s; 18 × 6 = 108 |
+| Per player, per rolling 24 h | **6,000** | 1,000 rounds a day, about 66 full Dash games or 33 Hourglass games |
+| Per room, per upcoming round | **64** | 8 players × 8 |
+| Per room, per rolling minute | **900** | 8 × 108 = 864 |
+
+The daily count lives in `private.echo_quota (player_id, day, n)`, one upserted row per player per
+day, purged after 2 days by the existing daily job.
+
+**Worst case one hostile guest or one hostile room can spend, with the limits in place.** Assumptions:
+- the game is run continuously;
+- 8 hostile members in the room case;
+- about 400 B of response per served call, headers included.
+
+| Resource | One guest, per minute | One guest, per month | One room, per minute | One room, per month | Free plan allows |
+|---|---|---|---|---|---|
+| **Edge Function invocations** | **0** | **0** | **0** | **0** | 500,000 / month |
+| Served echo calls | ≤ 120 | ≤ 6,000 × 30 = **180,000** | ≤ 900 | ≤ 8 × 180,000 = **1,440,000** | unlimited API requests |
+| Rows written (all deleted within 10 min) | ≤ 120 | — (at most 1,200 alive) | ≤ 900 | — (at most 9,000 alive, under 1 MB) | 500 MB database |
+| Egress of served calls | ≤ 48 KB | ≤ 180,000 × 400 B = **72 MB (1.4%)** | ≤ 360 KB | ≤ 1,440,000 × 400 B = **576 MB (11.5%)** | 5 GB / month |
+
+**The echo can't touch the invocation quota at all.** Its served work is capped well inside the
+other two quotas: 1.4% of egress for a guest, 11.5% for a whole hostile room running nonstop for a
+month.
+
+For comparison, the previous draft's edge-function echo had no ceiling. Because Supabase bills every
+invocation whatever the response, a single script calling it 20 times a second (1,200 a minute) would
+use the whole 500,000 in 500,000 / 1,200 ≈ 417 minutes (about 7 hours), with every one of those calls
+rejected.
+
+**What no limit in this app can bound (stated plainly).**
+- **Raw request volume to any endpoint.** A signed-in guest can call `echo`, `server_now()` or any
+  table read as fast as their connection allows. Rejections write nothing, but each one still costs
+  a little database CPU and about 200 B of egress. This is **not new**: it is true of every RPC and
+  table the client can already reach.
+- **Calls to the answer edge functions** (`submit-round`, `close-round`, `submit-turn`, …). Every call
+  counts as an invocation even when rejected, so a script spamming them spends the 500,000 quota.
+  This is also **not new** (`submit-answer` has had this exposure since Session 9a). The answer is
+  detection and response (§6.6), not prevention.
+
+**Invocation budget for honest play, with the echo moved off Edge Functions:**
+- Per player per round: 1 submit.
+- Per room per round: about 2 `close-round` calls.
+- Per game: 1 start.
+
+| Game | Invocations | Games a month on Free (500,000) |
+|---|---|---|
+| Dash, 8 players, ~8 rounds: 8 × 8 + 2 × 8 + 1 | 81 | ~6,170 |
+| Hourglass, 8 players, ~20 rounds: 8 × 20 + 2 × 20 + 1 | 201 | ~2,480 |
+| Dash, 4 players, ~6 rounds: 4 × 6 + 2 × 6 + 1 | 37 | ~13,500 |
+
+The previous draft allowed about 1,077 eight-player Dash games; this allows about 6,170.
+
+**One more limit for the answer path:** a host may start **at most 60 games a rolling 24 h**
+(`max_games_started_per_host_per_day`, counted in `start_match_tx`). Without it, one hostile room
+that plays nonstop *legitimately* would spend its way through the quota. The existing 20 rooms an
+hour allows 20 games an hour; at Hourglass's 201 invocations a game that is 4,020 an hour, so the
+whole quota in about 124 hours (5 days). At 60 games a day the worst is 60 × 201 = 12,060 a day, so
+500,000 lasts 41 days, longer than a billing month. Honest hosts are nowhere near 60 games a day.
+More hosts multiply it, and the Turnstile check on every guest sign-in is what limits that.
+
+#### 4.5.2 When the echo fails, is throttled, or is switched off
+
+**Rule: a failed echo never blocks an answer.** The credit just becomes 0 and the game carries on
+exactly as it would without §4.5 (the server-stamped, scheduled-reveal timing of §4.2 and §4.4).
+
+| Situation | Client | Server | Effect on the round |
 |---|---|---|---|
-| Dash, 8 players, ~8 rounds: 8 × 7 × 8 + 2 × 8 | 464 | ~1,077 | ~4,310 |
-| Hourglass, 8 players, ~20 rounds: 8 × 7 × 20 + 2 × 20 | 1,160 | ~431 | ~1,724 |
-| Dash, 4 players, ~6 rounds: 4 × 7 × 6 + 2 × 6 | 180 | ~2,777 | ~11,111 |
+| Echo slow (over 800 ms) or a network error | Stops echoing for this round; no retry | Has fewer samples | Credit 0 if under 3 samples; the round scores normally |
+| `throttled` / `outside_window` / `not_playing` | Stops for this round | Nothing written | Same |
+| `disabled` (kill switch) | Stops for the **rest of this game** | Nothing written | Credit 0 for everyone. Timing is still fair to within the §4.6 summary, minus the credit row. |
+| 402 or any 5xx from PostgREST | Stops for this game | — | Same |
+| Echo still in flight at the reveal | Abandons it. **The reveal, the input and the submit never `await` an echo.** | A late call is `outside_window` | None |
+| Reading the samples fails inside the submit transaction | — | The credit read is in its own `begin … exception when others then credit := 0` block, so it can't abort the answer | Credit 0; the round scores |
 
-If this ever binds, drop to 3 samples (4 echo calls, still a median); that removes 2 of the 7 calls
-per player per round.
+**The kill switch: no deploy needed.**
+- `private.runtime_flags (key text primary key, value jsonb, updated_at timestamptz)` is created by
+  the migration with its starting rows: `echo_enabled` true, `live_feed` true,
+  `feed_budget_msgs_per_s` 40 (§5.3), `multiplayer_open` true.
+- Only SQL reads it. Clients never do, and anon and `authenticated` get 42501 on it.
+- Ian flips a flag with one statement in the dashboard's SQL editor:
+
+  ```sql
+  update private.runtime_flags set value = 'false', updated_at = now() where key = 'echo_enabled';
+  ```
+
+  It takes effect on the next call: no migration, no function deploy, no client release.
+- Each flip is noted in `docs/history.md`, since it isn't in git.
+- These are runtime switches, deliberately not constants in immutable functions like
+  `decay_params()`. Changing one of those needs a migration, which is a deploy.
+
+**When the monthly Edge Function quota runs out** (Supabase docs, billing FAQ, 2026-10-04): a Free
+project "will be notified when you exceed the Free Plan quota". After a grace period (its length isn't
+published), restrictions may apply:
+- "Responding with a 402 status code" for API requests;
+- switching the database to read-only;
+- or "Pausing projects".
+
+They are lifted "once your quota refills at the start of the next billing cycle", or at once by
+upgrading.
+
+For this game:
+- **Every multiplayer answer, start and close fails**, and possibly sign-in and every database read
+  too, until the cycle resets.
+- **Singleplayer is unaffected.** It runs from GitHub Pages and makes no Supabase call (CLAUDE.md,
+  "Docs and disclosures").
+- The client must treat 402 as "multiplayer is resting" rather than a crash. `roomErrors.ts` maps
+  `http_402` to "Multiplayer is resting until next month. Singleplayer still works." and the lobby
+  shows it in place of the create and join buttons.
+- **The echo plays no part** in reaching this state: it spends no invocations.
+
+**How the project learns it's close:** the runbook in §6.6, a weekly usage check and an estimate
+query. Supabase's documented notification only arrives *after* the quota is exceeded.
 
 ### 4.6 How latency bias is limited (summary)
 
@@ -912,17 +1056,65 @@ same as Race.
   - The game survives it: `refresh()` re-reads everything on reconnect, and the sweepers keep rounds
     moving.
   - But it is visible, which is why the kill switch below exists.
-- **Mitigations (in the spec):**
-  - the 250 ms throttle;
-  - change-only sends;
-  - no presence;
-  - a **kill switch**: `spotlight_params()->>'live_feed'` is read by clients at game start. Setting
-    it false (a one-line migration) stops all feed traffic, and dropping the INSERT policy enforces
-    that server-side.
-- If real use grows, move to Pro (500/s) or raise the throttle to 400 ms (20/s at N = 8).
-- The Spotlight test (stage 10) reads the actual counts from the Supabase dashboard's Realtime usage report rather than
-  trusting these estimates.
+- **Mitigations (in the spec):** the 250 ms throttle, change-only sends, and no presence. Then the
+  kill switch, below.
 
+#### 5.3.1 The feed's kill switch, and how it trips before the cap (revised 2026-10-04, third pass)
+
+**Why it must trip early.** Going past the project's 100 messages a second doesn't just drop feed
+messages. Supabase's Realtime limits page says connections are disconnected when "your project is
+generating too many messages per second". That means **every live connection** on the project, with
+every `postgres_changes` subscription the race, Dash, Elimination and Spotlight screens run on, not
+only the feed. The games recover on reconnect (`refresh()` re-reads; the sweepers keep rounds
+moving), but every player in every room sees a stall at once. So the switch has to act **before** the
+cap, not in reaction to it.
+
+**1. Automatic: feed admission at game start (trips before the cap by construction).**
+- `start_match_tx` for a Spotlight room decides `rooms.feed_on` once, from
+  `private.runtime_flags.feed_budget_msgs_per_s` (default **40**).
+- An admitted room's worst-case honest feed rate is 4 sends/s × N players (§5.3), and that is what it
+  is charged against the budget.
+- The new room is admitted only if, summed over every *active* Spotlight room with `feed_on`, the
+  charged rates plus its own 4 × N stay within the budget.
+
+  | Rooms already feeding | Their worst-case rate | New 8-player room (32/s) | New 4-player room (16/s) |
+  |---|---|---|---|
+  | none | 0 | admitted (32 ≤ 40) | admitted |
+  | one 4-player | 16 | refused (48 > 40) | admitted (32 ≤ 40) |
+  | one 8-player | 32 | refused (64) | refused (48) |
+
+- Admitted feeds can therefore **never exceed 40 messages a second together, whatever honest players
+  type**. That leaves 60 of the Free plan's 100 for the `postgres_changes` traffic of every game on the
+  project.
+- A refused room plays normally without the live view. The feed panel says "Live view is off for this
+  game because the server is busy"; nothing else changes.
+- On Pro (500 a second), Ian raises the budget to 200 with one SQL statement.
+
+**The budget has to leave real room for the games themselves.** A round transition in today's race
+writes about 11 rows. The streak reset rewrites all 7 non-winners' rows (`0006:437-442`) even when
+their streak is already 0, so an 8-player round produces about 88 delivered messages **within about a
+second**. Two big rooms changing round in the same second can already approach 100 today, before any
+feed. **Rule for the new engines:** update only rows whose values actually change
+(`… and streak <> 0`). That brings an 8-player Dash round transition to about 4 changes × 8 = 32
+messages. Stage 6 measures it.
+
+**2. Manual: the runtime flag, no deploy.**
+- `update private.runtime_flags set value = 'false' where key = 'live_feed';` stops new rooms
+  getting a feed.
+- `update public.rooms set feed_on = false where mode = 'spotlight' and status = 'active';` turns
+  feeds off in running games. Run it in the SQL editor as the owner; clients aren't granted UPDATE
+  on `rooms`. Every client sees the `rooms` change through its existing `postgres_changes`
+  subscription, stops sending, and shows the "live view is off" line.
+- Both take effect within a second. No migration, no function deploy, no client release.
+
+**3. Last resort, against a modified client that ignores the throttle** (Decisions C2): drop the
+`realtime.messages` INSERT policy with one SQL statement. Policies are cached per connection
+(Supabase Realtime Authorization docs), so it takes effect for a misbehaving client the next time it rejoins.
+Until then, step 2 has already stopped every honest client.
+
+- If real use grows, move to Pro (500/s) or raise the throttle to 400 ms (20/s at N = 8).
+- The Spotlight test (stage 10) reads the actual counts from the Supabase dashboard's Realtime usage
+  report rather than trusting these estimates.
 ### 5.4 Screen readers
 
 - **The feed text is `aria-hidden="true"`.** A screen reader never hears keystrokes. One message per
@@ -947,6 +1139,10 @@ same as Race.
 Add under **Multiplayer**:
 
 > In Spotlight, what you type on your turn is shown live to the other players in your room as you type it, including mistakes you then delete. It travels through Supabase Realtime and is not stored. Your final answer is stored like any other guess.
+
+**And, in the Dash commit (stage 6/7), because the echo stores network timings briefly:**
+
+> In Dash and Hourglass, the game measures how long a message takes to reach the server and back before each word, so a slower connection isn't penalised. These measurements are linked to your guest ID and deleted within 10 minutes.
 
 Also bump "Last checked against the code". Nothing else changes:
 - the avatar parts replace "avatar" and are covered by the existing sentence;
@@ -976,7 +1172,7 @@ Also bump "Last checked against the code". Nothing else changes:
 | # | Name | Contents | Compatible with the deployed client because |
 |---|---|---|---|
 | — | `word_start` (stage 3) | Race: `start_game_tx` and `advance_round_tx` set `round_started_at = now() + preroll_ms`, and `submit_answer_tx` refuses an answer before it (`round_not_started`), so a negative elapsed can never score. Elimination: the opening turn also gets the preroll (later turns already start in the future, `0012:856-867`). `preroll_ms()` constant (1500), revoked from anon. | The client from stage 3 shows "Get ready" for a future start. It ships **before** this migration, so a client never meets a future start it can't display. The old client would merely show a full, still bar for 1.5 s. |
-| — | `echo_credit` (stage 6) | `p_latency_credit_ms` parameters on the stage-6 submit overloads; `round_scores.credit_ms`; `timing_params()` gains `latency_cap_ms` (100), `echo_min_samples` (3) and `echo_window_ms` (15000). The echo edge function and `ECHO_SECRET` need no SQL. | New overloads only. |
+| — | `echo_credit` (stage 6) | `public.echo(p_room_id)` RPC (granted to `authenticated` only, SECURITY DEFINER, `search_path` pinned); `private.echo_samples` and `private.echo_quota`; `purge_echo_samples()` plus a 10-minute cron job (expired quota rows go in the existing daily job); the credit is computed **inside** the submit transactions (median of samples, in an exception block that falls back to 0); `round_scores.credit_ms`; `timing_params()` gains `latency_cap_ms` (100) and `echo_min_samples` (3); `abuse_limits()` gains the five echo limits (§4.5.1) and `max_games_started_per_host_per_day` (60); `private.runtime_flags` with its four starting rows (§4.5.2); `rooms.feed_on boolean not null default false`. `purge_anonymous_users` adds `echo_samples.player_id` and `echo_quota.player_id` to its checks. | New objects only. `rooms.feed_on` has a default and isn't in the client INSERT grant (`0017`). |
 | 0021 | `avatar_parts` | `avatar_options()`; `room_players.avatar_color` and `avatar_hat` plus CHECKs; backfill from `avatar`; the legacy sync trigger (§2.4); column grants re-issued with the two columns | The old client names only legacy columns; the trigger fills the parts. |
 | 0022 | `mode_schema` | Widen the `rooms.mode` CHECK to add `dash`, `hourglass` and `spotlight`. Add `room_players.round_wins int not null default 0`, `time_bank_ms int` (null until start) and `contending boolean not null default true`. Add `rooms.phase text` (`regular` / `sudden_death`, null otherwise). Add the `round_scores` table. Add `dash_params()`, `hourglass_params()`, `spotlight_params()` and `timing_params()`. **Extend the 0016 backstop trigger** to reject client rows with non-default `round_wins`, `time_bank_ms` or `contending`. | Purely additive. The old client never creates the new modes (its lobby offers Race and Elimination only), and the column grants are unchanged, so it cannot set the new columns. |
 | 0023 | `timing_core` | `p_received_at` overloads of the submit functions; `floor_ms()`; the `too_fast` path; nothing for `timeout-turn`: `timeout_turn_tx` already takes an optional caller and is already granted to `service_role` (`0012:1052-1057,1152-1157`), so stage 1 needs no migration. The old signatures stay until the old edge functions are redeployed. | The old edge functions call the old signatures, which are unchanged. |
@@ -1022,8 +1218,8 @@ number, so a branch at that one number is the smaller change.
 | `submit-round` | `submit_dash_tx` / `submit_hourglass_tx` | Stamps `received_at` as the first line of the handler. |
 | `close-round` | `close_round_tx` / `close_hourglass_round_tx` | The client fast path, like `advance-round`. |
 | `submit-turn` (existing) | redeployed to pass `p_received_at` | |
-| `echo` (stage 6) | none (no SQL, no table) | Stamps `T2` first and `T1'` last; signs challenges and receipts with `ECHO_SECRET` (§4.5). Pinned to the DB region like every game call. |
-| `submit-round` (stage 6) | as above | Also verifies the echo receipts and passes `p_latency_credit_ms` |
+| (no `echo` edge function) | — | **Deliberately not an edge function** (third pass, §4.5): every edge invocation is billed even when rejected, so a public echo there would let any guest spend the monthly quota. The echo is the `public.echo()` database RPC. |
+| `submit-round` (stage 6) | as above | Sends nothing new. The credit is computed in SQL from the stored samples. |
 
 Every one returns only `{ok:false, error:"internal_error"}` on a 500 (hardening #17,
 `_shared/mod.ts`).
@@ -1040,7 +1236,9 @@ Every one returns only `{ok:false, error:"internal_error"}` on a 500 (hardening 
 | `purge_anonymous_users` FK list (`0019:277-301`) | **Must add `round_scores.player_id`** to its NOT EXISTS checks. The rule: check every FK column, even ones that cascade. |
 | `round_scores` retention | Cascades with its room (30 days). |
 | Feed | Stores nothing. Supabase keeps its own Realtime logs under its policy (PRIVACY.md already says this of Supabase). |
-| **New write path: Broadcast** | Not covered by any existing limit (Decisions C2). Bounded by membership (Turnstile plus caps), own-topic sends only, the client throttle (honest clients), and the kill switch. A hostile member *can* flood their own topic up to the project's per-second cap, which would degrade Realtime for every room. Accepted for a hobby project, with the kill switch as the response. |
+| **New read/write path: the `echo` RPC** | Token, membership, pre-start window, per-player/per-room/per-day limits under an advisory lock, and the `echo_enabled` runtime flag (§4.5.1). Spends no Edge invocations. Samples are deleted within 10 min. |
+| **Answer edge functions vs. the monthly invocation quota** | A per-host cap of 60 game starts a day bounds legitimate-shaped spend (§4.5.1). Spam of the endpoints themselves can't be capped inside a function, because every invocation is billed. It is detected and answered through the §6.6 runbook. This is pre-existing, the same as `submit-answer` today. |
+| **New write path: Broadcast** | Not covered by any existing limit (Decisions C2). Bounded by membership (Turnstile plus caps), own-topic sends only, the client throttle (honest clients), and the kill switch. A hostile member *can* flood their own topic up to the project's per-second cap, which would degrade Realtime for every room. Accepted for a hobby project, with automatic feed admission and the runtime kill switch as the response (§5.3.1). |
 
 ### 6.5 Tests (same style as now)
 
@@ -1081,13 +1279,54 @@ Every one returns only `{ok:false, error:"internal_error"}` on a 500 (hardening 
   - "both changed: the parts win";
   - backfill of every legacy key;
   - `avatar_options()` equals the client lists (reads `src/lib/avatars.ts`).
-- `echo_credit.test.mjs`:
-  - the credit is capped at 100 even for a 900 ms median;
-  - 0 with fewer than 3 receipts;
-  - the median, not the mean, of a sample set containing one outlier;
-  - adjusted time is floored at 0 and compared with the human floor after the credit.
+- `echo.test.mjs` (the echo's protection, §4.5.1). Every rejection asserts **that no row was
+  written** to `echo_samples` or `echo_quota`.
+  - **Non-members are rejected:**
+    - anon: 42501, no execute grant;
+    - an authenticated guest who isn't in the room: `not_a_member`;
+    - a member of a *different* active room passing this room's id: `not_a_member`;
+    - a member who can't answer (knocked out in Hourglass, a non-contender in sudden death):
+      `not_playing`.
+  - **Outside the window:**
+    - a lobby, a finished room, a Spotlight, Race or Elimination room;
+    - a Dash room while the word is live (after the reveal, before the close);
 
-  Signature and freshness checks run in the edge tests below.
+    each gives `outside_window`. The feedback window and the countdown both succeed.
+  - **Over-limit calls are throttled:**
+    - the 9th call for one upcoming round: `throttled`, and exactly 8 rows exist;
+    - the 121st call in a rolling minute, spread over two rooms;
+    - the 6,001st in 24 h, seeded through `echo_quota`;
+    - the 65th call in one room's round, spread over 8 members;
+    - limits read from `abuse_limits()`, never hard-coded in the test.
+  - **The kill switch:** with `echo_enabled = false`, the reply is `disabled` and nothing is written;
+    flipping it back works on the next call. `private.runtime_flags` gives 42501 to anon and
+    `authenticated` for SELECT and UPDATE.
+  - **Sample correctness:**
+    - two calls separated by `pg_sleep(0.05)` give one closed sample with `rtt_ms >= 50`;
+    - a pipelined second call (no sleep) gives a sample of about 0, never negative.
+  - **Retention:** the round's close deletes its samples; `purge_echo_samples()` removes rows older
+    than 10 min; the purge of anonymous users still works with echo rows present.
+- `echo_credit.test.mjs` (the credit, and **an unavailable echo never stops a round from scoring**):
+  - the credit is capped at 100 even for a 900 ms median;
+  - the median, not the mean, of a sample set containing one outlier;
+  - adjusted time is floored at 0 and compared with the human floor after the credit;
+  - **zero credit, still scores:**
+    - a correct Dash answer with 0 samples, then with 2: the outcome is `correct`, `credit_ms = 0`,
+      and `round_wins` goes up;
+    - the same for an Hourglass round, where charges are computed from the unadjusted times;
+    - with `echo_enabled` switched off between the samples and the answer;
+    - with `private.echo_samples` made unreadable inside the test transaction (a revoke from the
+      function owner) to simulate a failure: the submit still commits, with `credit_ms = 0`. This
+      proves the exception block.
+- `feed_admission.test.mjs`:
+  - with a budget of 40, a first 8-player Spotlight room gets `feed_on`, and a second 8-player room
+    doesn't;
+  - two 4-player rooms both do;
+  - a finished room frees its share;
+  - `live_feed = false` admits none;
+  - `rooms.feed_on` can't be written by a client (42501).
+- `abuse_limits.test.mjs` (extended): the 61st game start by one host in 24 h gives
+  `too_many_games_today`.
 - `dash_engine.test.mjs`:
   - first to 3, the 5-round cap, a void round uses a slot, sudden death limited to contenders;
   - `not_contending`, the 10-round draw;
@@ -1133,10 +1372,78 @@ control that must break the invariant:
 
 **Edge (`edge_errors.test.mjs` pattern):**
 - the new handlers stamp `received_at` before awaiting anything, and return the generic 500 shape;
-- `echo` stamps `T2` before auth and `T1'` after it;
-- a receipt fails if any of these is wrong: the signature (tampered or forged), the player
-  (another player's receipt), the room, or freshness (more than 15 s old);
-- a receipt whose `T2` is after the answer's `received_at` fails.
+- `submit-round` still accepts exactly `{room_id, round_num, guess}` and ignores any extra
+  credit-like field a client sends.
+
+**Client (Vitest), the echo never blocks play:**
+- with fake timers and an echo promise that **never resolves**, the reveal still enables the input
+  on time, and Enter sends `submit-round` at once (asserted: no `await` on the echo chain);
+- after a `throttled`, `outside_window`, network error or 402 reply, the loop makes no further call
+  that round (the call count is asserted);
+- after `disabled`, no further call for the rest of the game;
+- `roomErrors` maps `http_402` to the friendly "Multiplayer is resting" message.
+
+**Concurrency package (real Postgres 17):** 20 parallel echo calls from one player in one round leave
+exactly 8 rows. *Negative control:* with `lock_for()` stubbed to a no-op, the count goes past 8.
+
+### 6.6 Runbook: quotas, usage checks and the runtime switches (added 2026-10-04)
+
+**When:** every Monday, and the day after any real-player session. It takes about five minutes.
+
+1. **Read usage.** Dashboard → Organization → Usage, then pick the project. Note these against the
+   day of the billing cycle:
+   - Edge Function invocations (Free: 500,000);
+   - Egress (5 GB);
+   - Realtime messages (2,000,000) and peak connections (200);
+   - Database size (500 MB).
+2. **Compare pace with the calendar.** Let *used%* be the share of a quota used so far and
+   *elapsed%* the share of the cycle gone.
+   - **Investigate** if used% is more than elapsed% + 20 points, or above 60% at any time.
+   - **Act** above 80%: step 4c, or upgrade.
+
+   Supabase's documented notice only arrives once a quota is **exceeded**, so this check is the
+   early warning.
+3. **Estimate what the games alone should have used** (SQL editor, read-only). Replace the date with
+   the cycle start:
+
+   ```sql
+   select count(*) filter (where rr.round_num = 1)          as games,
+          count(*)                                           as rounds,
+          coalesce(sum(m.members), 0)                        as player_rounds
+   from public.round_results rr
+   join lateral (select count(*) as members from public.room_players p
+                 where p.room_id = rr.room_id) m on true
+   where rr.ended_at >= '2026-10-01';
+   ```
+
+   Expected invocations ≈ `player_rounds + 2 × rounds + games` (§4.5.1 budget).
+   - **A dashboard figure well above twice the estimate means calls are arriving that aren't
+     games.** Open Edge Functions → Logs and look for one user id making most of the calls.
+   - Rooms older than 30 days are already purged, so the estimate undercounts a cycle that began
+     more than 30 days ago. Use it only within the current cycle.
+4. **Respond.** Each of these is one SQL statement in the dashboard; there's no deploy. Note every
+   flip in `docs/history.md`.
+   - **a. Echo misbehaving or loading the database:**
+     `update private.runtime_flags set value='false', updated_at=now() where key='echo_enabled';`
+     The latency credit becomes 0 and games carry on (§4.5.2).
+   - **b. Realtime close to its per-second cap, or a disconnect storm:** set `live_feed` to false,
+     then `update public.rooms set feed_on=false where mode='spotlight' and status='active';`
+     (§5.3.1).
+   - **c. Invocations close to the quota:** set `multiplayer_open` to false.
+     - `start_match_tx` then refuses new games with `paused`, and the lobby shows "Multiplayer is
+       paused for now. Singleplayer still works." Games already running finish.
+     - It **does not** stop a script's calls from counting. Nothing inside a function can (§4.5.1).
+   - **d. A scripted attack on the edge functions:**
+     - find the user id in the logs, then ban it through the Auth admin API (`auth.admin.updateUserById(id,
+       { ban_duration })` from a local script with the service key). Its current token keeps
+       working until it expires, 1 h by default;
+     - if the count is still climbing, delete the attacked functions with
+       `supabase functions delete <name>`. Multiplayer is down until they are redeployed, but a
+       function that no longer exists can't be invoked. Confirm on the usage page that the counter
+       has stopped.
+   - **e. Over the quota anyway:** Supabase may answer API requests with 402 until the next cycle
+     (§4.5.2). Singleplayer is unaffected. Upgrading lifts it at once.
+5. **Set everything back** when the cause is gone, with the same statements and `'true'`.
 
 ---
 
@@ -1210,7 +1517,7 @@ project.
 | 4 | `avatar_parts` migration: schema, sync trigger, backfill, rollback, plus the §6.5 range and no-game-state tests | 1 | nothing visible | test:db |
 | 5 | Avatar maker UI, hats art, 8 colour tokens, localStorage migration, contrast gate at 0, keyboard pass | 2 | the new picker | Ian: a taste check on screenshots plus a keyboard pass |
 | | ***Dash*** | | | |
-| 6 | **Dash engine plus timing core:** `mode_schema`, `timing_core`, `echo_credit` and `dash_engine` migrations; the `start-match`, `submit-round`, `close-round` and `echo` edge functions; region pinning (`forceFunctionRegion`); edge stamps; human floor; Dash sweeper; test:db plus concurrency | 3 | nothing visible | Tests only |
+| 6 | **Dash engine plus timing core:** `mode_schema`, `timing_core`, `echo_credit` and `dash_engine` migrations; the `start-match`, `submit-round` and `close-round` edge functions; the `echo` database RPC with its limits and the runtime flags (§4.5.1–4.5.2); feed admission columns; region pinning (`forceFunctionRegion`); edge stamps; human floor; Dash sweeper; test:db plus concurrency | 3 | nothing visible | Tests only |
 | 7 | Dash UI behind `?modes=next`: Get ready, pips, sudden death, `DashResults` | 2 | Dash (flagged) | **Real players:** 3–4 people, at least one phone on mobile data. Log `credit_ms`, `t − F` and voice start-up per device. |
 | 8 | Dash replaces Race in the lobby (flag off for Dash) | 0.5 | Dash live | — |
 | | **⏸ Stopping point A: a good game.** Dash for everyone, plus Elimination (with the fast timeout) and the avatar maker. Nothing below is needed for the site to be complete. | | | |
@@ -1313,22 +1620,26 @@ blocks the stage, because that is the one an automated check can't hear.
 
 **Every item below is resolved as of 2026-10-04.** "Ian" means Ian decided it in his review of the
 first draft. "Default" means the draft's recommendation was kept, because the review accepted the
-spec and did not change it. Nothing is left open; a later change is a new dated decision, not a
-reopened question.
+spec and did not change it. Ian can still change a Default in one line: those are listed in
+plain language, ordered by how much they change the game, in `docs/multiplayer-decisions-for-ian.md`.
+"Engineering" means the item has no player-visible or stored-data effect, so it isn't his call and
+isn't on that list. Nothing is left open; a later change is a new dated decision, not a reopened
+question.
 
 ### 9.1 Conflicts with the security work or the fairness goals
 
 | # | Conflict | Resolution | Status |
 |---|---|---|---|
-| **C1** | The avatar parts **widen the `room_players` INSERT/UPDATE column grants**, against 0016's "never widen these grants". | Widened by exactly the two cosmetic columns. The full column lists are pinned in `avatar_parts.test.mjs`, and the tests prove the parts can't set any game state (§6.5). The backstop trigger still guards every game column. | Resolved 2026-10-04 (default) |
-| **C2** | Spotlight's feed is **a new client write path (Broadcast) that the 0019 abuse limits don't cover**. A flood past 100 msg/s gets the project's Realtime connections disconnected, including `postgres_changes` (§5.3). | Accepted: own-topic sends, members only, the 250 ms throttle, the kill switch; Pro if it binds. | Resolved 2026-10-04 (default) |
+| **C1** | The avatar parts **widen the `room_players` INSERT/UPDATE column grants**, against 0016's "never widen these grants". | Widened by exactly the two cosmetic columns. The full column lists are pinned in `avatar_parts.test.mjs`, and the tests prove the parts can't set any game state (§6.5). The backstop trigger still guards every game column. | Resolved 2026-10-04 (engineering) |
+| **C2** | Spotlight's feed is **a new client write path (Broadcast) that the 0019 abuse limits don't cover**. A flood past 100 msg/s gets the project's Realtime connections disconnected, including `postgres_changes` (§5.3). | Accepted. Own-topic sends, members only, the 250 ms throttle, **automatic feed admission within a 40 msg/s budget**, and a runtime kill switch that needs no deploy (§5.3.1); Pro if it binds. | Resolved 2026-10-04 (default) |
 | **C3** | The live feed **sends every keystroke, including deleted mistakes, to other players**. | The PRIVACY.md text in §5.6, in the same commit as the feed. Nothing is stored. | Resolved 2026-10-04 (default) |
 | **C4** | **The client must hold the word to speak it**, so a scripted client can answer just above the human floor. | The floor stops instant bots and nothing more, and the spec says so (§4.4). | Resolved 2026-10-04 (default) |
 | **C5** | A miss costing the full round time ends nearly every Hourglass game. | **A miss costs at most 4 s, to be tuned with real players (stage 12).** | **Resolved 2026-10-04 (Ian)** |
 | **C6** | Spotlight had no end condition without lives. | **Spotlight keeps lives.** | **Resolved 2026-10-04 (Ian)** |
 | **C7** | Speech rate, lead-ins and voice start-up make "fastest" partly a device property. | **No spoken lead-in: every round starts with the countdown, then the word alone at the same server moment on every device. The speech-rate setting stays.** Upload latency is credited up to 100 ms by server-measured echoes (§4.5). Voice start-up is measured in stage 7. | **Resolved 2026-10-04 (Ian)** |
 | **C8** | Old cached clients mislabel a new-mode room as "Race", then fail safely with `wrong_mode`. | Accepted. A reload fixes it, and the guards prevent corruption. Stage 13 removes the old modes after 30+ days. | Resolved 2026-10-04 (default) |
-| **C9** (new) | The latency credit lets a hostile client that delays its echoes claim up to the cap every round. | Cap 100 ms, under the 200 ms dead band with a 40 ms margin (§4.5 budget). At most 0.1 s per Hourglass round, and only rounds closer than 100 ms in Dash. | Resolved 2026-10-04 (this review) |
+| **C9** (new) | The latency credit lets a hostile client that delays its echoes claim up to the cap every round. | Cap 100 ms, under the 200 ms dead band with a 30 ms margin (§4.5 budget, revised for the RPC path). At most 0.1 s per Hourglass round, and only rounds closer than 100 ms in Dash. | Resolved 2026-10-04 (this review) |
+| **C10** (new, third pass) | **The monthly Edge Function quota is shared by every game, and anyone signed in can spend it.** Supabase bills every invocation whatever the response, so no check inside a function stops a script calling the answer endpoints. Running out can bring 402s for the whole project until the next cycle. This is pre-existing (`submit-answer` has always been exposed); the spec doesn't widen it, because the echo is moved off Edge Functions (D26). | Accept on Free, with the per-host daily game cap (D30), the weekly usage check and estimate query, and the response ladder (§6.6). The alternative is Pro: a 2,000,000 quota and paid overage instead of a shutdown. | Resolved 2026-10-04 (default) |
 
 ### 9.2 Decisions
 
@@ -1353,10 +1664,16 @@ reopened question.
 | D16 | Feed throttle | 250 ms; 400 ms if the Realtime cap binds | 32 msg/s at 8 players | Default |
 | D17 | Avatar model | Two append-only smallint indexes (8 colours, 10 hats) | A range CHECK, asserted against the client | Default |
 | D18 | "Surprise me" button | Yes | Cheap, and keyboard reachable | Default |
-| D19 | Legacy `avatar` column after the cleanup | Keep the column; drop the sync trigger in stage 13 | No user benefit in dropping it | Default |
+| D19 | Legacy `avatar` column after the cleanup | Keep the column; drop the sync trigger in stage 13 | No user benefit in dropping it | Engineering |
 | D20 | Pin edge functions to the DB region? | **Yes, required.** Verified against Supabase's docs on 2026-10-04: regional invocation via `forceFunctionRegion` / `x-region` / supabase-js `region`, with no plan restriction documented (§4.4.1). Uses the query parameter, which needs no CORS change. | Echo and answer stamps must share one clock pool. | Resolved (this review) |
 | D21 | Plan tier | Stay on Free. Move to Pro only if the Realtime cap (stage 10) or Edge invocations (§4.5 table) bind. | The estimates fit Free at hobby scale. | Default |
 | D22 | Hourglass round cap | 30 rounds, then the most time left wins | Bounded games | Default |
 | D23 | Live speed for watchers | Yes, labelled "live", replaced by the official time | Ian asked for "how fast". | Default |
-| D24 (new) | Latency credit | **Server-measured echoes:** 6 chained calls (5 samples) before each reveal; the median RTT; credit `min(median/2, 100 ms)`; 0 with fewer than 3 samples. Used by Dash and Hourglass, not Spotlight. | A slower connection isn't charged for network delay, and the exposure stays inside the dead band. | Resolved (this review) |
+| D24 (new) | Latency credit | **Server-measured echoes:** 6 chained calls (5 samples) before each reveal; the median RTT; credit `min(median/2, 100 ms)`; 0 with fewer than 3 samples. Used by Dash and Hourglass, not Spotlight. **Third pass:** the echo is a database RPC, not an edge function (D26), and a failed echo only ever zeroes the credit (§4.5.2). | A slower connection isn't charged for network delay, and the exposure stays inside the dead band. | Resolved (this review) |
+| D26 (new, third pass) | Where the echo runs | A database RPC (`public.echo`) with token, membership, pre-start-window and rate-limit checks, not an edge function | Supabase bills every edge invocation "regardless of the response status code". An edge echo would let one script use up the 500,000 monthly quota in about 7 hours; the RPC uses none of it (§4.5.1). | Engineering |
+| D27 (new) | When the live feed is offered | Only while the project's feed budget (40 msg/s on Free) has room. Otherwise that Spotlight game plays without the live view and says so. | It keeps the feed from ever tripping the Realtime cap that disconnects every game (§5.3.1). | Default |
+| D28 (new) | What players see if the monthly quota is nearly or fully used | A "multiplayer is paused" switch Ian can flip, and a "multiplayer is resting until next month" message on 402. Singleplayer always works. | A clear message instead of failed requests (§4.5.2, §6.6) | Default |
+| D29 (new) | Storing echo timings | Kept server-side, linked to the guest ID, deleted within 10 minutes; one PRIVACY.md sentence | Needed to compute the credit server-side without trusting the client | Default |
+| D30 (new) | Daily game cap per host | At most 60 games started per host in a rolling 24 h | Bounds what one room playing nonstop can spend from the invocation quota: 41 days for the full quota instead of 5 (§4.5.1) | Default |
+| D31 (new) | Echo rate limits | 8 per player per round, 120 per player per minute, 6,000 per player per day, 64 per room per round, 900 per room per minute | Each sits above the legitimate maximum (§4.5.1), so honest play never meets it | Engineering |
 | D25 (new) | Build order | Fixes that stand alone, then avatars, Dash, Spotlight, Hourglass (optional), cleanup. Stopping points after Dash and after Spotlight. Clock sync before the word start it supports. | Ian's order. The one swap is explained in §8. | **Ian** (the order) / this review (the swap) |
