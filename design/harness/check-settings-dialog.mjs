@@ -24,7 +24,9 @@ for (const theme of ["dark", "light"]) {
   check(stayed, `${theme}: 46 Tab / Shift+Tab presses never land on the page behind it`);
   check(await p.evaluate(() => getComputedStyle(document.querySelector(".settings-drawer")).backgroundColor.startsWith("rgba(") === false), `${theme}: the drawer is opaque (no honeycomb through the form)`);
   await p.keyboard.press("Escape");
-  await p.waitForSelector("dialog[open]", { state: "detached" });
+  // A dialog that ignores Escape must FAIL the check, not crash it.
+  const closed = await p.waitForSelector("dialog[open]", { state: "detached", timeout: 3000 }).then(() => true, () => false);
+  check(closed, `${theme}: Escape closes the dialog`);
   check(await p.evaluate(() => document.activeElement?.classList.contains("settings-toggle")), `${theme}: Escape closes and focus returns to the Settings button`);
 }
 await b.close();

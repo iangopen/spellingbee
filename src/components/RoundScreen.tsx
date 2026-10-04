@@ -49,6 +49,19 @@ export function RoundScreen({
   const [confirmingExit, setConfirmingExit] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // The Leave/Quit link is REPLACED by the confirm, taking focus with it to <body>
+  // (hardening #19 again). Opening the confirm focuses "Keep playing", the safe
+  // choice for a destructive step; closing it hands focus back to the link.
+  const keepRef = useRef<HTMLButtonElement>(null);
+  const leaveLinkRef = useRef<HTMLButtonElement>(null);
+  const wasConfirming = useRef(false);
+  useEffect(() => {
+    if (confirmingExit) keepRef.current?.focus();
+    else if (wasConfirming.current) leaveLinkRef.current?.focus();
+    wasConfirming.current = confirmingExit;
+  }, [confirmingExit]);
+
+
   const wordId = state.currentWord?.id;
   const wordText = state.currentWord?.word;
 
@@ -130,13 +143,13 @@ export function RoundScreen({
                 <Button variant="danger" size="sm" onClick={handleExit}>
                   Quit game
                 </Button>
-                <Button size="sm" onClick={() => setConfirmingExit(false)}>
+                <Button ref={keepRef} size="sm" onClick={() => setConfirmingExit(false)}>
                   Keep playing
                 </Button>
               </div>
             </Panel>
           ) : (
-            <button className="back-link" onClick={() => setConfirmingExit(true)}>
+            <button ref={leaveLinkRef} className="back-link" onClick={() => setConfirmingExit(true)}>
               <ArrowLeft size={15} aria-hidden />
               Quit
             </button>
