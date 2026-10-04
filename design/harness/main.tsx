@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import "../../src/index.css";
 import "../../src/App.css";
 import { applyTheme, setStoredTheme } from "../../src/lib/theme";
+import { HoneycombBackground } from "../../src/components/HoneycombBackground";
 import { SettingsPanel } from "../../src/components/SettingsPanel";
 import { ModeSelect } from "../../src/components/ModeSelect";
 import { DifficultySelect } from "../../src/components/DifficultySelect";
@@ -25,6 +26,8 @@ const theme = params.get("theme") === "light" ? "light" : "dark";
 // stored theme on mount, so the harness stores its pick exactly as a player would.
 setStoredTheme(theme);
 applyTheme(theme);
+// ?peak=1: the shimmer at its brightest everywhere (honeycomb.css), so measure.mjs sees the worst pixel.
+if (params.get("peak") === "1") document.documentElement.setAttribute("data-peak", "1");
 
 const SCREENS: Record<string, () => ReactNode> = {
   home: () => <ModeSelect onSingle={noop} onMulti={noop} />,
@@ -99,6 +102,7 @@ const render = SCREENS[screen] ?? (() => <p>Unknown screen: {screen}</p>);
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <div className="app-shell">
+      <HoneycombBackground />
       <SettingsPanel />
       {render()}
     </div>

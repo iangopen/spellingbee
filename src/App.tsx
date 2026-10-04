@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import "./App.css";
 import { ModeSelect } from "./components/ModeSelect";
+import { HoneycombBackground } from "./components/HoneycombBackground";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { DifficultySelect } from "./components/DifficultySelect";
 import { RoundScreen } from "./components/RoundScreen";
@@ -28,6 +29,7 @@ type Mode = "single" | "multi" | null;
 function Shell({ children, onBestsReset }: { children: ReactNode; onBestsReset?: () => void }) {
   return (
     <div className="app-shell">
+      <HoneycombBackground />
       <SettingsPanel onBestsReset={onBestsReset} />
       {children}
     </div>

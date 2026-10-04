@@ -55,7 +55,7 @@ if (TARGET === "prototype") {
 }
 const urlFor = (r) => TARGET !== "app"
   ? `${pathToFileURL(resolve(PROTO_DIR, r.page + ".html")).href}?${new URLSearchParams({ ...(r.v ? { v: r.v } : {}), ...(r.h ? { h: r.h } : {}), bg: "shimmer", peak: "1", bee: r.bee, theme: r.theme, ...(r.state ? { state: r.state } : {}) })}`
-  : `${APP_URL}/?screen=${r.page}&theme=${r.theme}`;
+  : `${APP_URL}/?screen=${r.page}&theme=${r.theme}&peak=1`;
 
 // Worst-pixel sampler, run inside the page (Playwright serialises it).
 const SAMPLE = async ({ png, targets }) => {

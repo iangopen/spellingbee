@@ -1,6 +1,6 @@
 .app-shell {
   position: relative;
-  z-index: 1; /* above the fixed honeycomb wash on body::before */
+  z-index: 1; /* above the fixed honeycomb layer (.bg, z-index 0) */
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;

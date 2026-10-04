@@ -1,0 +1,107 @@
+/* The honeycomb background (redesign stage 2): DECORATION ONLY. It is fixed,
+   aria-hidden, takes no pointer events and holds no text or controls (see
+   HoneycombBackground.tsx). Honey hues only, never lemon yellow, never flat
+   grey tiles, never a letter board.
+
+   The tile is an SVG used as a MASK, painted with a theme token, so both
+   palettes and every theme switch work with no JavaScript. 28x49px is the old
+   live site's cell size (pointy-top hexagons, 28px pitch across, 24.5px down;
+   drawn at the exact regular-hexagon height and stretched 1% to 49px).
+
+   Layering: .bg lives inside .app-shell, which is its own stacking context
+   (z-index 1), so z-index -1 puts it above the shell's own background and
+   BELOW every screen. z-index 0 would paint it over in-flow content, which
+   is not positioned: that bug hid the whole screen once.
+
+   Layers, bottom to top:
+     .bg-base         gradient: charcoal with a honey bloom (light: cream)
+     .bg-cells-glow   blurred copy of the cell lines (rasterised once)
+     .bg-cells        the crisp cell lines
+     .bg-grain        paper grain (page background only, never under text panels)
+     .bg-light        the shimmer: a window that moves over BRIGHTER cells that
+                      stay put (the child counter-moves with identical timing)
+     .bg-depth        a calm band under the header, then a vignette
+
+   Motion: only transform and opacity animate, so the blurred glow is never
+   repainted. The shimmer is removed under the OS reduced-motion setting AND
+   the in-app override; the still page is then exactly the static glow.
+   The tab hidden -> everything freezes (the component sets data-paused). */
+
+.bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; contain: strict; }
+.bg > * { position: absolute; pointer-events: none; }
+
+:root {
+  /* the vignette fade the cells fall away with; not a colour, so not themed */
+  --hex-mask: radial-gradient(75% 70% at 50% 40%, #000 25%, rgba(0, 0, 0, 0.35) 70%, transparent 100%);
+  /* the tile, as black strokes, used only as a mask */
+  --hex-tile: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'28'%20height%3D'49'%20viewBox%3D'0%200%2028%2048.497'%20preserveAspectRatio%3D'none'%3E%3Cpolygon%20points%3D'0.00%2C-16.17%2014.00%2C-8.08%2014.00%2C8.08%200.00%2C16.17%20-14.00%2C8.08%20-14.00%2C-8.08'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.4'%2F%3E%3Cpolygon%20points%3D'28.00%2C-16.17%2042.00%2C-8.08%2042.00%2C8.08%2028.00%2C16.17%2014.00%2C8.08%2014.00%2C-8.08'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.4'%2F%3E%3Cpolygon%20points%3D'14.00%2C8.08%2028.00%2C16.17%2028.00%2C32.33%2014.00%2C40.41%20-0.00%2C32.33%200.00%2C16.17'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.4'%2F%3E%3Cpolygon%20points%3D'0.00%2C32.33%2014.00%2C40.41%2014.00%2C56.58%200.00%2C64.66%20-14.00%2C56.58%20-14.00%2C40.41'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.4'%2F%3E%3Cpolygon%20points%3D'28.00%2C32.33%2042.00%2C40.41%2042.00%2C56.58%2028.00%2C64.66%2014.00%2C56.58%2014.00%2C40.41'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.4'%2F%3E%3C%2Fsvg%3E");
+  --hex-tile-bright: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'28'%20height%3D'49'%20viewBox%3D'0%200%2028%2048.497'%20preserveAspectRatio%3D'none'%3E%3Cpolygon%20points%3D'0.00%2C-16.17%2014.00%2C-8.08%2014.00%2C8.08%200.00%2C16.17%20-14.00%2C8.08%20-14.00%2C-8.08'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.8'%2F%3E%3Cpolygon%20points%3D'28.00%2C-16.17%2042.00%2C-8.08%2042.00%2C8.08%2028.00%2C16.17%2014.00%2C8.08%2014.00%2C-8.08'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.8'%2F%3E%3Cpolygon%20points%3D'14.00%2C8.08%2028.00%2C16.17%2028.00%2C32.33%2014.00%2C40.41%20-0.00%2C32.33%200.00%2C16.17'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.8'%2F%3E%3Cpolygon%20points%3D'0.00%2C32.33%2014.00%2C40.41%2014.00%2C56.58%200.00%2C64.66%20-14.00%2C56.58%20-14.00%2C40.41'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.8'%2F%3E%3Cpolygon%20points%3D'28.00%2C32.33%2042.00%2C40.41%2042.00%2C56.58%2028.00%2C64.66%2014.00%2C56.58%2014.00%2C40.41'%20fill%3D'none'%20stroke%3D'black'%20stroke-width%3D'1.8'%2F%3E%3C%2Fsvg%3E");
+  --hex-size: 28px 49px;
+}
+
+.bg-base {
+  inset: 0;
+  background:
+    radial-gradient(90% 70% at 50% 18%, var(--bg-glow) 0%, transparent 62%),
+    radial-gradient(60% 50% at 88% 92%, var(--bg-glow-2) 0%, transparent 70%),
+    linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+}
+
+/* cells: a glow copy and a crisp copy, both faded toward the edges by the
+   wrapper's mask, each line-shaped by the tile mask on the child */
+.bg-fade { inset: 0; -webkit-mask-image: var(--hex-mask); mask-image: var(--hex-mask); }
+.bg-fade > * { position: absolute; inset: 0; }
+.bg-cells, .bg-cells-glow, .bg-light .lit {
+  -webkit-mask-image: var(--hex-tile); mask-image: var(--hex-tile);
+  -webkit-mask-size: var(--hex-size); mask-size: var(--hex-size);
+  -webkit-mask-position: center top; mask-position: center top;
+}
+.bg-cells { background: var(--cell-line); opacity: var(--cells-opacity); }
+.bg-cells-glow { background: var(--cell-line); filter: blur(6px); opacity: var(--cells-glow-opacity); transform: translateZ(0); }
+
+.bg-grain { inset: 0; background-image: var(--grain); background-size: 200px 200px; opacity: var(--grain-bg-opacity); }
+
+/* A calm band at the top so the header controls never sit on the brightest
+   cells, then a soft vignette toward the corners. */
+.bg-depth { inset: 0; background:
+  linear-gradient(180deg, var(--bg-top) 0, var(--bg-top) 56px, transparent 132px),
+  radial-gradient(120% 95% at 50% 35%, transparent 55%, var(--bg-edge) 100%); }
+
+/* the shimmer: a slow, soft vertical band crossing every 18s, then resting */
+.bg-light { top: 0; bottom: 0; left: 0; width: 46vw; opacity: 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 50%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 50%, transparent); }
+.bg-light .lit { position: absolute; top: 0; bottom: 0; left: 0; width: 100vw; background: var(--cell-line-bright); }
+.bg-light .lit-glow { filter: blur(7px); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .bg-light { animation: sweep-window 18s cubic-bezier(0.45, 0, 0.55, 1) infinite; will-change: transform, opacity; }
+  .bg-light .lit { animation: sweep-content 18s cubic-bezier(0.45, 0, 0.55, 1) infinite; will-change: transform; }
+}
+@keyframes sweep-window {
+  0%   { transform: translate3d(-50vw, 0, 0); opacity: 0; }
+  8%   { opacity: var(--light-peak); }
+  42%  { opacity: var(--light-peak); }
+  50%  { transform: translate3d(104vw, 0, 0); opacity: 0; }
+  100% { transform: translate3d(104vw, 0, 0); opacity: 0; }
+}
+@keyframes sweep-content {
+  0%   { transform: translate3d(50vw, 0, 0); }
+  50%  { transform: translate3d(-104vw, 0, 0); }
+  100% { transform: translate3d(-104vw, 0, 0); }
+}
+
+/* Reduced motion, OS or in-app: the moving light is not shown at all. */
+@media (prefers-reduced-motion: reduce) { .bg-light { display: none !important; } }
+:root[data-reduce-motion="true"] .bg-light { display: none !important; }
+
+/* Tab hidden: freeze every animation (HoneycombBackground sets this). */
+:root[data-paused] .bg * { animation-play-state: paused !important; }
+
+/* Contrast measurement hook (design/harness/measure.mjs): every bright cell at
+   the shimmer's peak, everywhere, so the check sees the WORST pixel behind any
+   text. Never set in production. */
+:root[data-peak="1"] .bg-light { display: block !important; opacity: var(--light-peak) !important; animation: none !important;
+  inset: 0 !important; width: auto !important; transform: none !important;
+  -webkit-mask-image: none !important; mask-image: none !important; }
+:root[data-peak="1"] .bg-light .lit { animation: none !important; transform: none !important; inset: 0 !important; width: auto !important; }
