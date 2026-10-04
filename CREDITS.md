@@ -15,8 +15,6 @@ to the files.
 | Bricolage Grotesque | 2022 The Bricolage Grotesque Project Authors | `OFL-BricolageGrotesque.txt` | redesign: display type and numbers |
 | Atkinson Hyperlegible | 2020 Braille Institute of America, Inc. | `OFL-AtkinsonHyperlegible.txt` | redesign: body text and the typed answer |
 | Caveat Brush | 2015 Google Inc. | `OFL-CaveatBrush.txt` | redesign: hand lettering on the title, headings and badges only (subset, no digits) |
-| Space Grotesk | 2020 The Space Grotesk Project Authors | `OFL-SpaceGrotesk.txt` | current UI (retired in redesign stage 7) |
-| Inter | 2020 The Inter Project Authors | `OFL-Inter.txt` | current UI (retired in redesign stage 7) |
 
 ## Icons
 

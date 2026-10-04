@@ -31,15 +31,15 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--honey);
+  border: 1px solid var(--panel-edge);
+  background: var(--panel-solid);
+  color: var(--accent);
   box-shadow: var(--shadow);
   transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
 .settings-toggle:hover {
-  border-color: var(--honey);
+  border-color: var(--accent);
   transform: rotate(-25deg);
 }
 
@@ -614,7 +614,7 @@
 /* The resting edge is close to honey in lightness, so a border colour change
    alone is too weak a focus cue; the outline carries it. */
 .code-input {
-  font-family: var(--font-display);
+  font-family: var(--display);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   text-align: center;
@@ -757,7 +757,7 @@
 
 @keyframes streak-pulse {
   0% { transform: scale(1); }
-  35% { transform: scale(1.32); color: var(--honey); }
+  35% { transform: scale(1.32); color: var(--accent); }
   100% { transform: scale(1); }
 }
 
@@ -788,8 +788,8 @@
   padding: 0;
   cursor: pointer;
   color: var(--muted);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--panel-solid);
+  border: 1px solid var(--panel-edge);
   border-radius: 12px;
   transition: transform 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
@@ -808,7 +808,7 @@
   display: inline-grid;
   place-items: center;
   flex: none;
-  color: var(--honey);
+  color: var(--accent);
 }
 
 

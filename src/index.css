@@ -16,9 +16,9 @@
    no script. Light is the override on [data-theme="light"]. The OS setting is
    deliberately NOT consulted any more: theme.ts resolves stored ?? "dark".
 
-   Every colour is a token in BOTH palettes (the standing rule). Tokens in the
-   "aliases" block keep the pre-redesign names rendering; they are deleted in
-   stage 7 once every screen has been ported.
+   Every colour is a token in BOTH palettes (the standing rule). The pre-redesign
+   names (--bg, --surface, --border, --honey*, --on-honey, --font-*) were aliases of
+   these while the screens were ported and are gone.
 --------------------------------------------------------------------------- */
 :root {
   color-scheme: dark;
@@ -32,7 +32,7 @@
 
   /* surfaces */
   --panel: rgba(33, 28, 21, 0.88); --panel-solid: #211c15;
-  --panel-edge: rgba(232, 166, 61, 0.18); --panel-highlight: rgba(255, 232, 190, 0.07);
+  --panel-edge: rgba(232, 166, 61, 0.18);
   --scrim: rgba(16, 13, 9, 0.76);
   --scrim-modal: rgba(0, 0, 0, 0.55);
   --raised: rgba(232, 166, 61, 0.13);
@@ -40,7 +40,7 @@
 
   /* ink */
   --text: #f5efe3; --muted: #b3a68f;
-  --accent: #e8a63d; --accent-strong: #f2bd62; --accent-fill: #e8a63d; --on-accent: #1a1610;
+  --accent: #e8a63d; --accent-fill: #e8a63d; --on-accent: #1a1610;
   --heading: #f2bd62;
   --kicker: #a3b5ff; --you: #a3b5ff;
 
@@ -64,7 +64,7 @@
   --shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.8);
 
   /* the homemade "light" strength: marker shadows, one hand-drawn outline, stickers, paper grain */
-  --sketch: rgba(244, 196, 110, 0.66); --sketch-faint: rgba(244, 196, 110, 0.32);
+  --sketch: rgba(244, 196, 110, 0.66);
   --ink-shadow: rgba(6, 4, 1, 0.75);
   --paper-shadow: 0 14px 30px -18px rgba(0, 0, 0, 0.75);
   --sticker-bg: #e8a63d; --sticker-ink: #1a1610; --sticker-line: rgba(26, 22, 16, 0.3);
@@ -75,8 +75,7 @@
   /* type, radius, motion (not themed, so they live on :root only) */
   --display: 'Bricolage Grotesque', system-ui, sans-serif;
   --body: 'Atkinson Hyperlegible', system-ui, sans-serif;
-  --hand: 'Caveat Brush', 'Bricolage Grotesque', cursive;
-  --r-sm: 8px; --r-md: 14px; --r-lg: 22px; --r-pill: 999px;
+  --hand: 'Caveat Brush', 'Bricolage Grotesque', cursive; --r-pill: 999px;
   --hm-r-panel: 28px 21px 26px 19px / 21px 27px 19px 25px;
   --hm-r-btn: 15px 19px 16px 18px / 18px 15px 19px 16px;
   --hm-r-field: 14px 17px 15px 16px / 16px 14px 17px 15px;
@@ -89,18 +88,6 @@
   --out: #6f6455;          /* an eliminated player: present but spent */
   --spectate: #5b8fb0;     /* watching, not playing; cool against the honey */
 
-  /* ---- aliases: pre-redesign names, pointing at the new tokens (deleted in stage 7) ---- */
-  --bg: var(--bg-top);
-  --surface: var(--panel-solid);
-  --border: var(--panel-edge);
-  --field-edge: var(--edge);       /* text-input boundary: --edge clears WCAG 1.4.11 on every field background */
-  --honey: var(--accent);
-  --honey-solid: var(--accent-fill);
-  --honey-dark: var(--edge);
-  --honey-glow: var(--glow-accent);
-  --on-honey: var(--on-accent);
-  --font-display: 'Space Grotesk', sans-serif;  /* becomes var(--display) with the shared components, stage 3 */
-  --font-body: 'Inter', sans-serif;
   /* Expert and Master are fixed solid bars with their own ink (stage 4b); the
      other six tiers derive from --t-*. */
   --tier-expert-fill: linear-gradient(155deg, #edae47, #b97c1e);
@@ -121,14 +108,14 @@
   --cells-opacity: 1; --cells-glow-opacity: 0.26; --light-peak: 0.44;
 
   --panel: rgba(255, 252, 245, 0.92); --panel-solid: #fffcf5;
-  --panel-edge: rgba(154, 98, 16, 0.16); --panel-highlight: rgba(255, 255, 255, 0.9);
+  --panel-edge: rgba(154, 98, 16, 0.16);
   --scrim: rgba(250, 243, 227, 0.84);
   --scrim-modal: rgba(44, 36, 25, 0.4);
   --raised: rgba(201, 135, 30, 0.13);
   --field: #fffdf8;
 
   --text: #2c2419; --muted: #6b5a42;
-  --accent: #8f5a0e; --accent-strong: #7a4b08; --accent-fill: #e09a2c; --on-accent: #2b2115;
+  --accent: #8f5a0e; --accent-fill: #e09a2c; --on-accent: #2b2115;
   --heading: #8f5a0e;
   --kicker: #2346d8; --you: #2346d8;
 
@@ -147,7 +134,7 @@
 
   --shadow: 0 18px 40px -22px rgba(120, 80, 20, 0.35);
 
-  --sketch: rgba(122, 75, 8, 0.6); --sketch-faint: rgba(122, 75, 8, 0.3);
+  --sketch: rgba(122, 75, 8, 0.6);
   --ink-shadow: rgba(122, 75, 8, 0.2);
   --paper-shadow: 0 12px 26px -16px rgba(120, 80, 20, 0.45);
   --sticker-bg: #e09a2c; --sticker-ink: #2b2115; --sticker-line: rgba(26, 22, 16, 0.3);
@@ -174,9 +161,9 @@ html, body, #root {
 }
 
 body {
-  background: var(--bg);
+  background: var(--bg-top);
   color: var(--text);
-  font-family: var(--font-body);
+  font-family: var(--body);
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 

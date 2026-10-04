@@ -75,7 +75,7 @@
 .btn-secondary:hover:not(:disabled) { border-color: var(--accent); box-shadow: 4px 5px 0 var(--ink-shadow); }
 .btn-secondary:active:not(:disabled) { transform: translate(2px, 3px); box-shadow: 1px 1px 0 var(--ink-shadow); }
 .btn-danger { background: transparent; color: var(--bad); border-color: var(--bad); }
-.btn-danger:hover:not(:disabled) { background: var(--bad); color: var(--bg); }
+.btn-danger:hover:not(:disabled) { background: var(--bad); color: var(--bg-top); }
 .btn-text {
   min-height: 44px; padding: 0 12px; background: none; border: 0; color: var(--text); font-weight: 400; font-size: 15px;
   text-decoration: underline; text-underline-offset: 3px;
