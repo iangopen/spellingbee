@@ -545,37 +545,24 @@
   margin-left: auto;
 }
 
-/* Results screen */
-.results-screen {
-  text-align: center;
-}
-
+/* Results screen (stage 4d): one panel, with the rosette pinned on only when the
+   run truly beat the previous best (decided by App, never inferred here). */
+.results-screen { width: 100%; max-width: 560px; margin: 0 auto; padding: 44px 32px 28px; text-align: center; }
 .results-screen h2 {
-  font-family: var(--font-display);
-  color: var(--honey);
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+  margin: 0; font: 400 clamp(2.4rem, 7vw, 3.2rem)/1 var(--hand); letter-spacing: 0.012em; color: var(--heading);
 }
-
-.results-stats {
-  display: flex;
-  gap: 40px;
-  justify-content: center;
-  margin: 24px 0 32px;
+.results-screen .sticker { left: 22px; top: -19px; }
+.results-rosette { position: absolute; right: 22px; top: -48px; width: 104px; height: 104px; }
+@media (prefers-reduced-motion: no-preference) {
+  .results-rosette { animation: rosette-pin 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) both 0.2s; }
 }
-
-.results-best {
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.results-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: center;
-}
+@keyframes rosette-pin { from { transform: scale(0.6) rotate(-25deg); opacity: 0; } }
+.results-stats { display: flex; gap: 40px; justify-content: center; margin: 24px 0 20px; }
+.results-screen .stat { align-items: center; }
+.results-screen .stat-value { font: 800 2.4rem/1 var(--display); font-variant-numeric: tabular-nums; }
+.results-screen .stat-label { margin-top: 4px; font-size: 0.85rem; letter-spacing: 0.05em; }
+.results-best { margin: 0 0 24px; color: var(--muted); font-size: 1rem; }
+.results-actions { display: flex; flex-direction: column; gap: 10px; align-items: center; }
 
 /* Home (stage 4a). Text sits on panels; the honeycomb is only ever behind them. */
 .home {
@@ -1581,4 +1568,10 @@
   .clock b { font-size: 2rem; }
   .pronouncer { padding: 20px; }
   .answer { padding: 16px 16px 10px; }
+}
+@media (max-width: 760px) {
+  /* the rosette hangs off the top edge; leave it room so it never covers the heading */
+  .results-screen { padding: 64px 20px 24px; }
+  .results-rosette { width: 80px; height: 80px; top: -40px; right: 16px; }
+  .results-screen .sticker { left: 12px; font-size: 1.25rem; }
 }

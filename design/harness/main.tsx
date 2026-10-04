@@ -44,7 +44,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   "sp-round": () => <RoundScreen state={spState("playing")} onSubmit={noop} onSkip={noop} onExit={noop} />,
   "sp-correct": () => <RoundScreen state={spState("correct", { score: 77, streak: 4 })} onSubmit={noop} onSkip={noop} onExit={noop} />,
   "sp-incorrect": () => <RoundScreen state={spState("incorrect", { streak: 0 })} onSubmit={noop} onSkip={noop} onExit={noop} />,
-  "sp-results": () => <ResultsScreen score={132} bestStreak={6} best={118} onReplay={noop} onMenu={noop} />,
+  "sp-results": () => <ResultsScreen score={132} bestStreak={6} best={132} isNewBest onReplay={noop} onMenu={noop} />,
   settings: () => <ModeSelect onSingle={noop} onMulti={noop} />,
   lobby: () => <LobbyScreen onExitToModes={noop} onEnterRoom={noop} />,
   "waiting-room": () => (
@@ -72,7 +72,7 @@ const SCREENS: Record<string, () => ReactNode> = {
       resultNote="Tomasz won this round"
     />
   ),
-  "race-results": () => <ResultsScreen score={205} bestStreak={5} best={205} onReplay={noop} onMenu={noop} />,
+  "race-results": () => <ResultsScreen score={205} bestStreak={5} onLeaveRoom={noop} />,
   "elim-watch": () => (
     <TurnScreen state={spState("playing", { timeLeft: 10 })} extras={elimExtras()} onSubmit={noop} onLeave={noop} />
   ),

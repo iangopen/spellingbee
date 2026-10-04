@@ -32,4 +32,26 @@ describe("ResultsScreen actions", () => {
     expect(onReplay).toHaveBeenCalledTimes(1);
     expect(onMenu).toHaveBeenCalledTimes(1);
   });
+
+  it("claims a new best, and shows the rosette, only when the caller says the previous best was beaten", () => {
+    const { container, rerender } = render(<ResultsScreen score={132} bestStreak={6} best={132} isNewBest onReplay={() => {}} onMenu={() => {}} />);
+    expect(screen.getByText(/new best/)).toBeTruthy();
+    expect(container.querySelector(".results-rosette")).not.toBeNull();
+    // a tie with the stored best is NOT a new best (it used to read score >= best)
+    rerender(<ResultsScreen score={132} bestStreak={6} best={132} onReplay={() => {}} onMenu={() => {}} />);
+    expect(screen.queryByText(/new best/i)).toBeNull();
+    expect(container.querySelector(".results-rosette")).toBeNull();
+  });
+
+  it("practice: says best scores are not set, and never claims a new best", () => {
+    render(<ResultsScreen score={60} bestStreak={6} best={0} practice onReplay={() => {}} onMenu={() => {}} />);
+    expect(screen.getByText(/Practice runs don't set best scores/)).toBeTruthy();
+    expect(screen.queryByText(/new best/i)).toBeNull();
+  });
+
+  it("race: no best line at all", () => {
+    render(<ResultsScreen score={205} bestStreak={5} onLeaveRoom={() => {}} />);
+    expect(screen.queryByText(/Best:/)).toBeNull();
+    expect(screen.queryByText(/new best/i)).toBeNull();
+  });
 });

@@ -65,8 +65,16 @@ function App() {
     setMpRoom(null);
   }
 
+  // True only for the run that beat the PREVIOUS stored best. Decided here, at the
+  // one place that compares against it, so the results screen never infers it
+  // from `score >= best` (which also fired on ties, on practice runs and on races).
+  const [beatBest, setBeatBest] = useState(false);
+
   useEffect(() => {
-    if (state.status !== "finished" || !state.tier) return;
+    if (state.status !== "finished" || !state.tier) {
+      setBeatBest(false);
+      return;
+    }
     // Practice runs don't set best scores. Scoring is `10 + timeLeft` per word
     // and untimed holds timeLeft at 0, so a practice score isn't on the same
     // scale as a timed one — recording it would let an untimed run occupy the
@@ -75,6 +83,7 @@ function App() {
     if (state.untimed) return;
     const tier = state.tier;
     if (state.score > bests[tier]) {
+      setBeatBest(true);
       setBest(tier, state.score);
       setBests((prev) => ({ ...prev, [tier]: state.score }));
     }
@@ -149,7 +158,6 @@ function App() {
             <ResultsScreen
               score={mp.state.score}
               bestStreak={mp.state.bestStreak}
-              best={mp.state.score}
               onLeaveRoom={handleLeaveRoom}
             />
           ))}
@@ -191,6 +199,8 @@ function App() {
           score={state.score}
           bestStreak={state.bestStreak}
           best={bests[state.tier]}
+          isNewBest={beatBest && !state.untimed}
+          practice={state.untimed}
           // Replay keeps the modifiers the finished game was played with, so
           // "Play again" repeats the same game rather than silently dropping
           // back to timed-with-definition.
