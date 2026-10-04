@@ -118,3 +118,21 @@ lobby and waiting room.
 - **I replaced a rule by renaming it, then had to undo it:** a stray script line
   renamed `.replay-btn`, which TurnScreen still uses. Reverted before the commit.
 
+## 2026-10-03: stages 4e to 4g
+
+Race results, settings, lobby and waiting room. Failures 64, 63, 64, 45 after 4d,
+4e, 4f, 4g; everything left is elimination. Pushed after each stage.
+
+- **4f measured nothing new on purpose.** The settings screen already measured 0
+  because `measure.mjs` opens the real dialog itself; an auto-open I added to the
+  harness collided with that click (a 30s timeout and a partial result file with
+  689 pairs). Removed. A partial measurement is not a result: the run that crashed
+  was discarded and redone before any number was reported.
+- **The first dialog check was wrong, not the dialog.** "Tab never leaves the
+  dialog" failed because a native modal lets Tab pass through browser UI; the
+  test now asks the right question (never lands on the page behind). The negative
+  control I tried (a non-modal dialog) broke React's own dialog handling and
+  proved nothing, so it is recorded as missing.
+- **The tied-race screenshots drove a wording rule:** a tie is never worded as a
+  win for whoever's row is first, and a zero-point race has no winner or rosette.
+

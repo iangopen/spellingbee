@@ -245,9 +245,9 @@ middle stages alone would show a half-old, half-new UI.
 | 4b ✅ | **Difficulty:** the OLD hexagon tier bars restyled with the new tokens (see 1.6 and `prototypes/homemade/`) + the modifier chips, with the header on a lit panel | `DifficultySelect.tsx`, `App.css` (`.tier-bar` rules adapted, not deleted) | tap-target measurement with `elementFromPoint` probes (every bar ≥44px, the clip-path IS the target); focus rim contrast (`shoot-homemade.mjs` section 5); `TIER_ORDER` / `TIER_META` untouched |
 | 4c ✅ | **Round** (solo + race): the pronouncer panel, placard, clock, answer moments (light-up, bell + shake), "+14" | `RoundScreen.tsx` (markup/classes) | existing `RoundScreen.test.tsx` green, especially: no word reveal while `awaitingOthers`, `readOnly` focus kept, `role="status"` text unchanged |
 | 4d ✅ | **Solo results:** the rosette moment on a new best | `ResultsScreen.tsx` | "new best" only when it truly is (solo) |
-| 4e | **Race results:** the new `RaceResults` (winner + lanes). `App.tsx` routes race to it. This fixes the audit bugs: no false "new best!", a real winner and standings, and the button says what it does. | `components/RaceResults.tsx`, `App.tsx` (routing line only) | unit test: order by score, the "you" row, ties, 2 to 8 players; lane positions ∝ score |
-| 4f | **Settings dialog** restyle (the theme picker stays Light/Dark) | `SettingsPanel.tsx` (classes), CSS | a dialog test: focus in / trap / Escape / restore, still green in Chrome |
-| 4g | **Lobby + waiting room:** panels side by side at desktop, new inputs (fixes the 1.47:1 edges), avatar picker with bee contestants | `LobbyScreen.tsx`, `WaitingRoom.tsx` | contrast of every input edge; name validation copy unchanged |
+| 4e ✅ | **Race results:** the new `RaceResults` (winner + lanes). `App.tsx` routes race to it. This fixes the audit bugs: no false "new best!", a real winner and standings, and the button says what it does. | `components/RaceResults.tsx`, `App.tsx` (routing line only) | unit test: order by score, the "you" row, ties, 2 to 8 players; lane positions ∝ score |
+| 4f ✅ | **Settings dialog** restyle (the theme picker stays Light/Dark) | `SettingsPanel.tsx` (classes), CSS | a dialog test: focus in / trap / Escape / restore, still green in Chrome |
+| 4g ✅ | **Lobby + waiting room:** panels side by side at desktop, new inputs (fixes the 1.47:1 edges), avatar picker with bee contestants | `LobbyScreen.tsx`, `WaitingRoom.tsx` | contrast of every input edge; name validation copy unchanged |
 | 4h | **Elimination:** TurnScreen HUD, bee contestant tokens, ghost state, knockout overlay; EliminationResults | `TurnScreen.tsx`, `EliminationResults.tsx` | the Session 21 rules re-verified (tokens not focusable, the reserved feedback slot, ghost drift decoration-only) |
 | 5 | **Rename.** "Spelling Race" becomes "Spelling Bee" in `<title>` ("Spelling Bee \| Hear the word. Spell it right."), the meta description (rewritten, no "race game"), the two `<h1>`s, and the CLAUDE.md heading and naming note. The mode "Race" is unchanged. Slug, base, `package.json` name and localStorage keys are unchanged. | `index.html`, `ModeSelect.tsx`, `DifficultySelect.tsx`, `CLAUDE.md` | grep: 0 user-facing "Spelling Race"; `vite.config.ts` base still `/spellingbee/` |
 | 6 | **Assets.** Rosette favicon (SVG + 32px PNG), 180px apple-touch-icon, `manifest.webmanifest` (name/short_name "Spelling Bee", `theme_color` `#070b1c`, `background_color` `#050814`, 192/512 icons, start_url `/spellingbee/`), `theme-color` meta, OG/Twitter tags + a 1200×630 card (rosette + bee on the honeycomb). Remove the unused Vite scaffold files (`public/icons.svg`, `src/assets/*`). | `public/*`, `index.html`, `CREDITS.md` | manifest validates; the icons resolve under `/spellingbee/`; the card renders in a share preview |
@@ -349,3 +349,35 @@ waiting room (4g). Race results already pass because it shares `ResultsScreen`;
   race. Practice runs say they do not set best scores; the race shows no best line.
 - Phones: `.app-shell` has 76px top padding so no first row sits under the fixed
   Settings button.
+
+## Stage 4e to 4g: what was built (2026-10-03)
+
+| After | Failing | Screens still failing |
+|---|---|---|
+| 4d | 64 | elimination 46, lobby 10, waiting room 8 |
+| 4e race results | 63 | race results and a tie: 0 |
+| 4f settings | 64 | settings: 0 (the +1 is animation timing inside elimination, not touched) |
+| 4g lobby + waiting room | 45 | lobby 0, waiting room 0; **all 45 left are elimination (4h)** |
+
+- **4e:** `lib/standings.ts` ranks the scoreboard the server already holds
+  (standard competition ranking: 1, 1, 3), words the winner line and the line to
+  the viewer ("You came 2nd with 205 points, 6 behind", "You tied for 1st"),
+  and scales lane position to score / leader. A tie names every tied player and
+  picks nobody by row order; nobody scoring is "No points this time" with no
+  rosette. `RaceResults` renders it (winner card, labelled standings list, the
+  tokens decoration-only); `ResultsScreen` is now solo-only. Lane subtitles
+  ("8 of 10 spelled") from the prototype are NOT shown: the client has no
+  per-player correct count, and none was invented.
+- **4f:** the drawer is an opaque panel (`--panel-solid`, hand-drawn left edge,
+  hand-lettered title), controls use `--edge` and the honey fill, the switch
+  keeps >= 3:1 in both states. New token `--scrim-modal`. Behaviour checked in
+  real Chrome by `design/harness/check-settings-dialog.mjs`: focus moves in, 46
+  Tab / Shift+Tab presses never land on the page behind (a native modal does let
+  Tab pass through browser UI, so "never leave" would be the wrong test), Escape
+  closes, focus returns to the Settings button, the drawer is opaque. That check
+  has no negative control yet.
+- **4g:** the lobby is a grid: who you are across the top, Create and Join side
+  by side at desktop, one column on phones; the hint and error moved into the
+  "you" panel. The waiting room is a column of panels (code, avatar, players,
+  start). `.lobby-panel` and `.lobby-divider` are gone.
+

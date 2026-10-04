@@ -1047,10 +1047,18 @@ the live site.
       plus the panel's drawn outline would otherwise overlap and fail contrast.
     - `design/harness/check-tier-bars.mjs` is the gate for the difficulty screen
       (tap target by `elementFromPoint`, rim contrast on the real app).
+  - **Stages 4e-4g are done (2026-10-03):** race results (winner or tie, ranked
+    lanes), the settings drawer, the lobby and the waiting room. Rules they keep:
+    - Standings are `lib/standings.ts` over the server's scoreboard: ties share a
+      place and name every tied player; never pick a winner by row order and never
+      show a per-player stat the client does not have.
+    - `ResultsScreen` is solo-only; a finished race is `RaceResults`.
+    - The settings drawer stays opaque (it holds forms), and its behaviour is
+      checked by `design/harness/check-settings-dialog.mjs`.
   - **App-wide contrast failures, the merge gate (must reach 0):** stage 1: 11;
-    stage 2: 265; stage 3: 217; 4a: 212; 4b: 187; 4c: 90; 4d: 64. The 64 left are
-    exactly the unported screens: elimination 46 (4h), lobby 10 and waiting room 8
-    (4g). Every focus ring passes. Results are in `design/stage-results/`;
+    2: 265; 3: 217; 4a: 212; 4b: 187; 4c: 90; 4d: 64; 4e: 63; 4f: 64; 4g: 45.
+    **All 45 left are elimination** (TurnScreen and EliminationResults, stage 4h).
+    Every focus ring passes. Results are in `design/stage-results/`;
     `design/baseline/` is untouched.
   - `design/harness/check-tier-focus.mjs` runs only the tier-bar focus check
     against any copy of the prototype (`HM_DIR`). It was proven able to fail on
@@ -1113,13 +1121,13 @@ the live site.
   in both palettes" and "motion only decorates a visible state".
 
 ### Open
-- Stages 4e to 4h are next (race results, settings, lobby + waiting room,
-  elimination), then 5 to 7. Each moves its screens onto `Panel` and re-measures;
-  the total must reach 0 (64 now).
+- Stage 4h (elimination) is next, then 5 to 7. It must take the total from 45 to 0.
   `.text-input` uses `--field-edge` (aliased to `--edge`, >=3:1 on every field
   surface); do not fold it back into `--border`.
-- Still failing after 4d (64): the unported screens. Includes the eliminated
-  name's `--out` (2.86 to 2.88:1, 4h). The Master bar is fixed.
+- Still failing after 4g (45): elimination only. Includes the eliminated name's
+  `--out` (2.86 to 2.88:1).
+- Not done yet: a keyboard-only multiplayer pass (waiting room, race, results).
+  `check-settings-dialog.mjs` has no negative control.
 - A real-phone check of the shimmer (in stage 7). The perf numbers so far are
   headless Chrome with the CPU throttled 4×. The static glow is the fallback.
 - The name itself: a distinct look lowers the risk of being mistaken for NYT's
