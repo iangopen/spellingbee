@@ -302,7 +302,7 @@
   position: fixed;
   inset: 0;
   z-index: 30;
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--scrim-modal);
   display: flex;
   justify-content: flex-end;
 }
@@ -311,11 +311,13 @@
   width: min(400px, 100%);
   height: 100%;
   overflow-y: auto;
-  background: var(--bg);
-  border-left: 1px solid var(--border);
+  /* solid, never translucent: the drawer holds forms and must not show the
+     honeycomb through it */
+  background: var(--panel-solid);
+  border-left: 2px solid var(--sketch);
   padding: 20px;
   text-align: left;
-  box-shadow: var(--shadow);
+  box-shadow: var(--paper-shadow);
 }
 
 .settings-head {
@@ -326,10 +328,10 @@
 }
 
 .settings-title {
-  font-family: var(--font-display);
-  font-size: 22px;
+  font: 400 2rem/1 var(--hand);
+  letter-spacing: 0.012em;
   margin: 0;
-  color: var(--honey);
+  color: var(--heading);
 }
 
 .settings-close {
@@ -339,24 +341,24 @@
   align-items: center;
   justify-content: center;
   background: none;
-  border: 1px solid var(--border);
+  border: 2px solid var(--edge);
   border-radius: 50%;
   color: var(--text);
 }
 
 .settings-close:hover {
-  border-color: var(--honey);
-  color: var(--honey);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .settings-section {
   padding: 16px 0;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--panel-edge);
 }
 
 .settings-section-title {
-  font-family: var(--font-display);
-  font-size: 12px;
+  font-family: var(--display);
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--muted);
@@ -365,7 +367,7 @@
 
 .settings-note {
   margin: 8px 0 0;
-  font-size: 12px;
+  font-size: 0.85rem;
   color: var(--muted);
   line-height: 1.45;
 }
@@ -373,7 +375,7 @@
 .settings-range {
   width: 100%;
   height: 44px; /* the slider itself is the tap target */
-  accent-color: var(--honey-solid);
+  accent-color: var(--accent-fill);
 }
 
 /* Theme picker */
@@ -389,24 +391,23 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  color: var(--muted);
-  font-family: var(--font-body);
-  font-size: 14px;
-  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+  border: 2px solid var(--edge);
+  border-radius: var(--hm-r-btn);
+  background: var(--field);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 15px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .segment:hover {
-  border-color: var(--honey);
-  color: var(--text);
+  border-color: var(--accent);
 }
 
 .segment.active {
-  background: var(--honey-solid);
-  border-color: var(--honey-solid);
-  color: var(--on-honey);
+  background: var(--accent-fill);
+  border-color: var(--accent-fill);
+  color: var(--on-accent);
 }
 
 /* Switch row */
@@ -422,7 +423,7 @@
   border: none;
   text-align: left;
   color: var(--text);
-  font-family: var(--font-body);
+  font-family: var(--body);
 }
 
 .switch-text {
@@ -433,49 +434,50 @@
 }
 
 .switch-label {
-  font-size: 15px;
+  font-size: 1rem;
 }
 
 .switch-hint {
-  font-size: 12px;
+  font-size: 0.85rem;
   color: var(--muted);
   line-height: 1.4;
 }
 
 .switch-track {
   flex: none;
-  width: 46px;
-  height: 27px;
+  width: 48px;
+  height: 28px;
   border-radius: 999px;
-  background: var(--border);
-  border: 1px solid var(--border);
+  /* off is the control edge colour (>= 3:1 on the drawer), on is honey */
+  background: var(--edge);
+  border: 2px solid var(--edge);
   display: flex;
   align-items: center;
-  padding: 2px;
-  transition: background-color 0.18s ease;
+  padding: 1px;
+  transition: background-color 0.18s ease, border-color 0.18s ease;
 }
 
 .switch-track.on {
-  background: var(--honey-solid);
-  border-color: var(--honey-solid);
+  background: var(--accent-fill);
+  border-color: var(--accent-fill);
 }
 
 .switch-thumb {
-  width: 21px;
-  height: 21px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: var(--bg);
+  background: var(--panel-solid);
   transition: transform 0.18s ease;
 }
 
 .switch-track.on .switch-thumb {
-  transform: translateX(19px);
+  transform: translateX(20px);
 }
 
 /* Destructive action + its in-panel confirm step */
 .confirm-block {
-  border: 1px solid var(--bad);
-  border-radius: 10px;
+  border: 2px solid var(--bad);
+  border-radius: var(--hm-r-btn);
   padding: 12px;
 }
 
@@ -696,7 +698,7 @@
 
 .field-label {
   display: block;
-  font-size: 11px;
+  font-size: 0.8rem;
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;

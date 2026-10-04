@@ -34,6 +34,7 @@
   --panel: rgba(33, 28, 21, 0.88); --panel-solid: #211c15;
   --panel-edge: rgba(232, 166, 61, 0.18); --panel-highlight: rgba(255, 232, 190, 0.07);
   --scrim: rgba(16, 13, 9, 0.76);
+  --scrim-modal: rgba(0, 0, 0, 0.55);
   --raised: rgba(232, 166, 61, 0.13);
   --field: #16130f;
 
@@ -122,6 +123,7 @@
   --panel: rgba(255, 252, 245, 0.92); --panel-solid: #fffcf5;
   --panel-edge: rgba(154, 98, 16, 0.16); --panel-highlight: rgba(255, 255, 255, 0.9);
   --scrim: rgba(250, 243, 227, 0.84);
+  --scrim-modal: rgba(44, 36, 25, 0.4);
   --raised: rgba(201, 135, 30, 0.13);
   --field: #fffdf8;
 
