@@ -578,7 +578,7 @@ already in `MultiplayerExtras`. Two files plus one token.
 
 Rules this session must keep:
 - **Every new rule is scoped under `.turn-screen` or `.ptoken*`.** `.prompt-card`,
-  `.lead-in`, `.guess-input`, `.timer-track`, `.feedback`, `.result-note` and
+  `.lead-in`, `.answer-field`, `.timer-track`, `.feedback`, `.result-note` and
   `.score-bar` are all SHARED with `RoundScreen`, so an unscoped tweak silently
   moves singleplayer and race mode. Verified by measuring: outside `.turn-screen`,
   `.prompt-card` still computes `margin-bottom: 20px` and `.timer-track` `0px`.
@@ -1011,7 +1011,34 @@ the live site.
     eliminated name `--out`, the lobby's primary buttons, the default focus ring
     on Settings over honey): see PHASE3 1.1. `--font-display` / `--font-body`
     and the old `--tier-*` gradients are NOT switched yet (stages 3 and 4b).
-    Stage 2 (honeycomb) is next.
+    Stage 2 (honeycomb) and 3 (shared components) are below.
+  - **Stage 2 is done (2026-10-03):** `HoneycombBackground` replaces
+    `body::before`. Rules it keeps: it is `aria-hidden` with no text or
+    focusables; `.bg` stays at `z-index: -1` INSIDE `.app-shell` (z-index 0 paints
+    over the unpositioned screen and hides it); the tile is a CSS mask so the
+    colour is always a token; only `transform` and `opacity` animate; the shimmer
+    is removed by the OS setting AND `data-reduce-motion`; `data-peak="1"` exists
+    only for `design/harness/measure.mjs` and is never set in the app.
+  - **Stage 3 is done (2026-10-03):** `src/components/ui/` and `src/ui.css`.
+    Rules it keeps:
+    - ONE focus rule in `ui.css`, more specific than every button shadow, so a
+      marker shadow can never replace the moat. The tier bars and `.answer-field`
+      are excluded (clip-path hides outlines; the answer field has its own
+      glow-and-gap). New controls inherit it: never add a per-component outline.
+    - Buttons are `<Button>` only. Disabled is a dashed outline in `--muted`, not
+      a faded fill (fading the primary put its label at 3.19:1).
+    - `AnswerField` keeps `readOnly` (not `disabled`) so focus survives, and its
+      tick/cross are `aria-hidden` (the `role="status"` region announces).
+    - Avatars are drawn by `lib/beeArt.ts` from tokens only (a unit test rejects
+      hex literals), seeded per key so each is identical everywhere.
+      `lib/avatars.ts` is still the ONE list of keys (the DB CHECK).
+    - Panel, Sticker, Placard, BeeMascot and Rosette have no screen yet; their
+      first consumers are 4a, 4c, 4d and 4e.
+  - **App-wide contrast failures, the merge gate (must reach 0):** stage 1: 11;
+    stage 2: 265; stage 3: 217 (7 are not honeycomb: Master bar, "Championship
+    rarities", the eliminated name). The rest is loose text on bare honeycomb and
+    clears when each screen moves onto a Panel in stage 4. Every focus ring passes.
+    Results are in `design/stage-results/`; `design/baseline/` is untouched.
   - `design/harness/check-tier-focus.mjs` runs only the tier-bar focus check
     against any copy of the prototype (`HM_DIR`). It was proven able to fail on
     2026-10-03 (see docs/history.md), and exits 1 on any failing configuration.
@@ -1073,16 +1100,12 @@ the live site.
   in both palettes" and "motion only decorates a visible state".
 
 ### Open
-- Stage 2 of `design/PHASE3.md` (the honeycomb background) is next, then 3 to 7.
-  `--field-edge` is satisfied for now by aliasing `--edge`; stage 3's `TextInput`
-  must keep it at >=3:1 against every surface behind a field (`measure.mjs`),
-  and must not fold it back into `--border`.
-- Stage 1's leftovers, each owned by a stage: the default focus ring on the
-  Settings button over honey (1.82:1, stage 3's global focus rule), the lobby's
-  primary buttons in dark (3.19:1, stage 3), the Master bar and "Championship
+- Stage 4 (a to h) is next, then 5 to 7. Each 4x moves one screen onto `Panel` so
+  its text is no longer on bare honeycomb, and re-measures; the total must reach 0.
+  `.text-input` uses `--field-edge` (aliased to `--edge`, >=3:1 on every field
+  surface); do not fold it back into `--border`.
+- Still failing after stage 3 (7, not honeycomb): the Master bar and "Championship
   rarities" (stage 4b), the eliminated name's `--out` (2.86 to 2.88:1, stage 4h).
-- `--tape*` and `--grain-panel-opacity` came across from the prototype and are
-  unused at the light strength; delete them if stage 3 does not need them.
 - A real-phone check of the shimmer (in stage 7). The perf numbers so far are
   headless Chrome with the CPU throttled 4×. The static glow is the fallback.
 - The name itself: a distinct look lowers the risk of being mistaken for NYT's

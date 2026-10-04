@@ -38,8 +38,8 @@ BOTH palettes". Groups, and what each is for:
 | Award accent | `--kicker`, `--you`, `--mark`, `--mark-2`, `--mark-ring`, `--ribbon-1..3` | the ONLY ribbon-blue uses: winner kicker, the "you" tag, rosette ribbon, first-place ribbon |
 | Controls | `--edge`, `--ring`, `--focus-moat`, `--glow-soft`, `--glow-accent`, `--glow-good`, `--glow-bad`, `--good`, `--bad` | control edges, focus ring + its solid moat + halo, state glows, correct / missed |
 | Difficulty ramp | `--t-novice` ... `--t-master` | the eight tier bars (stage 4b); sage to olive to amber to burnt orange to honey to rust |
-| Bee art | `--bee-body`, `--bee-stripe`, `--bee-wing`, `--bee-line`, `--bee-cheek` | the mascot and avatars |
-| Homemade (light strength) | `--sketch`, `--sketch-faint`, `--ink-shadow`, `--paper-shadow`, `--sticker-bg`, `--sticker-ink`, `--tape`, `--tape-line`, `--grain`, `--grain-bg-opacity`, `--grain-panel-opacity` | the one hand-drawn panel outline, marker shadows, the sticker, page grain. `--tape*` and `--grain-panel-opacity` (0 at light) are inherited from the prototype and unused at this strength: delete them when the stage that would consume them is built |
+| Bee art | `--bee-body`, `--bee-stripe`, `--bee-wing`, `--bee-line`, `--bee-cheek`, `--bee-eye`, `--bee-leaf` | the mascot and avatars |
+| Homemade (light strength) | `--sketch`, `--sketch-faint`, `--ink-shadow`, `--paper-shadow`, `--sticker-bg`, `--sticker-ink`, `--sticker-line`, `--btn-sheen`, `--grain`, `--grain-bg-opacity` | the one hand-drawn panel outline, marker shadows, the sticker, page grain. (`--tape*` and `--grain-panel-opacity` were deleted in stage 3: they only served the closed `more` strength.) |
 | Elimination | `--life`, `--out`, `--spectate` | unchanged from Session 20 |
 | Elevation | `--shadow` | panel lift |
 | Not themed (`:root` only) | `--display`, `--body`, `--hand`, `--r-sm/md/lg/pill`, `--hm-r-panel/btn/field`, `--ease-out` | type families, radii (incl. the irregular homemade corners), easing |
@@ -62,6 +62,22 @@ the eliminated player's name `--out` (2.86 to 2.88; stage 4h), the lobby's
 primary buttons in dark (3.19; stage 3's Button), and the default focus ring on
 the Settings button over a honey fill (1.82, was 2.14; stage 3's global focus
 rule). Each is owned by the stage named.
+
+**Measured at stages 2 and 3** (peak shimmer, `design/stage-results/stage{2,3}-contrast-app.md`):
+
+| After | Pairs | Failing | Why |
+|---|---|---|---|
+| Stage 1 | 728 | 11 | tokens only, no background |
+| Stage 2 | 701 | 265 | the honeycomb now sits behind loose text; text on bare glow is not allowed |
+| Stage 3 | 715 | 217 | 48 fewer: every focus ring passes, the lobby buttons pass |
+
+Of the 217, 7 are not honeycomb problems (Master and "Championship rarities" on
+the tier bars, the eliminated name `--out` on four screens): stages 4b and 4h.
+The other 210 are loose text with no panel behind it (muted captions, headings,
+the "Your word is" kicker, the scoreboard labels). They are the reason stage 4
+exists: each screen moves onto a `Panel`, and the count has to reach 0 there.
+Focus on controls that show it another way (the eight tier bars; the lobby's
+disabled buttons, which cannot take focus) is listed separately by the script.
 
 
 ### 1.2 Type
@@ -183,7 +199,7 @@ light-up). The honeycomb pauses in a hidden tab.
 | `Panel` | the ad-hoc `.prompt-card`, `.lobby-panel`, `.results-*`, `.champion` | one lit-glass surface |
 | `Button` (primary / secondary / text / danger) | `.primary-btn`, `.ghost-btn`, `.secondary-btn`, `.danger-btn`, `.skip-btn` | 54px primary; `:active` press; glow on primary only |
 | Back link / quit | `.back-link`, `.exit-confirm` | pill on a scrim; the two-step confirm is unchanged |
-| `AnswerField` | `.guess-input` (RoundScreen, TurnScreen) | moat + state glows; tick/cross icon; keeps `readOnly` (not `disabled`) during feedback |
+| `AnswerField` | `.guess-input` (replaced in stage 3) | moat + state glows; tick/cross icon; keeps `readOnly` (not `disabled`) during feedback |
 | `TextInput`, `Select` | `.text-input`, native `<select>` | edge `--edge` (fixes the audit's 1.47:1 inputs); explicit select colours for Windows dark |
 | **Tier selector** | the hex `.tier-bar` stack | **Changed 2026-10-02 (Ian): the OLD hexagon bars return**, restyled with the hybrid's tokens (prototype: `prototypes/homemade/difficulty.html`). 8 bars in one scrolling stack, ≥44px targets, the rim that thickens on focus, the practice / hide-definition chips. Replaces the earlier "ribbon-marked rows, no clip-path" plan. Never a letter board. |
 | `Placard` | new | word counter ("4 of 10 words"); in Race/Elimination, the player's seat |
@@ -223,8 +239,8 @@ middle stages alone would show a half-old, half-new UI.
 |---|---|---|---|
 | 0 ✅ | **Groundwork (done 2026-09-29).** Self-host the two fonts (woff2, Latin + Latin Extended) and add `CREDITS.md` (the OFL fonts, lucide ISC). Port `measure.mjs` / `check-glow.mjs` to the real screens (`TARGET=app`, through `design/harness`), and record the baseline in `design/baseline/`. The current fonts were self-hosted on `main` first (HARDENING #24; live, 0 Google requests). | `src/fonts.css`, `src/assets/fonts/`, `CREDITS.md`, `design/harness/*`, `design/baseline/*` | prototype regression: 152 pairs, 0 failing, unchanged; app baseline: 715 pairs, 47 failing, 44 controls without an outline |
 | 1 ✅ | **Tokens + dark default (done 2026-10-03).** The honey-and-ribbon token set (homemade `light`) in both themes in `index.css`, old tokens aliased (see 1.1). `theme.ts`: `resolveTheme()` is stored ?? `"dark"`, the OS listener and `getSystemTheme`/`onSystemThemeChange` are gone, `SettingsPanel`'s listener removed. The `spellingbee:theme` key and its values are unchanged, so a player who chose light keeps it. The harness now stores its theme pick like a player would (the OS emulation no longer selects a theme). Stage 0 gap closed: Caveat Brush added to `src/fonts.css`, `src/assets/fonts/` and `CREDITS.md`. | `index.css`, `fonts.css`, `lib/theme.ts`, `main.tsx`, `SettingsPanel.tsx`, `CREDITS.md`, `design/harness/main.tsx` | `theme.test.ts` (7 tests; negative control: following the OS again fails 2 of them); contrast 728 pairs / 11 failing vs baseline 47, no new failure |
-| 2 | **Honeycomb background.** The `HoneycombBackground` component + CSS (28×49 tile, glow, shimmer, vignette, header band), replacing `body::before`. The shimmer is hidden under the OS setting AND the in-app override. | `components/HoneycombBackground.tsx`, `index.css` | render test (`aria-hidden`, no text, no focusables); check-glow on the app; the perf script at 390px |
-| 3 | **Shared components.** Panel, Button, AnswerField (moat + states), TextInput/Select, Placard, Rosette, BeeMascot, AvatarArt, Clock/TimerBar and Tally restyles; the global focus-moat rule. | new `components/ui/*`, `AvatarPicker.tsx`, `TimerBar.tsx` (CSS only), `ScoreBar.tsx`, `lib/avatars.ts` (art mapping only) | `AVATAR_KEYS` unchanged (unit test pins the list); TimerBar tests unchanged and green; focus-ring contrast |
+| 2 ✅ | **Honeycomb background (done 2026-10-03).** `HoneycombBackground` + `src/honeycomb.css`, mounted once in `Shell`, replacing `body::before`. The 28x49 tile is an SVG used as a CSS MASK painted with `--cell-line` / `--cell-line-bright`, so both palettes and every theme switch work with no JavaScript. Layers: gradient, blurred + crisp cells (faded by `--hex-mask`), paper grain, the shimmer (a window over brighter cells, transform and opacity only), a calm header band and vignette. It lives at `z-index: -1` INSIDE `.app-shell`: z-index 0 painted it over the in-flow screen and hid every screen (caught by the first measurement, which reported 371 failures that were really the background). The shimmer is removed under the OS setting and the in-app override; the tab being hidden freezes it. `?peak=1` (harness only) shows every bright cell at once. | `components/HoneycombBackground.tsx`, `honeycomb.css`, `index.css`, `App.tsx`, `design/harness/*` | render test (aria-hidden, no text, no focusables, pause/resume/cleanup); lemon pixels 0 of 1.02M on home and round, both themes; phone, CPU 4x: median frame 16.7ms, p95 16.8ms, worst 49.9ms (one-off, headless) |
+| 3 ✅ | **Shared components (done 2026-10-03).** `components/ui/`: `Button` (primary / secondary / text / danger, `sm` size; replaced `.primary-btn`, `.secondary-btn`, `.ghost-btn`, `.danger-btn`, all 18 call sites; disabled is a dashed muted outline, not a faded fill), `TextInput` / `Select` (`--edge`, native option colours for Windows dark), `AnswerField` (replaced `.guess-input` in both screens; moat + state glows, tick/cross, `readOnly` kept), `Panel`, `Sticker`, `Placard`, `WobbleFilters` (mounted in Shell), and `Art` (`AvatarArt`, `BeeMascot`, `Rosette`) drawn by `lib/beeArt.ts` from tokens, seeded per avatar key. `AvatarPicker` / `AvatarBadge` now draw the bee contestants; `lib/avatars.ts` lost its lucide icons and keeps the keys. The global focus rule (`ui.css`) outranks the marker shadows. `--tape*` / `--grain-panel-opacity` deleted. Panel, Sticker, Placard, BeeMascot and Rosette are built and tested but have no screen yet: their first consumers are stages 4a (home), 4c (round), 4d and 4e (results). | `components/ui/*`, `ui.css`, `lib/beeArt.ts`, `lib/avatars.ts`, `AvatarPicker.tsx`, call sites, `App.css` (old rules removed) | `ui.test.tsx` (12), `AVATAR_KEYS` pinned; focus rings 0 failing (Settings 11.47 / 7.35, was 1.82); lobby buttons 7.06 / 6.47 (was 3.19) |
 | 4a | **Home** (ModeSelect): hero panel + mascot + best-scores panel (from `getAllBests()`) | `ModeSelect.tsx`, `App.tsx` (pass bests only) | keyboard: heading focus via `useScreenFocus` is unchanged |
 | 4b | **Difficulty:** the OLD hexagon tier bars restyled with the new tokens (see 1.6 and `prototypes/homemade/`) + the modifier chips, with the header on a lit panel | `DifficultySelect.tsx`, `App.css` (`.tier-bar` rules adapted, not deleted) | tap-target measurement with `elementFromPoint` probes (every bar ≥44px, the clip-path IS the target); focus rim contrast (`shoot-homemade.mjs` section 5); `TIER_ORDER` / `TIER_META` untouched |
 | 4c | **Round** (solo + race): the pronouncer panel, placard, clock, answer moments (light-up, bell + shake), "+14" | `RoundScreen.tsx` (markup/classes) | existing `RoundScreen.test.tsx` green, especially: no word reveal while `awaitingOthers`, `readOnly` focus kept, `role="status"` text unchanged |

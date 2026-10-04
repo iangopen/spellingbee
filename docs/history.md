@@ -72,3 +72,26 @@ harness stored its pick like a player; (2) measuring overwrites `design/baseline
 so stage results go to `design/stage-results/` and the baseline is restored.
 Caveat Brush, which the 2026-10-02 plan said stage 0 would carry, had never been
 added; stage 1 added it.
+
+## 2026-10-03: stages 2 and 3
+
+Stage 2 (honeycomb) and stage 3 (shared components, global focus rule) on
+`redesign/spelling-bee`. App-wide contrast failures: 11 after stage 1, 265 after
+stage 2, 217 after stage 3; the target is 0 before merge.
+
+- **The first stage 2 measurement said 371 failing and was wrong.** The
+  background was `z-index: 0` inside `.app-shell`, which paints over unpositioned
+  content, so the screens were hidden and the measurer read the honeycomb. A
+  screenshot showed it. Moving it to `-1` gave the real figure, 265.
+- **The 265 are expected, not a bug:** the real app has loose text (captions,
+  headings, scoreboard labels) that the old near-invisible wash never threatened.
+  Against the shimmer at peak it fails. Panels fix it, which is stage 4.
+- **Both named failures are fixed and measured:** the Settings focus ring
+  (1.82:1) is 11.47 dark / 7.35 light from the global focus rule; the lobby
+  primary buttons (3.19:1) are 7.06 / 6.47 because a disabled button is now a
+  dashed muted outline instead of a 50% fade. WCAG exempts disabled controls, but
+  the script measures them and the shape change is also the clearer cue.
+- `--tape*` and `--grain-panel-opacity` deleted (they only served `more`).
+- Found and fixed while checking: the correct/incorrect answer field kept the
+  honey focus outline around a green or red border; the outline now takes the
+  state colour.
