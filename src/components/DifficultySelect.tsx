@@ -3,6 +3,7 @@ import { EyeOff, Timer } from "lucide-react";
 import type { DifficultyTier, GameOptions } from "../types";
 import { TIERS } from "../lib/tiers";
 import { useScreenFocus } from "../hooks/useScreenFocus";
+import { Panel } from "./ui/Panel";
 
 export function DifficultySelect({
   bests,
@@ -22,6 +23,8 @@ export function DifficultySelect({
 
   return (
     <div className="tier-select">
+      {/* The header is a lit panel: text never sits on the bare honeycomb. */}
+      <Panel as="section" className="tier-head">
       <h1 ref={headingRef} tabIndex={-1}>Spelling Bee</h1>
       <p className="subtitle">Hear it. Spell it. Beat the clock.</p>
 
@@ -43,7 +46,7 @@ export function DifficultySelect({
           Hide definition
         </button>
       </div>
-      <p className="mode-hint">
+      <p className="mode-hint" role="status" aria-live="polite">
         {untimed && hideDefinition
           ? "No clock, and no definition — audio only."
           : untimed
@@ -52,22 +55,25 @@ export function DifficultySelect({
               ? "No definition shown — spell from the audio alone."
               : "Timed, with a definition for every word."}
       </p>
+      </Panel>
 
-      {/* Layered strata, novice at the top down to master. */}
-      <div className="tier-stack">
+      {/* Eight tier BUTTONS in one stack, novice down to master. Never a letter
+          board. The wrapper owns the hexagon so the focus moat shares its shape. */}
+      <div className="tier-stack" role="group" aria-label="Difficulty">
         {TIERS.map((t) => (
-          <button
-            key={t.id}
-            className="tier-bar"
-            data-tier={t.id}
-            onClick={() => onSelect(t.id, { untimed, hideDefinition })}
-          >
-            <span className="tier-bar-main">
-              <span className="tier-label">{t.label}</span>
-              <span className="tier-blurb">{t.blurb}</span>
-            </span>
-            <span className="tier-best">Best {bests[t.id]}</span>
-          </button>
+          <span key={t.id} className="tier-wrap">
+            <button
+              className="tier-bar"
+              data-tier={t.id}
+              onClick={() => onSelect(t.id, { untimed, hideDefinition })}
+            >
+              <span className="tier-bar-main">
+                <span className="tier-label">{t.label}</span>
+                <span className="tier-blurb">{t.blurb}</span>
+              </span>
+              <span className="tier-best">Best {bests[t.id]}</span>
+            </button>
+          </span>
         ))}
       </div>
     </div>

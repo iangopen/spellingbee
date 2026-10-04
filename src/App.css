@@ -41,242 +41,88 @@
   transform: rotate(-25deg);
 }
 
-/* Difficulty select */
-.tier-select {
-  text-align: center;
-  max-width: 480px;
-}
-
+/* Difficulty select (stage 4b): the OLD live design's eight elongated hexagon
+   bars in one stacked column, restyled with the new tokens, the header on a lit
+   panel. The bars are tier BUTTONS and never a letter board: one per row, same
+   left edge and width. */
+.tier-select { width: 100%; max-width: 480px; margin: 0 auto; text-align: center; padding-top: 8px; }
+.tier-head { padding: 24px 20px 18px; margin-bottom: 28px; }
 .tier-select h1 {
-  font-family: var(--font-display);
-  font-size: 40px;
-  font-weight: 700;
-  margin: 0;
-  color: var(--honey);
+  margin: 0; font: 400 clamp(3.4rem, 11vw, 4.4rem)/0.95 var(--hand); letter-spacing: 0.012em; color: var(--heading); rotate: -1deg;
 }
-
-.subtitle {
-  color: var(--muted);
-  margin-top: 8px;
-  margin-bottom: 28px;
+.tier-select h1::after {
+  content: ""; display: block; height: 10px; width: min(11ch, 78%); margin: 0.3em auto 0; background: var(--heading); opacity: 0.75;
+  -webkit-mask: var(--squiggle) left center / 100% 100% no-repeat; mask: var(--squiggle) left center / 100% 100% no-repeat;
 }
-
-/* ---------------------------------------------------------------------------
-   Tier bars — stacked strata, easy at the top down to expert.
-
-   The clip-path is the real hit area: a browser tests pointer events against
-   the clipped shape, not the layout box, so the visible bar and the tappable
-   bar are the same thing by construction. The stack gap supplies the breathing
-   room; nothing invisible is left clickable.
---------------------------------------------------------------------------- */
-/* Per-run mode toggles. These sit on the tier screen, not in settings, because
-   they apply to the next game rather than to the player. */
-.mode-toggles {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-}
-
+.subtitle { margin: 8px 0 20px; color: var(--muted); }
+/* Per-run toggles: they apply to the next game, not to the player, so they live
+   here and not in settings. */
+.mode-toggles { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
 .mode-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  min-height: 44px;
-  padding: 0 15px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--muted);
-  font-family: var(--font-body);
-  font-size: 13px;
-  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: var(--hm-r-btn);
+  border: 1.5px solid var(--edge); background: var(--field); color: var(--text); font: 400 0.95rem var(--body);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
+.mode-chip svg { width: 1.05em; height: 1.05em; color: var(--accent); }
+.mode-chip:hover { border-color: var(--accent); }
+.mode-chip[aria-pressed="true"] { background: var(--accent-fill); border-color: var(--accent-fill); color: var(--on-accent); }
+.mode-chip[aria-pressed="true"] svg { color: var(--on-accent); }
+.mode-hint { margin: 2px 0 0; min-height: 1.3em; font-size: 0.9rem; color: var(--muted); }
 
-.mode-chip:hover {
-  border-color: var(--honey);
-  color: var(--text);
+/* Eight bars, one plain page-scrolling stack (Session 15): an inner scroll
+   container would hide the hardest tiers behind a scrollbar inside a page that
+   already scrolls. */
+.tier-stack { display: flex; flex-direction: column; gap: 6px; max-width: 420px; margin: 0 auto; }
+.tier-wrap {
+  /* the hexagon lives on the wrapper so the focus moat (::before) and the bar share it */
+  --hex-bar: polygon(18px 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 18px 100%, 0 50%);
+  position: relative; display: block; transition: filter 0.2s ease;
 }
-
-.mode-chip.active {
-  background: var(--honey-solid);
-  border-color: var(--honey-solid);
-  color: var(--on-honey);
-}
-
-.mode-hint {
-  margin: 0 0 18px;
-  font-size: 12px;
-  color: var(--muted);
-  min-height: 1.2em;
-}
-
-/* Eight bars, not four (Session 15). Kept as one plain page-scrolling stack:
-   an inner scroll container would hide the hardest tiers behind a scrollbar
-   inside a page that already scrolls, which is worse than a slightly long page.
-   Instead the bars got shorter (64px -> 54px) and the gap tighter (8px -> 6px),
-   which fits all eight in ~474px — under one phone viewport once the header is
-   accounted for, and still well over the 44px tap floor. */
-.tier-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-width: 420px;
-  margin: 0 auto;
-}
-
+.tier-wrap::before { content: ""; position: absolute; inset: -3px; clip-path: var(--hex-bar); background: var(--focus-moat); display: none; }
+.tier-wrap:has(.tier-bar:focus-visible)::before { display: block; }
+.tier-wrap:has(.tier-bar:focus-visible) { filter: drop-shadow(0 0 9px var(--glow-accent)); }
 .tier-bar {
-  /* Elongated hexagon: flat top and bottom, pointed left and right. The points
-     are a fixed 18px rather than a percentage so they stay the same shape at
-     every width instead of stretching into shallow slivers on desktop. */
-  --hex-bar: polygon(
-    18px 0,
-    calc(100% - 18px) 0,
-    100% 50%,
-    calc(100% - 18px) 100%,
-    18px 100%,
-    0 50%
-  );
-  position: relative;
-  width: 100%;
-  min-width: 0;
-  min-height: 54px;
-  border: none;
-  /* Horizontal padding clears the points so text never sits in the taper. */
-  padding: 8px 28px;
-  background: var(--tier-edge);
-  color: var(--tier-ink, var(--text));
-  clip-path: var(--hex-bar);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  text-align: left;
-  transition: transform 0.15s ease, filter 0.15s ease;
+  /* Elongated hexagon: flat top and bottom, points left and right, a fixed 18px
+     so the shape is the same at every width. The clip-path IS the tap target:
+     browsers hit-test the clipped shape, so getBoundingClientRect overstates it
+     and only elementFromPoint probing measures it honestly. */
+  --fill: linear-gradient(155deg, color-mix(in srgb, var(--t) 26%, var(--panel-solid)), color-mix(in srgb, var(--t) 11%, var(--panel-solid)));
+  --rim: color-mix(in srgb, var(--t) 66%, var(--panel-solid));
+  --ink: var(--text); --ink-2: var(--muted);
+  position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; min-width: 0; min-height: 58px; padding: 8px 30px; border: 0; text-align: left;
+  background: var(--rim); color: var(--ink); clip-path: var(--hex-bar);
+  transition: transform 0.15s var(--ease-out), filter 0.15s ease;
 }
-
-/* The rim is the element's own background showing through around an inset
-   ::before carrying the fill. A real border can't be used: clip-path cuts it
-   off along the angled ends. */
-.tier-bar::before {
-  content: "";
-  position: absolute;
-  inset: 2px;
-  clip-path: var(--hex-bar);
-  background: var(--tier-fill);
-  z-index: 0;
-}
-
-.tier-bar > * {
-  position: relative;
-  z-index: 1;
-}
-
-.tier-bar:hover {
-  transform: translateX(3px);
-  filter: brightness(1.08);
-}
-
-.tier-bar:active {
-  transform: translateX(0) scale(0.99);
-}
-
-/* An outline or box-shadow would be clipped away with the rest of the box, so
-   focus is shown by thickening the rim instead. */
-.tier-bar:focus-visible {
-  outline: none;
-  background: var(--honey);
-}
-
-.tier-bar:focus-visible::before {
-  inset: 5px;
-}
-
-.tier-bar[data-tier="novice"] {
-  --tier-fill: var(--tier-novice-fill);
-  --tier-edge: var(--tier-novice-edge);
-}
-
-.tier-bar[data-tier="easy"] {
-  --tier-fill: var(--tier-easy-fill);
-  --tier-edge: var(--tier-easy-edge);
-}
-
-.tier-bar[data-tier="building"] {
-  --tier-fill: var(--tier-building-fill);
-  --tier-edge: var(--tier-building-edge);
-}
-
-.tier-bar[data-tier="medium"] {
-  --tier-fill: var(--tier-medium-fill);
-  --tier-edge: var(--tier-medium-edge);
-}
-
-.tier-bar[data-tier="advanced"] {
-  --tier-fill: var(--tier-advanced-fill);
-  --tier-edge: var(--tier-advanced-edge);
-}
-
-.tier-bar[data-tier="hard"] {
-  --tier-fill: var(--tier-hard-fill);
-  --tier-edge: var(--tier-hard-edge);
-}
-
-/* Expert takes the honey accent as its actual fill; master goes past it into
-   ember. Both are solid rather than tinted — the visual break that marks the
-   top two tiers apart from the graded six above them. */
-.tier-bar[data-tier="expert"] {
-  --tier-fill: var(--tier-expert-fill);
-  --tier-edge: var(--tier-expert-edge);
-  --tier-ink: var(--tier-expert-ink);
-}
-
-.tier-bar[data-tier="master"] {
-  --tier-fill: var(--tier-master-fill);
-  --tier-edge: var(--tier-master-edge);
-  --tier-ink: var(--tier-master-ink);
-}
-
-.tier-bar-main {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.tier-label {
-  display: block;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 1.1;
-  color: inherit;
-}
-
-.tier-blurb {
-  display: block;
-  font-size: 11px;
-  line-height: 1.2;
-  opacity: 0.78;
-  color: inherit;
-  /* Eight bars means eight blurbs; a wrap would push the stack past a phone
-     screen, so the blurb truncates rather than growing the bar. */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.tier-best {
-  flex: none;
-  font-family: var(--font-display);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  opacity: 0.65;
-  color: inherit;
-  white-space: nowrap;
-}
+/* The rim is the element's own background showing around an inset ::before that
+   carries the fill; a real border would be cut off by the angled ends. */
+.tier-bar::before { content: ""; position: absolute; inset: 2px; clip-path: var(--hex-bar); background: var(--fill); z-index: 0; }
+.tier-bar > * { position: relative; z-index: 1; }
+.tier-bar:hover { transform: translateX(3px); filter: brightness(1.08); }
+.tier-bar:active { transform: translateX(0) scale(0.99); }
+/* An outline or shadow would be clipped with the rest of the box, so focus
+   thickens the rim and turns it the focus colour; the wrapper adds the glow.
+   Three bands, outside in: a moat (the wrapper's ::before, 3px bigger), the 5px
+   focus-colour rim, a 3px moat band, then the fill. The moats keep the rim above
+   3:1 on the Expert bar, whose fill is nearly the focus colour. Measured by
+   design/harness/check-tier-focus.mjs, which has been proven able to fail. */
+:root .tier-wrap .tier-bar:focus-visible { outline: none; box-shadow: none; background: var(--ring); }
+.tier-bar::after { content: ""; position: absolute; inset: 8px; clip-path: var(--hex-bar); background: var(--fill); z-index: 0; display: none; }
+.tier-bar:focus-visible::before { inset: 5px; background: var(--focus-moat); }
+.tier-bar:focus-visible::after { display: block; }
+.tier-bar-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tier-label { display: block; font: 700 1.05rem/1.1 var(--display); color: inherit; }
+/* Eight blurbs: a wrap would push the stack past a phone screen, so it truncates. */
+.tier-blurb { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.8rem; line-height: 1.25; color: var(--ink-2); }
+.tier-best { flex: none; font: 700 0.75rem/1 var(--display); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+/* Expert is the honey accent itself; master goes past it into ember. Solid
+   rather than tinted: the break that sets the top two apart. Both are
+   fixed-colour tokens with their own ink, so they hold in either theme. */
+.tier-bar[data-tier="expert"] { --fill: var(--tier-expert-fill); --rim: var(--tier-expert-edge); --ink: var(--tier-expert-ink); --ink-2: var(--tier-expert-ink); }
+.tier-bar[data-tier="master"] { --fill: var(--tier-master-fill); --rim: var(--tier-master-edge); --ink: var(--tier-master-ink); --ink-2: var(--tier-master-ink); }
+:root[data-theme="light"] .tier-bar { --ink-2: color-mix(in srgb, var(--text) 82%, var(--panel-solid)); --fill: linear-gradient(155deg, color-mix(in srgb, var(--t) 18%, var(--panel-solid)), color-mix(in srgb, var(--t) 30%, var(--panel-solid))); --rim: color-mix(in srgb, var(--t) 70%, var(--panel-solid)); }
+:root[data-theme="light"] .tier-bar[data-tier="expert"] { --fill: var(--tier-expert-fill); --rim: var(--tier-expert-edge); --ink: var(--tier-expert-ink); --ink-2: var(--tier-expert-ink); }
+:root[data-theme="light"] .tier-bar[data-tier="master"] { --fill: var(--tier-master-fill); --rim: var(--tier-master-edge); --ink: var(--tier-master-ink); --ink-2: var(--tier-master-ink); }
 
 /* Round screen */
 .round-screen {
@@ -781,24 +627,14 @@
   .rosette-float { width: 72px; height: 72px; top: -32px; right: -4px; }
 }
 
-/* Shared back link (singleplayer home + lobby) */
+/* Shared back link (singleplayer home + lobby): a pill on the scrim, so its text
+   is never on the bare honeycomb. 24px below: the focus ring (7px moat) and the
+   next panel's drawn outline must not overlap. */
 .back-link {
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 13px;
-  padding: 6px 0;
-  margin-bottom: 12px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 44px;
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-bottom: 24px; padding: 0 14px 0 10px;
+  border: 0; border-radius: var(--r-pill); background: var(--scrim); color: var(--text); font-size: 14px; cursor: pointer;
 }
-
-.back-link:hover {
-  color: var(--honey);
-}
+.back-link:hover { color: var(--accent); }
 
 .sp-home {
   text-align: center;
