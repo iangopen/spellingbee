@@ -649,6 +649,27 @@ Rules this session must keep:
   empty the bar instantly and destroy the information. A `transition` degrades
   to a once-a-second step instead, which is the Session 12 guarantee.
 
+## Next project: avatar maker and three multiplayer modes (spec only)
+
+The spec is `docs/multiplayer-modes-spec.md` (branch `plan/multiplayer-modes`,
+2026-10-04). It covers:
+- an arrow-picker avatar with colour and hat indexes, replacing the 8 bee types;
+- **Dash** (first to 3 round wins), **Hourglass** (a shrinking time bank) and
+  **Spotlight** (one speller, watched live).
+
+Nothing is built. It assumes the redesign has merged first. Before building:
+- Read §9 first: the flagged conflicts and the defaults Ian has not yet
+  confirmed. In particular, a miss in Hourglass is capped at 4 s, and Spotlight
+  keeps lives.
+- Follow §8's stage order. Stage 1 is the `timeout-turn` edge function, which
+  fixes the Elimination gap above.
+- Migrations start at 0021, and each extends the rollback file.
+
+Issues the spec found in TODAY's race, not yet fixed:
+- each client rolls its own random lead-in (`tts.ts`), so players hear phrases
+  of different lengths before the same word;
+- the server-clock sync takes one sample.
+
 ## Naming note
 Local dev folder/npm package name may still say "spelling-race" from
 initial scaffolding — that's cosmetic and doesn't need to match the repo
