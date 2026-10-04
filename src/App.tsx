@@ -7,6 +7,7 @@ import { WobbleFilters } from "./components/ui/WobbleFilters";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { DifficultySelect } from "./components/DifficultySelect";
 import { RoundScreen } from "./components/RoundScreen";
+import { RaceResults } from "./components/RaceResults";
 import { ResultsScreen } from "./components/ResultsScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
 import { WaitingRoom } from "./components/WaitingRoom";
@@ -155,10 +156,11 @@ function App() {
           (mp.extras.mode === "elimination" ? (
             <EliminationResults extras={mp.extras} onLeave={handleLeaveRoom} />
           ) : (
-            <ResultsScreen
-              score={mp.state.score}
-              bestStreak={mp.state.bestStreak}
-              onLeaveRoom={handleLeaveRoom}
+            <RaceResults
+              players={mp.extras.players}
+              currentUserId={mp.extras.currentUserId}
+              tier={mp.state.tier}
+              onLeave={handleLeaveRoom}
             />
           ))}
 

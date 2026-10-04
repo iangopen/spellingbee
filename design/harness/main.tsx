@@ -18,7 +18,8 @@ import { LobbyScreen } from "../../src/components/LobbyScreen";
 import { WaitingRoom } from "../../src/components/WaitingRoom";
 import { TurnScreen } from "../../src/components/TurnScreen";
 import { EliminationResults } from "../../src/components/EliminationResults";
-import { BESTS, MOCK_PLAYERS, elimExtras, spState } from "./mock";
+import { RaceResults } from "../../src/components/RaceResults";
+import { RACE_CLEAR, RACE_TIE, BESTS, MOCK_PLAYERS, elimExtras, spState } from "./mock";
 
 const noop = () => {};
 const params = new URLSearchParams(location.search);
@@ -72,7 +73,8 @@ const SCREENS: Record<string, () => ReactNode> = {
       resultNote="Tomasz won this round"
     />
   ),
-  "race-results": () => <ResultsScreen score={205} bestStreak={5} onLeaveRoom={noop} />,
+  "race-results": () => <RaceResults players={RACE_CLEAR} currentUserId="me" tier="medium" onLeave={noop} />,
+  "race-tie": () => <RaceResults players={RACE_TIE} currentUserId="me" tier="medium" onLeave={noop} />,
   "elim-watch": () => (
     <TurnScreen state={spState("playing", { timeLeft: 10 })} extras={elimExtras()} onSubmit={noop} onLeave={noop} />
   ),

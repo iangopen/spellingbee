@@ -33,7 +33,7 @@ const THEMES = ["dark", "light"];
 const PROTO_DIR = resolve(TARGET === "hybrid" ? "design/prototypes/honey-hybrid" : TARGET === "homemade" ? "design/prototypes/homemade" : "design/prototypes/blue-ribbon-glow");
 const APP_URL = process.env.APP_URL || "http://localhost:5199";
 const APP_SCREENS = ["home", "difficulty", "sp-round", "sp-correct", "sp-incorrect", "sp-results", "settings",
-  "lobby", "waiting-room", "race-round", "race-locked", "race-roundend", "race-results",
+  "lobby", "waiting-room", "race-round", "race-locked", "race-roundend", "race-results", "race-tie",
   "elim-watch", "elim-myturn", "elim-results"];
 
 const RUNS = [];

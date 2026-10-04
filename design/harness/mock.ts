@@ -60,3 +60,10 @@ export function elimExtras(over: Partial<MultiplayerExtras> = {}): MultiplayerEx
     ...over,
   };
 }
+
+// Race results fixtures: a clear winner among three, and a two-way tie for first.
+const row = (player_id: string, display_name: string, score: number, avatar: PlayerRow["avatar"]): PlayerRow => ({
+  room_id: "r", player_id, display_name, score, streak: 0, connected_at: T, lives: 3, is_eliminated: false, turn_order: null, avatar,
+});
+export const RACE_CLEAR: PlayerRow[] = [row("me", "Maya", 205, "bee"), row("p2", "Tomasz", 211, "clover"), row("p3", "Adaeze", 141, "blossom")];
+export const RACE_TIE: PlayerRow[] = [row("me", "Maya", 205, "bee"), row("p2", "Tomasz", 205, "clover"), row("p3", "Adaeze", 141, "blossom")];
