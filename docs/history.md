@@ -110,3 +110,68 @@ which is now noted against the feed.
 
 The Spotlight screen-reader check is now Ian's own NVDA pass, with setup steps
 and a checklist (§8.1).
+
+## 2026-10-04: echo protection and the decisions list (plan/multiplayer-modes)
+
+Docs only. No code, migrations or edge functions were changed.
+
+**Supabase docs read today:**
+- Edge Function invocations are billed "regardless of the response status
+  code";
+- on Free, the quota is 500,000 invocations, and API requests are unlimited;
+- going over a quota brings a notification, a grace period, then possible 402
+  responses, read-only mode or pausing until the next billing cycle;
+- the Realtime per-second cap disconnects connections.
+
+**The spec's echo moved from an edge function to a database RPC.** A rate
+limit inside a function can't stop rejected calls being billed, so the old
+design let one script use up the monthly quota in about 7 hours. The RPC
+spends no invocations.
+
+**Protection** (§4.5.1):
+- user token, room membership, the pre-start window;
+- limits of 8 per round, 120 a minute and 6,000 a day per player, and 64 per
+  round and 900 a minute per room, all under an advisory lock;
+- worst case per month: one guest, 180,000 served calls and 72 MB of egress
+  (1.4%); one hostile room, 1,440,000 calls and 576 MB (11.5%); Edge
+  invocations 0 in both cases.
+
+**New limit:** a host may start at most 60 games a day, so one room playing
+nonstop can't use up the invocation quota (41 days instead of 5).
+
+**Failure behaviour** (§4.5.2): a failed, throttled or disabled echo zeroes
+the credit, and answers never wait on it.
+
+**Runtime switches:** `private.runtime_flags` holds `echo_enabled`,
+`live_feed`, `feed_budget_msgs_per_s` and `multiplayer_open`. Each is flipped
+with one SQL statement, without a deploy.
+
+**402 handling:** players are told multiplayer is resting until next month;
+singleplayer is unaffected.
+
+**Live feed** (§5.3.1): admitted against a 40 msg/s budget at game start,
+before the cap that disconnects every connection, plus a manual off switch.
+New engines must not rewrite unchanged rows, because today's streak reset
+sends about 88 Realtime messages per 8-player round.
+
+**Runbook** (§6.6): a weekly usage check, an estimate query from game rows,
+and a response ladder.
+
+**Tests added:**
+- non-members and outside-window calls rejected with no rows written;
+- every limit throttles;
+- the kill switch works;
+- a zero credit still scores, including when the sample read fails;
+- feed admission;
+- the 60-games cap;
+- the client never awaits the echo;
+- the concurrency limit has a negative control.
+
+**PRIVACY.md wording** for the echo timings is in §5.6.
+
+**§9:**
+- new items C10 and D26 to D31;
+- C1 and D19 reclassified as engineering;
+- 22 items remain Default.
+
+They are listed in plain language in `docs/multiplayer-decisions-for-ian.md`.

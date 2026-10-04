@@ -677,6 +677,22 @@ Timing (§4.5):
 - every game call is pinned to the DB region. Supabase's docs confirm this is
   available, with no plan restriction documented.
 
+The echo is a **database RPC (`public.echo`), not an edge function**, because
+Supabase bills every edge invocation even when it is rejected (third pass,
+2026-10-04). It is protected by:
+- the user token, membership, and the pre-start window;
+- per-player, per-room and per-day limits;
+- a no-deploy kill switch in `private.runtime_flags`.
+
+A failed echo only zeroes the credit and never blocks an answer.
+
+The Spotlight feed is admitted against a 40 msg/s budget, so it can't trip
+the Realtime cap that disconnects every game. §6.6 is the usage and quota
+runbook.
+
+`docs/multiplayer-decisions-for-ian.md` lists, in plain language, the 22 items
+still on their default, for Ian to confirm or change.
+
 Build order (§8):
 1. fixes that stand alone: the `timeout-turn` fast path, multi-sample clock
    sync, the device-independent word start;
