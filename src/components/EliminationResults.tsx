@@ -1,9 +1,10 @@
 import { useRef } from "react";
-import { Trophy } from "lucide-react";
 import { useScreenFocus } from "../hooks/useScreenFocus";
 import type { MultiplayerExtras } from "../hooks/useMultiplayerGame";
 import { AvatarBadge } from "./AvatarPicker";
+import { Rosette } from "./ui/Art";
 import { Button } from "./ui/Button";
+import { Panel, Sticker } from "./ui/Panel";
 
 /**
  * End of an elimination game.
@@ -62,26 +63,35 @@ export function EliminationResults({
   return (
     <div className="elim-results">
       {winner ? (
-        <div className={`champion${iWon ? " mine" : ""}`}>
-          <Trophy size={40} aria-hidden className="champion-cup" />
-          <span className="champion-kicker">{iWon ? "You win" : "Champion"}</span>
-          <span className="champion-name">
-            <AvatarBadge avatar={winner.avatar} size={24} />
-            {winner.display_name}
-          </span>
-          <span className="champion-note">
-            {iWon ? "Last speller standing." : `${winner.display_name} was the last one standing.`}
-          </span>
-        </div>
+        <Panel as="section" className={`winner champion${iWon ? " mine" : ""}`} aria-labelledby="champion-name">
+          <Sticker>Game over</Sticker>
+          <Rosette className="winner-rosette" />
+          <div>
+            <p className="kicker">{iWon ? "You win" : "Champion"}</p>
+            <h1 id="champion-name" className="champion-name">
+              <AvatarBadge avatar={winner.avatar} size={40} />
+              {winner.display_name}
+            </h1>
+            <p>
+              {iWon ? "Last speller standing." : `${winner.display_name} was the last one standing.`}
+            </p>
+          </div>
+        </Panel>
       ) : (
-        <div className="champion">
-          <span className="champion-kicker">Draw</span>
-          <span className="champion-note">The words ran out with nobody ahead.</span>
-        </div>
+        <Panel as="section" className="winner champion draw" aria-labelledby="champion-name">
+          <Sticker>Game over</Sticker>
+          <div>
+            <p className="kicker">Draw</p>
+            <h1 id="champion-name">No winner</h1>
+            <p>The words ran out with nobody ahead.</p>
+          </div>
+        </Panel>
       )}
 
-      <div className="standings">
-        <span className="standings-label">Final standings — by how long you lasted</span>
+      <Panel as="section" className="standings" aria-labelledby="standings-label">
+        <h2 id="standings-label" className="standings-label">
+          Final standings — by how long you lasted
+        </h2>
         <ol>
           {standings.map((p, i) => (
             <li
@@ -89,13 +99,20 @@ export function EliminationResults({
               className={`standing-row${p.player_id === currentUserId ? " you" : ""}`}
             >
               <span className="standing-place">{i + 1}</span>
-              <AvatarBadge avatar={p.avatar} size={16} dimmed={p.is_eliminated} />
-              <span className="standing-name">{p.display_name}</span>
-              <span className="standing-score">{p.score}</span>
+              <AvatarBadge avatar={p.avatar} size={32} dimmed={p.is_eliminated} />
+              <span className="standing-name">
+                {p.display_name}
+                {p.player_id === currentUserId && <span className="standing-you">you</span>}
+              </span>
+              <span className="standing-score">
+                {p.score}
+                <span className="sr-only"> points</span>
+              </span>
             </li>
           ))}
         </ol>
-      </div>
+        <p className="standings-note">Points are shown, but they do not decide the order.</p>
+      </Panel>
 
       <Button ref={primaryRef} variant="primary" onClick={onLeave}>
         Back to lobby
