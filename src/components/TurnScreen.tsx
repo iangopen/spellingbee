@@ -233,7 +233,8 @@ export function TurnScreen({
   if (knockout) {
     return (
       <div className="turn-screen">
-        <div className="knockout" role="alert">
+        <Panel className="knockout" role="alert">
+          <Ghost aria-hidden className="knockout-ghost" />
           <span className="knockout-kicker">You're out</span>
           {knockout.word ? (
             <>
@@ -246,7 +247,7 @@ export function TurnScreen({
           <span className="knockout-note">
             {survivors} player{survivors === 1 ? "" : "s"} still standing — stay and watch.
           </span>
-        </div>
+        </Panel>
       </div>
     );
   }

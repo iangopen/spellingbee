@@ -1,7 +1,7 @@
 // Screenshot harness entry: ?screen=<id>&theme=light|dark
 // Every screen is the real component from src/, handed mock props. The shell
 // markup mirrors App.tsx's <Shell> so layout and the settings launcher match.
-import { StrictMode, type ReactNode } from "react";
+import { StrictMode, useEffect, useState, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { ArrowLeft } from "lucide-react";
 import "../../src/index.css";
@@ -22,6 +22,28 @@ import { RaceResults } from "../../src/components/RaceResults";
 import { RACE_CLEAR, RACE_TIE, BESTS, MOCK_PLAYERS, elimExtras, spState } from "./mock";
 
 const noop = () => {};
+
+// The knockout overlay latches on the TRANSITION of amEliminated, so the mock
+// mounts alive and flips to eliminated, exactly as a Realtime update would.
+function KnockoutDemo() {
+  const [out, setOut] = useState(false);
+  useEffect(() => { const t = window.setTimeout(() => setOut(true), 50); return () => window.clearTimeout(t); }, []);
+  return (
+    <TurnScreen
+      state={spState("playing", { timeLeft: 9 })}
+      extras={elimExtras({
+        amEliminated: out,
+        myLives: out ? 0 : 1,
+        survivors: 2,
+        currentTurnPlayerId: "p2",
+        lastResolvedTurn: { roundNum: 7, word: "rhythm", playerId: "me", outcome: "wrong", responseMs: null } as never,
+        players: MOCK_PLAYERS.map((p) => (p.player_id === "me" && out ? { ...p, lives: 0, is_eliminated: true } : p)),
+      })}
+      onSubmit={noop}
+      onLeave={noop}
+    />
+  );
+}
 const params = new URLSearchParams(location.search);
 const theme = params.get("theme") === "light" ? "light" : "dark";
 // The OS setting is ignored since redesign stage 1, and SettingsPanel re-applies the
@@ -78,6 +100,7 @@ const SCREENS: Record<string, () => ReactNode> = {
   "elim-watch": () => (
     <TurnScreen state={spState("playing", { timeLeft: 10 })} extras={elimExtras()} onSubmit={noop} onLeave={noop} />
   ),
+  "elim-knockout": () => <KnockoutDemo />,
   "elim-myturn": () => (
     <TurnScreen
       state={spState("playing", { timeLeft: 12 })}

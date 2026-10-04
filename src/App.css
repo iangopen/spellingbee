@@ -1098,57 +1098,23 @@
   .turn-screen .answer { padding: 16px 16px 10px; }
 }
 
-/* --- the elimination moment ----------------------------------------------- */
-
-/* A full-screen beat, not a line of feedback text. Losing your last life is the
-   biggest thing that happens to a player in this mode, and a normal wrong
-   answer already uses .feedback.incorrect — this has to be unmistakably
-   different from that. */
+/* --- the elimination moment (stage 4h-2) ----------------------------------
+   A full-screen beat on a panel, not a line of feedback text. Losing your last
+   life is the biggest thing that happens to a player in this mode, and a normal
+   wrong answer already uses .feedback.incorrect: this must be unmistakably
+   different from that. The red comes from the panel's own sketch line and the
+   kicker, never from a fill the text sits on. */
 .knockout {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  min-height: 60vh;
-  justify-content: center;
-  padding: 28px 20px;
-  text-align: center;
-  border: 2px solid var(--bad);
-  border-radius: 18px;
-  background: var(--surface);
-  animation: knockout-in 0.35s ease;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-height: 60vh;
+  padding: 28px 20px; text-align: center; animation: knockout-in 0.35s ease;
 }
-
-@keyframes knockout-in {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-.knockout-kicker {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--bad);
-}
-
-.knockout-label {
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.knockout-word {
-  font-family: var(--font-display);
-  font-size: clamp(1.6rem, 9vw, 2.6rem);
-  font-weight: 700;
-  line-height: 1.1;
-  word-break: break-word;
-  color: var(--text);
-}
-
-.knockout-note { font-size: 0.85rem; color: var(--muted); }
+.knockout::after { border-color: var(--bad); }
+@keyframes knockout-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+.knockout-ghost { width: 56px; height: 56px; color: var(--muted); }
+.knockout-kicker { font: 400 clamp(2.6rem, 9vw, 3.6rem)/1 var(--hand); letter-spacing: 0.012em; color: var(--bad); }
+.knockout-label { font-size: 0.9rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.knockout-word { font: 800 clamp(1.8rem, 9vw, 2.8rem)/1.1 var(--display); word-break: break-word; color: var(--text); }
+.knockout-note { font-size: 1rem; color: var(--muted); }
 
 /* --- elimination results -------------------------------------------------- */
 

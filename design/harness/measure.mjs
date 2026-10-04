@@ -34,7 +34,7 @@ const PROTO_DIR = resolve(TARGET === "hybrid" ? "design/prototypes/honey-hybrid"
 const APP_URL = process.env.APP_URL || "http://localhost:5199";
 const APP_SCREENS = ["home", "difficulty", "sp-round", "sp-correct", "sp-incorrect", "sp-results", "settings",
   "lobby", "waiting-room", "race-round", "race-locked", "race-roundend", "race-results", "race-tie",
-  "elim-watch", "elim-myturn", "elim-results"];
+  "elim-watch", "elim-myturn", "elim-knockout", "elim-results"];
 
 const RUNS = [];
 if (TARGET === "prototype") {
