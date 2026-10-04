@@ -10,6 +10,7 @@ import { useSfxForOutcome } from "../hooks/useSfxForOutcome";
 import { AvatarBadge } from "./AvatarPicker";
 import { TimerBar } from "./TimerBar";
 import { Button } from "./ui/Button";
+import { Panel } from "./ui/Panel";
 import { AnswerField } from "./ui/AnswerField";
 
 // TurnScreen — the elimination round UI.
@@ -264,7 +265,7 @@ export function TurnScreen({
     <div className="turn-screen">
       <div className="round-exit">
         {confirmingExit ? (
-          <div className="exit-confirm">
+          <Panel className="exit-confirm">
             <span className="exit-confirm-text">
               Leave? You forfeit — your turns will time out and cost a life each.
             </span>
@@ -276,7 +277,7 @@ export function TurnScreen({
                 Keep playing
               </Button>
             </div>
-          </div>
+          </Panel>
         ) : (
           <button className="back-link" onClick={() => setConfirmingExit(true)}>
             <ArrowLeft size={15} aria-hidden />
@@ -285,221 +286,204 @@ export function TurnScreen({
         )}
       </div>
 
-      {/* Elimination's own header, and deliberately NOT a relabelled ScoreBar.
-          ScoreBar's "to go" counts down a round budget this mode does not have,
-          and three further things were wrong when this was first written:
-
-          - SCORE is gone. Points do accrue here (apply_turn_outcome awards
-            10 + seconds left, and EliminationResults still shows the totals),
-            but placement in this mode is how long you SURVIVED, not points.
-            A running total is not a number anyone acts on mid-turn, so it does
-            not deserve the most prominent slot.
-          - No two labels repeat. "3 LEFT" (players) sat beside "12s LEFT"
-            (seconds) reading the same word twice, at the exact moment — mid-turn,
-            under a clock — when a glance has to be unambiguous.
-          - STREAK is the table-wide run of correct answers and is the most
-            game-relevant number on the bar, because it is what shortens the
-            next turn. It now sits immediately beside the clock it acts on, and
-            carries a plain-language sub-label saying so.
-
-          The sub-label names no thresholds on purpose. The numbers that trigger
-          the decay live in decay_params() on the server; stating them here would
-          put a copy of the decay contract in a file that cannot see it change.
-          It says what the streak DOES, not when it fires. */}
-      <div className="score-bar turn-stats">
-        <div className="stat">
-          <span className="stat-value">{amEliminated ? "—" : myLives ?? "—"}</span>
-          <span className="stat-label">your lives</span>
+      {/* Elimination's own header, and deliberately NOT a relabelled ScoreBar:
+          ScoreBar's "to go" counts down a round budget this mode does not have.
+          There is no SCORE here (placement is how long you SURVIVED, and a running
+          total is not a number anyone acts on mid-turn), no two labels repeat
+          ("3 LEFT" players beside "12s LEFT" seconds), and the STREAK, the table's
+          run of correct answers that shortens the next turn, sits beside the clock
+          it acts on. Its hint says what the streak DOES, not when it fires: the
+          thresholds live in decay_params() on the server. */}
+      <Panel className="turn-head">
+        <div className="hud">
+          <b>{amEliminated ? "—" : myLives ?? "—"}</b>
+          <span>your lives</span>
         </div>
-        <div className="stat">
-          <span className="stat-value">{survivors}</span>
-          <span className="stat-label">survivors</span>
+        <div className="hud">
+          <b>{survivors}</b>
+          <span>survivors</span>
         </div>
-        <div className="stat">
-          <span className="stat-value">{tableStreak}</span>
-          <span className="stat-label">streak</span>
-          <span className="stat-hint">speeds the clock up</span>
+        <div className="hud">
+          <b>{tableStreak}</b>
+          <span>streak</span>
+          <span className="hud-hint">speeds the clock up</span>
         </div>
-        <div className="stat timer" data-low={state.timeLeft <= 5}>
-          <span className="stat-value">{state.timeLeft}s</span>
-          <span className="stat-label">time left</span>
+        <div className="hud hud-clock" data-low={state.timeLeft <= 5}>
+          <b>{state.timeLeft}s</b>
+          <span>time left</span>
         </div>
-      </div>
+      </Panel>
 
       {/* Who is up. The single most important thing on this screen for the
           players who are not answering. */}
-      <div className={`turn-banner${isMyTurn ? " mine" : ""}`}>
-        {holder && <AvatarBadge avatar={holder.avatar} size={20} />}
+      <Panel className={`turn-banner${isMyTurn ? " mine" : ""}`}>
+        {holder && <AvatarBadge avatar={holder.avatar} size={32} />}
         <span className="turn-banner-name">{holderName}</span>
-      </div>
-
-      {leadIn && <p className="lead-in">{leadIn}</p>}
+      </Panel>
 
       {state.currentWord && (
-        <div className="prompt-card">
-          <p className="definition">"{state.currentWord.definition}"</p>
-          <button className="replay-btn" onClick={() => repeatWord(state.currentWord!.word)}>
-            <Volume2 size={16} aria-hidden />
-            Hear it again
-          </button>
-        </div>
-      )}
-
-      {/* THE INPUT EXISTS ONLY FOR THE TURN HOLDER. Not disabled — absent. */}
-      {isMyTurn ? (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (submitting) return;
-            playSubmit();
-            onSubmit(guess);
-          }}
-        >
-          <AnswerField
-            inputRef={inputRef}
-            value={guess}
-            onChange={(e) => setGuess(e.target.value)}
-            /* Disabled only while MY OWN answer is in flight, and only ever for
-               the turn holder. This is the one place a disabled input is honest:
-               you did something, it is being checked, and a second submission
-               would be refused anyway (already_submitted). It never disables a
-               non-holder — those get no input at all. */
-            disabled={submitting}
-            autoComplete="off"
-            autoCapitalize="off"
-            autoCorrect="off"
-            spellCheck={false}
-            placeholder={submitting ? "" : "Your turn — type the word"}
-          />
-          {/* Acknowledges the keypress during the round trip. Says only that the
-              answer was SENT — never guesses whether it was right. */}
-          {submitting && (
-            <p className="submit-pending" role="status">
-              <Loader2 size={14} aria-hidden className="spin" />
-              Checking…
+        <Panel as="section" className="pronouncer">
+          {leadIn && (
+            <p className="lead-in who">
+              <Volume2 aria-hidden />
+              {leadIn}
             </p>
           )}
-        </form>
-      ) : amEliminated ? (
-        <div ref={statusRef} tabIndex={-1} className="spectating" role="status">
-          <Eye size={16} aria-hidden />
-          <span>
-            You're out — watching {holder ? holder.display_name : "the table"} play it out.
-          </span>
-        </div>
-      ) : (
-        <div ref={statusRef} tabIndex={-1} className="waiting-turn" role="status">
-          <span className="waiting-dots" aria-hidden>
-            <i />
-            <i />
-            <i />
-          </span>
-          <span>
-            {holder ? `${holder.display_name} is spelling…` : "Waiting for the next turn…"}
-          </span>
-        </div>
+          <p className="definition">"{state.currentWord.definition}"</p>
+          <button className="chip-btn" onClick={() => repeatWord(state.currentWord!.word)}>
+            <Volume2 aria-hidden />
+            Hear it again
+          </button>
+        </Panel>
       )}
 
-      <TimerBar wordId={wordId} timeLeft={state.timeLeft} />
-
-      {/* Reserved slot, not a conditional gap.
-          Feedback appears for the ~1.1s server feedback window and then goes
-          again. Letting it insert and remove itself would shove the token row
-          (and, before the reorder, the input) up and down every single turn.
-          A fixed min-height means the turn ends with text APPEARING rather than
-          with the page jumping. It sits directly above the tokens on purpose:
-          "Missed — the word was X" reads straight into the token that just lost
-          a heart. */}
-      <div className="turn-feedback" aria-live="polite">
-        {feedback === "correct" && (
-          <p className="feedback correct">
-            {OUTCOME_LABEL.correct}!
-            {responseDetail && <span className="feedback-detail"> — {responseDetail}</span>}
-          </p>
+      {/* The action, its draining timer (welded to it) and the outcome slot, on one
+          panel. */}
+      <Panel as="section" className="answer">
+        {/* THE INPUT EXISTS ONLY FOR THE TURN HOLDER. Not disabled — absent. */}
+        {isMyTurn ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (submitting) return;
+              playSubmit();
+              onSubmit(guess);
+            }}
+          >
+            <AnswerField
+              inputRef={inputRef}
+              aria-label="Your spelling"
+              value={guess}
+              onChange={(e) => setGuess(e.target.value)}
+              /* Disabled only while MY OWN answer is in flight, and only ever for
+                 the turn holder. This is the one place a disabled input is honest:
+                 you did something, it is being checked, and a second submission
+                 would be refused anyway (already_submitted). It never disables a
+                 non-holder — those get no input at all. */
+              disabled={submitting}
+              autoComplete="off"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder={submitting ? "" : "Your turn — type the word"}
+            />
+            {/* Acknowledges the keypress during the round trip. Says only that the
+                answer was SENT — never guesses whether it was right. */}
+            {submitting && (
+              <p className="submit-pending" role="status">
+                <Loader2 size={14} aria-hidden className="spin" />
+                Checking…
+              </p>
+            )}
+          </form>
+        ) : amEliminated ? (
+          <div ref={statusRef} tabIndex={-1} className="spectating" role="status">
+            <Eye size={16} aria-hidden />
+            <span>
+              You're out — watching {holder ? holder.display_name : "the table"} play it out.
+            </span>
+          </div>
+        ) : (
+          <div ref={statusRef} tabIndex={-1} className="waiting-turn" role="status">
+            <span className="waiting-dots" aria-hidden>
+              <i />
+              <i />
+              <i />
+            </span>
+            <span>
+              {holder ? `${holder.display_name} is spelling…` : "Waiting for the next turn…"}
+            </span>
+          </div>
         )}
-        {feedback === "incorrect" && (
-          <p className="feedback incorrect">
-            {OUTCOME_LABEL[turnOutcome ?? "wrong"]}
-            {lastResolvedTurn?.word ? ` — the word was "${lastResolvedTurn.word}"` : ""}
-          </p>
-        )}
-        {resultNote && <p className="result-note">{resultNote}</p>}
-      </div>
 
-      {/* THE TABLE.
-          Replaces the old vertical name+hearts list. That list was fine at three
-          players and became the tallest thing on the screen at eight, pushing the
-          word itself below the fold — and it sat ABOVE the input, so the thing
-          you act on kept moving as the roster changed.
+        <TimerBar wordId={wordId} timeLeft={state.timeLeft} />
 
-          These are PURELY INFORMATIONAL: no button, no link, no click handler,
-          nothing focusable. So there is no tap target to measure — the row is
-          read, not touched.
+        {/* Reserved slot, not a conditional gap: feedback shows for the ~1.1s
+            server window and goes again, and a fixed height means the turn ends
+            with text APPEARING rather than the page jumping. */}
+        <div className="turn-feedback" aria-live="polite">
+          {feedback === "correct" && (
+            <p className="feedback correct">
+              {OUTCOME_LABEL.correct}!
+              {responseDetail && <span className="feedback-detail"> — {responseDetail}</span>}
+            </p>
+          )}
+          {feedback === "incorrect" && (
+            <p className="feedback incorrect">
+              {OUTCOME_LABEL[turnOutcome ?? "wrong"]}
+              {lastResolvedTurn?.word ? ` — the word was "${lastResolvedTurn.word}"` : ""}
+            </p>
+          )}
+          {resultNote && <p className="result-note">{resultNote}</p>}
+        </div>
+      </Panel>
 
-          Ghost state is driven by `p.is_eliminated`, which is a server column
-          arriving over Realtime. It reads identically on every client, including
-          the ghosted player's own screen; nothing here branches on who is
-          looking, so being out is a fact about the game rather than a private
-          notification. */}
-      <ul className="player-tokens" aria-label="Players at the table">
-        {roster.map((p, i) => {
-          const isTurn = p.player_id === currentTurnPlayerId;
-          const isYou = p.player_id === currentUserId;
-          const label = isYou ? "You" : p.display_name;
-          return (
-            <li
-              key={p.player_id}
-              className={
-                "ptoken" +
-                (p.is_eliminated ? " ghost" : "") +
-                (isTurn ? " active" : "") +
-                (isYou ? " you" : "") +
-                (struck[p.player_id] ? " struck" : "")
-              }
-              aria-label={
-                p.is_eliminated
-                  ? `${label} — out`
-                  : `${label} — ${p.lives} ${p.lives === 1 ? "life" : "lives"}${
-                      isTurn ? (isYou ? ", your turn" : ", their turn") : ""
-                    }`
-              }
-            >
-              <span
-                className="ptoken-disc"
-                /* Staggered so ghosts drift out of phase instead of bobbing in
-                   unison like one object. Index-based, so it is stable across
-                   re-renders and identical on every client. */
-                style={p.is_eliminated ? { animationDelay: `${(i % 4) * 0.55}s` } : undefined}
+      {/* THE TABLE. Purely informational: no button, no link, no click handler,
+          nothing focusable, so there is no tap target to measure. Ghost state is
+          driven by `p.is_eliminated`, a server column arriving over Realtime, so
+          it reads identically on every client, including the ghosted player's own
+          screen: being out is a fact about the game, not a private notification. */}
+      <Panel as="section" className="table-panel">
+        <ul className="player-tokens" aria-label="Players at the table">
+          {roster.map((p, i) => {
+            const isTurn = p.player_id === currentTurnPlayerId;
+            const isYou = p.player_id === currentUserId;
+            const label = isYou ? "You" : p.display_name;
+            return (
+              <li
+                key={p.player_id}
+                className={
+                  "ptoken" +
+                  (p.is_eliminated ? " ghost" : "") +
+                  (isTurn ? " active" : "") +
+                  (isYou ? " you" : "") +
+                  (struck[p.player_id] ? " struck" : "")
+                }
+                aria-label={
+                  p.is_eliminated
+                    ? `${label} — out`
+                    : `${label} — ${p.lives} ${p.lives === 1 ? "life" : "lives"}${
+                        isTurn ? (isYou ? ", your turn" : ", their turn") : ""
+                      }`
+                }
               >
-                {p.is_eliminated ? (
-                  /* A ghost MOTIF, not a ninth avatar. AVATAR_KEYS is untouched
-                     and still the one preset list — this is a state a player is
-                     in, never something anyone can pick. */
-                  <Ghost size={24} aria-hidden className="ptoken-ghost-icon" />
-                ) : (
-                  <AvatarBadge avatar={p.avatar} size={24} />
-                )}
+                <span
+                  className="ptoken-disc"
+                  /* Staggered so ghosts drift out of phase instead of bobbing in
+                     unison. Index-based, so it is stable across re-renders and
+                     identical on every client. */
+                  style={p.is_eliminated ? { animationDelay: `${(i % 4) * 0.55}s` } : undefined}
+                >
+                  {p.is_eliminated ? (
+                    /* A ghost MOTIF, not a ninth avatar. AVATAR_KEYS is untouched
+                       and still the one preset list. */
+                    <Ghost size={26} aria-hidden className="ptoken-ghost-icon" />
+                  ) : (
+                    <AvatarBadge avatar={p.avatar} size={34} />
+                  )}
 
-                {/* The ripple. Remounted by a changing key, because a CSS
-                    animation replays on mount, not on re-render (the Session 12
-                    streak-pulse rule). Purely decorative — the red rim on
-                    .ptoken.struck is the part that carries the meaning. */}
-                {struck[p.player_id] && (
-                  <span key={struck[p.player_id]} className="ptoken-hit" aria-hidden />
-                )}
+                  {/* The ripple: remounted by a changing key, because a CSS
+                      animation replays on mount, not on re-render. Decoration;
+                      the red rim on .ptoken.struck carries the meaning. */}
+                  {struck[p.player_id] && (
+                    <span key={struck[p.player_id]} className="ptoken-hit" aria-hidden />
+                  )}
 
+                </span>
+                <span className="ptoken-name">{label}</span>
+                {/* Lives sit BELOW the disc, not over its rim: a count laid across
+                    the ring has the ring's pixels behind its digits. */}
                 {!p.is_eliminated && (
                   <span className="ptoken-lives" aria-hidden>
-                    <Heart size={9} className="life" />
+                    <Heart size={11} className="life" />
                     {p.lives}
                   </span>
                 )}
-              </span>
-              <span className="ptoken-name">{label}</span>
-            </li>
-          );
-        })}
-      </ul>
+              </li>
+            );
+          })}
+        </ul>
+      </Panel>
     </div>
   );
 }

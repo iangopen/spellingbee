@@ -964,367 +964,138 @@
 }
 .room-mode.elimination { color: var(--life); }
 
-/* --- the turn screen ------------------------------------------------------ */
-
-/* Layout / rhythm.
-   Everything below is scoped under .turn-screen. .prompt-card, .lead-in,
-   .answer-field, .timer-track, .feedback and .result-note are all SHARED with
-   RoundScreen, so an unscoped tweak here would silently move singleplayer and
-   race mode.
-
-   The old version was one flat `gap: 12px` between every child, which is what
-   made the screen read as pieces stacked in build order: the turn banner, the
-   word and the input were all equally far apart, so nothing looked related to
-   anything. Now the gap encodes grouping — tight inside a group, loose between
-   groups — and the reading order is:
+/* --- the turn screen (stage 4h-1) -------------------------------------------
+   Elimination's live screen. Every group is a Panel, so no text sits on the bare
+   honeycomb. The reading order is deliberate (Session 21) and unchanged:
 
      1  HUD          lives / survivors / streak / clock
      2  who is up    the turn banner
-     3  the word     lead-in + definition card          <- the content
-     4  the action   input, or the waiting/spectating panel
-     5  the clock    timer bar, welded to the action above it
-     6  the outcome  reserved feedback slot
-     7  the table    player tokens
+     3  the word      lead-in + definition
+     4  the action    input, or the waiting/spectating line, with its timer bar
+     5  the outcome   the reserved feedback slot
+     6  the table     player tokens
 
-   The action and its timer bar are one unit (6px), per Session 17 — the bar
-   drains under the thing it is timing. The token row therefore goes BELOW the
-   bar rather than between input and bar, which would have split that pair. */
-/* max-width matches .round-screen's 480px, which has been the gameplay column
-   width since the original scaffold. TurnScreen (Session 20) and
-   EliminationResults were written with `width: 100%` and never inherited it, so
-   on a wide viewport they ran edge to edge while singleplayer and race stayed in
-   their column. This is the missing constraint, not a new value: .app-shell is
-   already a centering flex container, so a max-width is all either screen needs. */
-.turn-screen {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  width: 100%;
-  max-width: 480px;
-}
-
-.turn-screen > * { margin-bottom: 14px; }
+   The timer bar stays welded to the action (Session 17: it drains under the thing
+   it is timing), and the feedback slot keeps a fixed height so a turn ends with
+   text appearing rather than the page jumping. Same column width as the round
+   screen. */
+.turn-screen { display: flex; flex-direction: column; width: 100%; max-width: 720px; margin: 0 auto; padding-top: 8px; text-align: center; }
+.turn-screen > * { margin-bottom: 22px; }
 .turn-screen > *:last-child { margin-bottom: 0; }
+.turn-screen .round-exit { margin-bottom: 20px; justify-content: flex-start; }
+.turn-screen .exit-confirm { border: 0; border-radius: var(--hm-r-panel); padding: 12px 16px; text-align: left; }
+.turn-screen .exit-confirm-text { font-size: 14px; color: var(--text); }
 
-/* Group 1 -> 2: the HUD is reference material, so it sits further off. */
-.turn-screen .turn-stats { margin-bottom: 20px; }
+/* the HUD: four readings on one lit pill. The streak is the table-wide run of
+   correct answers, the one number that shortens the next turn, and sits beside
+   the clock it acts on. Its hint names no thresholds on purpose: they live in
+   decay_params() on the server and a copy here would drift. */
+.turn-head { display: grid; grid-template-columns: repeat(4, 1fr); align-items: start; gap: 8px; padding: 12px 20px; border-radius: var(--hm-r-panel); }
+.hud { display: flex; flex-direction: column; align-items: flex-start; text-align: left; font-variant-numeric: tabular-nums; }
+.hud b { font: 800 1.5rem/1.1 var(--display); color: var(--text); }
+.hud span { font-size: 0.8rem; color: var(--muted); }
+.hud .hud-hint { margin-top: 2px; max-width: 12ch; font-size: 0.75rem; line-height: 1.25; }
+.hud-clock { align-items: flex-end; text-align: right; }
+.hud-clock b { font-size: 2rem; }
+.hud-clock[data-low="true"] b { color: var(--bad); }
 
-/* Group 2 -> 3: banner and word belong together — this is one announcement. */
-.turn-screen .turn-banner { margin-bottom: 10px; }
-.turn-screen .lead-in { margin-bottom: 6px; }
-
-/* Group 3 -> 4: the biggest break on the screen. Above it is what you are
-   being asked; below it is what you do about it. */
-.turn-screen .prompt-card { margin-bottom: 18px; }
-
-/* Group 4 + 5 welded: input and its draining bar. */
-.turn-screen form,
-.turn-screen .waiting-turn,
-.turn-screen .spectating { margin-bottom: 6px; }
-
-.turn-screen .timer-track { margin-bottom: 12px; }
-
-/* "Checking…" while my own answer is in flight. Quiet on purpose: it reports
-   that the request left, not what the answer was. */
-.turn-screen .submit-pending {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin: 6px 0 0;
-  font-size: 0.8rem;
-  color: var(--muted);
+/* who is up: the one strong signal for the players who are not answering. Colour
+   is not the only cue: the text says whose turn it is. */
+.turn-banner {
+  display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 16px;
+  font: 700 1.2rem/1.2 var(--display); border-radius: var(--hm-r-btn);
 }
+.turn-banner::after { border-radius: inherit; }
+.turn-banner.mine { color: var(--on-accent); background: var(--accent-fill); animation: turn-pop 0.3s ease; }
+@keyframes turn-pop { from { transform: scale(0.97); } to { transform: scale(1); } }
+.turn-banner-name { font-weight: 800; }
 
+.turn-screen .pronouncer { margin-bottom: 22px; }
+.turn-screen .answer { padding: 22px 22px 12px; }
+.turn-screen .answer form { margin: 0; }
 
-/* The "2.1s, 61 WPM" tail on a correct answer. Lighter than the "Correct!" it
-   extends, because it is detail rather than the verdict — and it is part of the
-   same <p>, not a second feedback element. */
-.feedback-detail {
-  font-weight: 400;
-  font-size: 0.85em;
-  opacity: 0.8;
-}
-
+/* "Checking…" while my own answer is in flight: quiet, it reports that the
+   request left, not what the answer was. */
+.submit-pending { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 8px 0 0; font-size: 0.9rem; color: var(--muted); }
 .spin { animation: spin 0.9s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Four stats since the Session 20 follow-up (SCORE removed — see TurnScreen).
-   Everything here is scoped to .turn-stats: .score-bar / .stat / .stat-label
-   are shared with singleplayer and race mode, which are correct as they are and
-   must not shift. */
-.turn-stats {
-  /* Tops aligned, so the streak's extra sub-label lengthens its own column
-     instead of pushing the other three values out of line. */
-  align-items: flex-start;
+/* Deliberately NOT a disabled input. A non-holder has no input in the DOM at all;
+   this line is what stands in its place, so the page reads as "someone else is
+   up" rather than as a broken form. */
+.waiting-turn, .spectating {
+  display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 60px; padding: 12px 14px;
+  border: 2px dashed var(--edge); border-radius: var(--hm-r-field); background: var(--field); color: var(--text); font-size: 1rem; text-align: center;
 }
+.spectating { border-style: solid; border-color: var(--spectate); color: var(--spectate); }
+.waiting-dots { display: inline-flex; gap: 3px; }
+.waiting-dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--text); animation: waiting-pulse 1.2s ease-in-out infinite; }
+.waiting-dots i:nth-child(2) { animation-delay: 0.15s; }
+.waiting-dots i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes waiting-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-/* The clock is the last item in a space-between row, so right-aligning it keeps
-   the value under its own (wider) label rather than hanging left of it. */
-.turn-stats .stat:last-child { align-items: flex-end; }
-
-/* Sub-label under STREAK. Lower case and quiet: it is an explanation, not a
-   reading, and must not compete with the four numbers. */
-.turn-stats .stat-hint {
-  margin-top: 3px;
-  max-width: 11ch;
-  font-size: 9.5px;
-  line-height: 1.25;
-  color: var(--muted);
-  opacity: 0.8;
-}
-
-.turn-banner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface);
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-}
-
-/* The one strong signal on the page: your turn is honey, everyone else's is
-   quiet. Colour is not the only cue — the text says whose turn it is too. */
-.turn-banner.mine {
-  color: var(--on-honey);
-  background: var(--honey-solid);
-  border-color: var(--honey);
-  animation: turn-pop 0.3s ease;
-}
-
-@keyframes turn-pop {
-  from { transform: scale(0.97); }
-  to { transform: scale(1); }
-}
-
-.turn-banner-name { font-weight: 600; }
-
-/* Reserved outcome slot. Holds the feedback line and the result note for the
-   ~1.1s server feedback window; keeps its height when empty so the token row
-   below does not jump on every single turn resolution. Two short lines is the
+/* Reserved outcome slot: holds the feedback line and the result note for the
+   ~1.1s server window and keeps its height when empty. Two short lines is the
    worst case ("Missed — the word was X" plus "Alex ran out of time"). */
-.turn-screen .turn-feedback {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-  min-height: 44px;
-  text-align: center;
-}
+.turn-feedback { display: flex; flex-direction: column; justify-content: center; gap: 2px; min-height: 52px; text-align: center; }
+.turn-feedback .feedback, .turn-feedback .result-note { margin: 0; }
 
-.turn-screen .turn-feedback .feedback,
-.turn-screen .turn-feedback .result-note { margin: 0; }
-
-/* --- the table: circular player tokens ------------------------------------
-   Replaces the old .lives-roster (a vertical name + hearts list), which grew
-   taller than the word itself at eight players and sat above the input.
-
-   Non-interactive by construction: no button, no link, no tabindex, nothing
-   focusable. There is deliberately no :hover or :focus styling, because
-   suggesting these can be pressed would be a lie.
---------------------------------------------------------------------------- */
-
-.player-tokens {
-  display: flex;
-  flex-wrap: wrap;          /* eight tokens fold to a second row on a phone
-                               rather than sitting in an inner scroller — the
-                               Session 15 objection to hiding content applies */
-  justify-content: center;
-  align-items: flex-start;
-  gap: 10px 14px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ptoken {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  width: 58px;              /* fixed, so a long name cannot widen one column
-                               and stagger the whole row */
-}
-
+/* --- the table: round player tokens -----------------------------------------
+   Purely informational: no button, no link, no tabindex, nothing focusable, and
+   deliberately no :hover or :focus styling, because suggesting they can be
+   pressed would be a lie. Eight tokens fold to a second row on a phone rather
+   than sitting in an inner scroller (the Session 15 objection to hiding content). */
+.table-panel { padding: 18px 16px 14px; }
+.player-tokens { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 12px 14px; margin: 0; padding: 0; list-style: none; }
+.ptoken { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 64px; }
 .ptoken-disc {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  color: var(--honey);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  position: relative; display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%;
+  background: var(--panel-solid); border: 2px solid var(--edge);
   transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
-
-.ptoken-name {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.68rem;
-  line-height: 1.2;
-  color: var(--muted);
-}
-
-/* Whose turn — the honey ring plus a halo, the same accent the turn banner and
-   the selected-avatar tile already use, so "active" reads the same everywhere. */
-.ptoken.active .ptoken-disc {
-  border-color: var(--honey);
-  box-shadow: 0 0 0 2px var(--honey), 0 0 14px var(--honey-glow);
-  transform: translateY(-2px);
-}
-
-.ptoken.active .ptoken-name { color: var(--honey); font-weight: 600; }
-
-/* You. The label already reads "You" rather than your own name, which is the
-   unambiguous version of the old .tag-you pill and costs no extra chrome; this
-   just keeps it from reading as another player's name. */
+.ptoken-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.8rem; line-height: 1.2; color: var(--muted); }
+/* whose turn: the honey ring plus a halo, the accent the banner and the selected
+   avatar tile use too, so "active" reads the same everywhere */
+.ptoken.active .ptoken-disc { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent), 0 0 14px var(--glow-accent); transform: translateY(-2px); }
+.ptoken.active .ptoken-name { color: var(--accent); font-weight: 700; }
 .ptoken.you .ptoken-name { color: var(--text); }
-.ptoken.you.active .ptoken-name { color: var(--honey); }
-
-/* Lives, compact enough for a 46px circle: one heart and a count, not a row of
-   heart icons. The old list had the width for a row; a token does not. */
-.ptoken-lives {
-  position: absolute;
-  right: -3px;
-  bottom: -3px;
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  padding: 1px 4px;
-  border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  font-size: 0.6rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--text);
-}
-
+.ptoken.you.active .ptoken-name { color: var(--accent); }
+/* lives: one heart and a count under the name */
+.ptoken-lives { display: inline-flex; align-items: center; gap: 3px; font-size: 0.85rem; font-weight: 700; line-height: 1; color: var(--text); }
 .ptoken-lives .life { color: var(--life); fill: var(--life); }
 
-/* --- life lost (Session 22) ----------------------------------------------
-   A smaller, more frequent beat than the knockout overlay: it fires on every
-   miss and every timeout, for whichever player it happened to.
-
-   TWO LAYERS, and the split is what makes reduce-motion safe:
-     - the RIM below is a plain static declaration, so it is unaffected by the
-       global reduce-motion block and stays visible for the whole ~700ms the
-       .struck class is held by TurnScreen's JS timer;
-     - the ripple is a CSS animation layered on top, pure decoration.
-   Under reduce-motion the ripple collapses to nothing and the rim alone still
-   says "this player just lost a life" — the same guarantee the ghost drift has.
-------------------------------------------------------------------------- */
-.ptoken.struck .ptoken-disc {
-  border-color: var(--life);
-  box-shadow: 0 0 0 2px var(--life);
-}
-
-/* The turn ring and the life-loss rim can coincide (you miss on your own turn).
-   Life loss is the newer, louder event, so it wins the rim; the honey halo
-   stays underneath so you can still see whose turn it is. */
-.ptoken.struck.active .ptoken-disc {
-  box-shadow: 0 0 0 2px var(--life), 0 0 14px var(--honey-glow);
-}
-
-.ptoken.struck .ptoken-lives {
-  border-color: var(--life);
-  color: var(--life);
-}
-
-.ptoken-hit {
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  border: 2px solid var(--life);
-  pointer-events: none;
-  animation: life-hit 0.6s ease-out;
-}
-
-@keyframes life-hit {
-  from { opacity: 0.9; transform: scale(0.82); }
-  to   { opacity: 0;   transform: scale(1.35); }
-}
+/* --- life lost (Session 22): TWO LAYERS, and the split is what makes reduce-motion
+   safe. The RIM is a plain static declaration, so it is unaffected by the global
+   reduce-motion block and stays visible for the whole ~700ms the .struck class is
+   held by TurnScreen's JS timer; the ripple is an animation on top, decoration. */
+.ptoken.struck .ptoken-disc { border-color: var(--life); box-shadow: 0 0 0 2px var(--life); }
+.ptoken.struck.active .ptoken-disc { box-shadow: 0 0 0 2px var(--life), 0 0 14px var(--glow-accent); }
+.ptoken-hit { position: absolute; inset: -4px; border-radius: 50%; border: 2px solid var(--life); pointer-events: none; animation: life-hit 0.6s ease-out; }
+@keyframes life-hit { from { opacity: 0.9; transform: scale(0.82); } to { opacity: 0; transform: scale(1.35); } }
 
 /* --- ghost state ---------------------------------------------------------
    Not just a dimmed avatar: the glyph is SWAPPED for a ghost, the disc goes
-   translucent and dashed, and the colour drops to --out. The drift below is
-   decoration on top of all of that, which is what makes it safe to switch off.
-------------------------------------------------------------------------- */
+   translucent and dashed, and the ring drops to --out. The drift is decoration on
+   top; the desaturation is a filter, so the ghost stays distinct with motion off.
+   The NAME stays at full reading contrast (it is struck through, and the
+   aria-label says "out"): --out is a state colour for the disc, not for text,
+   which is what measured 2.88:1 before. */
 .ptoken.ghost .ptoken-disc {
-  color: var(--out);
-  background: transparent;
-  border-style: dashed;
-  border-color: var(--out);
-  opacity: 0.65;
-  /* Desaturation is a filter, not an animation, so it survives reduce-motion —
-     the ghost stays visually distinct when the drift is suppressed. */
-  filter: grayscale(0.85);
+  color: var(--out); background: transparent; border-style: dashed; border-color: var(--out); opacity: 0.8; filter: grayscale(0.85);
   animation: ghost-drift 3.2s ease-in-out infinite;
 }
+.ptoken.ghost .ptoken-name { color: var(--muted); text-decoration: line-through; }
+/* Resting state is transform: none, exactly what .ptoken-disc already has, so when
+   the reduce-motion block collapses this to 0.001ms with one iteration and no
+   fill-mode, the disc reverts to that same position: suppression cannot strand a
+   ghost mid-drift. */
+@keyframes ghost-drift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3.5px); } }
 
-.ptoken.ghost .ptoken-name {
-  color: var(--out);
-  text-decoration: line-through;
-}
-
-/* Resting state is transform: none, which is exactly what .ptoken-disc already
-   has. So when the global reduce-motion block collapses this to 0.001ms with
-   one iteration and no fill-mode, the disc reverts to that same resting
-   position — suppression cannot strand a ghost mid-drift. */
-@keyframes ghost-drift {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-3.5px); }
-}
-
-/* --- waiting / spectating ------------------------------------------------- */
-
-/* Deliberately NOT a disabled input. A non-holder has no input in the DOM at
-   all; this panel is what stands in its place, so the page reads as "someone
-   else is up" rather than as a broken form. */
-.waiting-turn,
-.spectating {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 52px;
-  padding: 12px 14px;
-  border: 1px dashed var(--border);
-  border-radius: 12px;
-  background: var(--surface);
-  color: var(--muted);
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-.spectating {
-  border-style: solid;
-  border-color: var(--spectate);
-  color: var(--spectate);
-}
-
-.waiting-dots { display: inline-flex; gap: 3px; }
-.waiting-dots i {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--muted);
-  animation: waiting-pulse 1.2s ease-in-out infinite;
-}
-.waiting-dots i:nth-child(2) { animation-delay: 0.15s; }
-.waiting-dots i:nth-child(3) { animation-delay: 0.3s; }
-
-@keyframes waiting-pulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
+@media (max-width: 760px) {
+  .turn-head { grid-template-columns: repeat(2, 1fr) repeat(2, auto); padding: 10px 14px; gap: 6px; }
+  .hud b { font-size: 1.25rem; }
+  .hud-clock b { font-size: 1.7rem; }
+  .turn-screen .answer { padding: 16px 16px 10px; }
 }
 
 /* --- the elimination moment ----------------------------------------------- */
@@ -1627,3 +1398,7 @@
   .lobby-you, .lobby-create, .lobby-join { padding: 20px; }
   .room-code { font-size: 2.1rem; }
 }
+
+/* The "2.1s, 61 WPM" tail on a correct answer: detail, not the verdict, and part
+   of the same <p> as "Correct!", never a second feedback element. */
+.feedback-detail { font-weight: 400; font-size: 0.85em; color: var(--muted); }
