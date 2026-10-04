@@ -38,6 +38,8 @@ import {
   setSfxVolume as persistSfxVolume,
 } from "../lib/storage";
 import { DISPLAY_NAME_MAX } from "../lib/displayName";
+import { Button } from "./ui/Button";
+import { Select, TextInput } from "./ui/TextInput";
 
 // The one place for genuinely global, cross-cutting preferences. It absorbed
 // Session 11's standalone VoiceSettings and Session 12's floating ThemeToggle,
@@ -228,8 +230,7 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
               <h3 className="settings-section-title">Player</h3>
               <label className="field">
                 <span className="field-label">Display name</span>
-                <input
-                  className="text-input"
+                <TextInput
                   value={name}
                   onChange={(e) => changeName(e.target.value)}
                   maxLength={DISPLAY_NAME_MAX}
@@ -263,8 +264,7 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
                       <span className="field-label">
                         Voice {selectedVoice === "" && auto ? `(auto: ${auto.name})` : ""}
                       </span>
-                      <select
-                        className="text-input"
+                      <Select
                         value={selectedVoice}
                         onChange={(e) => chooseVoice(e.target.value)}
                       >
@@ -274,7 +274,7 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
                             {v.name} ({v.lang}){v.localService ? "" : " · online"}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                     </label>
                   )}
 
@@ -304,22 +304,21 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
                     />
                   </label>
 
-                  <button className="secondary-btn" onClick={() => speakSample()}>
-                    <Play size={14} aria-hidden />
+                  <Button size="sm" icon={<Play size={14} aria-hidden />} onClick={() => speakSample()}>
                     Test voice
-                  </button>
+                  </Button>
 
                   {selectedVoice !== "" && (
-                    <button
-                      className="secondary-btn"
+                    <Button
+                      size="sm"
+                      icon={<RotateCcw size={14} aria-hidden />}
                       onClick={() => {
                         setSelectedVoice("");
                         setVoiceOverride(null);
                       }}
                     >
-                      <RotateCcw size={14} aria-hidden />
                       Reset to automatic
-                    </button>
+                    </Button>
                   )}
                 </>
               )}
@@ -367,10 +366,9 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
                     />
                   </label>
 
-                  <button className="secondary-btn" onClick={() => playPreview()}>
-                    <Play size={14} aria-hidden />
+                  <Button size="sm" icon={<Play size={14} aria-hidden />} onClick={() => playPreview()}>
                     Test sound
-                  </button>
+                  </Button>
                 </>
               )}
             </section>
@@ -420,9 +418,9 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
               <h3 className="settings-section-title">Data</h3>
 
               {!confirmingReset && !resetDone && (
-                <button className="danger-btn" onClick={() => setConfirmingReset(true)}>
+                <Button variant="danger" size="sm" onClick={() => setConfirmingReset(true)}>
                   Reset best scores
-                </button>
+                </Button>
               )}
 
               {confirmingReset && (
@@ -431,12 +429,12 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
                     This clears your best score for all four difficulties. It can't be undone.
                   </p>
                   <div className="confirm-actions">
-                    <button className="danger-btn" onClick={doReset}>
+                    <Button variant="danger" size="sm" onClick={doReset}>
                       Yes, reset them
-                    </button>
-                    <button className="secondary-btn" onClick={() => setConfirmingReset(false)}>
+                    </Button>
+                    <Button size="sm" onClick={() => setConfirmingReset(false)}>
                       Cancel
-                    </button>
+                    </Button>
                   </div>
                 </div>
               )}

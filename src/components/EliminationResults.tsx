@@ -3,6 +3,7 @@ import { Trophy } from "lucide-react";
 import { useScreenFocus } from "../hooks/useScreenFocus";
 import type { MultiplayerExtras } from "../hooks/useMultiplayerGame";
 import { AvatarBadge } from "./AvatarPicker";
+import { Button } from "./ui/Button";
 
 /**
  * End of an elimination game.
@@ -96,9 +97,9 @@ export function EliminationResults({
         </ol>
       </div>
 
-      <button ref={primaryRef} className="primary-btn" onClick={onLeave}>
+      <Button ref={primaryRef} variant="primary" onClick={onLeave}>
         Back to lobby
-      </button>
+      </Button>
     </div>
   );
 }

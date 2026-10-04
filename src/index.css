@@ -1,5 +1,6 @@
 @import './fonts.css';
 @import './honeycomb.css';
+@import './ui.css';
 
 /* ---------------------------------------------------------------------------
    Theme tokens (redesign stage 1).
@@ -57,6 +58,7 @@
 
   /* bee art: a honey bee with cocoa bands */
   --bee-body: #f0b24c; --bee-stripe: #2a2013; --bee-wing: rgba(255, 246, 228, 0.75); --bee-line: #1a1410; --bee-cheek: #ff9fb2;
+  --bee-eye: #fffdf8; --bee-leaf: #6fd49e;
 
   --shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.8);
 
@@ -64,10 +66,10 @@
   --sketch: rgba(244, 196, 110, 0.66); --sketch-faint: rgba(244, 196, 110, 0.32);
   --ink-shadow: rgba(6, 4, 1, 0.75);
   --paper-shadow: 0 14px 30px -18px rgba(0, 0, 0, 0.75);
-  --sticker-bg: #e8a63d; --sticker-ink: #1a1610;
-  --tape: rgba(232, 166, 61, 0.62); --tape-line: rgba(255, 236, 190, 0.5);
+  --sticker-bg: #e8a63d; --sticker-ink: #1a1610; --sticker-line: rgba(26, 22, 16, 0.3);
+  --btn-sheen: rgba(255, 244, 220, 0.14);
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.62' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .9 0 0 0 0 .72 1.2 0 0 0 -.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  --grain-bg-opacity: 0.16; --grain-panel-opacity: 0;
+  --grain-bg-opacity: 0.16;
 
   /* type, radius, motion (not themed, so they live on :root only) */
   --display: 'Bricolage Grotesque', system-ui, sans-serif;
@@ -148,14 +150,15 @@
   --t-advanced: #c0722a; --t-hard: #b95a22; --t-expert: #e09a2c; --t-master: #b8471a;
 
   --bee-body: #eaa640; --bee-stripe: #2c2419; --bee-wing: rgba(255, 255, 255, 0.85); --bee-line: #2c2419; --bee-cheek: #ff9fb2;
+  --bee-eye: #fffdf8; --bee-leaf: #4fae7c;
 
   --shadow: 0 18px 40px -22px rgba(120, 80, 20, 0.35);
 
   --sketch: rgba(122, 75, 8, 0.6); --sketch-faint: rgba(122, 75, 8, 0.3);
   --ink-shadow: rgba(122, 75, 8, 0.2);
   --paper-shadow: 0 12px 26px -16px rgba(120, 80, 20, 0.45);
-  --sticker-bg: #e09a2c; --sticker-ink: #2b2115;
-  --tape: rgba(224, 154, 44, 0.6); --tape-line: rgba(255, 255, 255, 0.55);
+  --sticker-bg: #e09a2c; --sticker-ink: #2b2115; --sticker-line: rgba(26, 22, 16, 0.3);
+  --btn-sheen: rgba(255, 244, 220, 0.14);
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.62' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .42 0 0 0 0 .27 0 0 0 0 .08 1.2 0 0 0 -.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 
   --life: #b4423a;

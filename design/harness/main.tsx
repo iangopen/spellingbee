@@ -8,6 +8,7 @@ import "../../src/index.css";
 import "../../src/App.css";
 import { applyTheme, setStoredTheme } from "../../src/lib/theme";
 import { HoneycombBackground } from "../../src/components/HoneycombBackground";
+import { WobbleFilters } from "../../src/components/ui/WobbleFilters";
 import { SettingsPanel } from "../../src/components/SettingsPanel";
 import { ModeSelect } from "../../src/components/ModeSelect";
 import { DifficultySelect } from "../../src/components/DifficultySelect";
@@ -103,6 +104,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <div className="app-shell">
       <HoneycombBackground />
+      <WobbleFilters />
       <SettingsPanel />
       {render()}
     </div>

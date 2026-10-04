@@ -26,6 +26,8 @@ import { DISPLAY_NAME_MAX, displayNameProblemText, validateDisplayName } from ".
 import { friendlyRoomError } from "../lib/roomErrors";
 
 import { TIERS, TIER_META } from "../lib/tiers";
+import { Button } from "./ui/Button";
+import { Select, TextInput } from "./ui/TextInput";
 
 // The lobby now only gets you INTO a room; the room itself (waiting room, then
 // the game) is owned by App, which runs useMultiplayerGame for it. That keeps
@@ -167,8 +169,7 @@ export function LobbyScreen({
 
       <label className="field">
         <span className="field-label">Your name</span>
-        <input
-          className="text-input"
+        <TextInput
           value={name}
           onChange={(e) => setName(e.target.value)}
           maxLength={DISPLAY_NAME_MAX}
@@ -213,15 +214,14 @@ export function LobbyScreen({
 
         <label className="field">
           <span className="field-label">Difficulty</span>
-          <select
-            className="text-input"
+          <Select
             value={tier}
             onChange={(e) => setTier(e.target.value as DifficultyTier)}
           >
             {TIERS.map((t) => (
               <option key={t.id} value={t.id}>{t.label}</option>
             ))}
-          </select>
+          </Select>
         </label>
 
         {/* Only for elimination: a race room has a lives_setting column but the
@@ -230,8 +230,7 @@ export function LobbyScreen({
         {mode === "elimination" && (
           <label className="field">
             <span className="field-label">Lives each</span>
-            <select
-              className="text-input"
+            <Select
               value={lives}
               onChange={(e) => setLives(Number(e.target.value))}
             >
@@ -243,17 +242,18 @@ export function LobbyScreen({
                   </option>
                 )
               )}
-            </select>
+            </Select>
           </label>
         )}
 
-        <button
-          className="primary-btn"
+        <Button
+          variant="primary"
+          className="btn-block"
           onClick={handleCreate}
           disabled={!nameOk || busy !== null}
         >
           {busy === "create" ? "Creating…" : "Create room"}
-        </button>
+        </Button>
       </div>
 
       <div className="lobby-divider">or</div>
@@ -262,8 +262,8 @@ export function LobbyScreen({
         <h3>Join a room</h3>
         <label className="field">
           <span className="field-label">Room code</span>
-          <input
-            className="text-input code-input"
+          <TextInput
+            className="code-input"
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             maxLength={6}
@@ -296,13 +296,14 @@ export function LobbyScreen({
           <p className="hint">No open room with that code.</p>
         )}
 
-        <button
-          className="primary-btn"
+        <Button
+          variant="primary"
+          className="btn-block"
           onClick={handleJoin}
           disabled={!nameOk || trimmedCode.length === 0 || busy !== null}
         >
           {busy === "join" ? "Joining…" : "Join room"}
-        </button>
+        </Button>
       </div>
 
       {!nameCheck.ok && <p className="hint">{displayNameProblemText(nameCheck.problem)}</p>}

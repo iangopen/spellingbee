@@ -18,6 +18,7 @@ import { AvatarBadge, AvatarPicker } from "./AvatarPicker";
 
 import { TIER_META } from "../lib/tiers";
 import { useScreenFocus } from "../hooks/useScreenFocus";
+import { Button } from "./ui/Button";
 
 export function WaitingRoom({
   room,
@@ -172,9 +173,9 @@ export function WaitingRoom({
 
       {isHost && (
         <div className="host-controls">
-          <button className="primary-btn" onClick={handleStart} disabled={!canStart || starting}>
+          <Button variant="primary" className="btn-block" onClick={handleStart} disabled={!canStart || starting}>
             {starting ? "Starting…" : "Start game"}
-          </button>
+          </Button>
           {!canStart && (
             <p className="hint">Waiting for at least 2 players to start.</p>
           )}

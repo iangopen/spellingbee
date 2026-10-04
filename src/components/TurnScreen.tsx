@@ -9,6 +9,8 @@ import { useAnnouncedWord } from "../hooks/useAnnouncedWord";
 import { useSfxForOutcome } from "../hooks/useSfxForOutcome";
 import { AvatarBadge } from "./AvatarPicker";
 import { TimerBar } from "./TimerBar";
+import { Button } from "./ui/Button";
+import { AnswerField } from "./ui/AnswerField";
 
 // TurnScreen — the elimination round UI.
 //
@@ -267,12 +269,12 @@ export function TurnScreen({
               Leave? You forfeit — your turns will time out and cost a life each.
             </span>
             <div className="exit-confirm-actions">
-              <button className="danger-btn" onClick={handleLeave}>
+              <Button variant="danger" size="sm" onClick={handleLeave}>
                 Leave game
-              </button>
-              <button className="secondary-btn" onClick={() => setConfirmingExit(false)}>
+              </Button>
+              <Button size="sm" onClick={() => setConfirmingExit(false)}>
                 Keep playing
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
@@ -353,9 +355,8 @@ export function TurnScreen({
             onSubmit(guess);
           }}
         >
-          <input
-            ref={inputRef}
-            className="guess-input"
+          <AnswerField
+            inputRef={inputRef}
             value={guess}
             onChange={(e) => setGuess(e.target.value)}
             /* Disabled only while MY OWN answer is in flight, and only ever for

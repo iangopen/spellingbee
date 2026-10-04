@@ -355,35 +355,6 @@
   border-color: var(--honey);
 }
 
-.guess-input {
-  width: 100%;
-  font-family: var(--font-display);
-  font-size: 24px;
-  text-align: center;
-  padding: 14px;
-  border-radius: 10px;
-  border: 2px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  outline: none;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.guess-input:focus {
-  border-color: var(--honey);
-}
-
-.guess-input.correct {
-  border-color: var(--good);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--good) 22%, transparent);
-  animation: pop 0.34s ease-out;
-}
-
-.guess-input.incorrect {
-  border-color: var(--bad);
-  animation: shake 0.4s ease-out;
-}
-
 /* ---------------------------------------------------------------------------
    Draining timer bar (Session 17).
 
@@ -652,23 +623,6 @@
 }
 
 /* Destructive action + its in-panel confirm step */
-.danger-btn {
-  min-height: 44px;
-  padding: 8px 16px;
-  border-radius: 10px;
-  border: 1px solid var(--bad);
-  background: none;
-  color: var(--bad);
-  font-family: var(--font-body);
-  font-size: 14px;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-
-.danger-btn:hover {
-  background: var(--bad);
-  color: var(--bg);
-}
-
 .confirm-block {
   border: 1px solid var(--bad);
   border-radius: 10px;
@@ -684,32 +638,6 @@
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 10px;
-}
-
-.settings-section .secondary-btn {
-  margin-right: 8px;
-  margin-top: 4px;
-}
-
-.secondary-btn {
-  background: none;
-  border: 1px solid var(--honey-dark);
-  border-radius: 10px;
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 14px;
-  padding: 8px 14px;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  cursor: pointer;
-  transition: border-color 0.15s ease;
-}
-
-.secondary-btn:hover {
-  border-color: var(--honey);
 }
 
 /* Hide-definition mode: a muted placeholder keeps the prompt card's shape and
@@ -767,20 +695,6 @@
   margin-left: auto;
 }
 
-.skip-btn {
-  margin-top: 16px;
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 13px;
-  text-decoration: underline;
-  min-height: 44px;
-  padding: 0 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* Results screen */
 .results-screen {
   text-align: center;
@@ -813,40 +727,6 @@
   align-items: center;
 }
 
-.primary-btn {
-  background: var(--honey-solid);
-  color: var(--on-honey);
-  border: none;
-  border-radius: 8px;
-  padding: 12px 28px;
-  min-height: 44px;
-  font-weight: 500;
-  font-size: 15px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: filter 0.15s ease;
-}
-
-.primary-btn:hover:not(:disabled) {
-  filter: brightness(1.07);
-}
-
-.ghost-btn {
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 13px;
-  text-decoration: underline;
-  min-height: 44px;
-  padding: 0 12px;
-}
-
-.ghost-btn:hover {
-  color: var(--honey);
-}
-
 /* Mode select */
 .mode-select {
   text-align: center;
@@ -876,12 +756,6 @@
   color: var(--muted);
   text-decoration: underline;
   text-underline-offset: 3px;
-}
-
-.mode-footer a:focus-visible {
-  outline: 2px solid var(--honey);
-  outline-offset: 2px;
-  border-radius: 4px;
 }
 
 .mode-grid {
@@ -1021,31 +895,8 @@
   margin-bottom: 6px;
 }
 
-.text-input {
-  width: 100%;
-  font-size: 16px;
-  padding: 12px;
-  min-height: 44px;
-  border-radius: 8px;
-  /* --field-edge, not --border: --border is 1.3-1.5:1 and would leave the
-     field with no visible boundary (WCAG 1.4.11 wants 3:1). */
-  border: 2px solid var(--field-edge);
-  background: var(--bg);
-  color: var(--text);
-  outline: none;
-}
-
 /* The resting edge is close to honey in lightness, so a border colour change
    alone is too weak a focus cue; the outline carries it. */
-.text-input:focus {
-  border-color: var(--honey);
-}
-
-.text-input:focus-visible {
-  outline: 2px solid var(--honey);
-  outline-offset: 2px;
-}
-
 .code-input {
   font-family: var(--font-display);
   letter-spacing: 0.2em;
@@ -1060,10 +911,6 @@
   padding: 18px;
   margin-bottom: 12px;
   box-shadow: var(--shadow);
-}
-
-.lobby-panel .primary-btn {
-  width: 100%;
 }
 
 .lobby-divider {
@@ -1182,18 +1029,9 @@
   padding: 12px 0;
 }
 
-.host-controls .primary-btn {
-  width: 100%;
-}
-
 /* Applies everywhere, not just the host controls: the lobby's Create/Join
    buttons are disabled until a name is entered and were rendering at full
    strength, reading as tappable when they aren't. */
-.primary-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .start-msg {
   color: var(--bad);
   font-size: 13px;
@@ -1263,14 +1101,11 @@
 .avatar-option:hover { color: var(--text); transform: translateY(-1px); }
 
 .avatar-option.selected {
-  color: var(--on-honey);
-  background: var(--honey-solid);
-  border-color: var(--honey);
-}
-
-.avatar-option:focus-visible {
-  outline: 2px solid var(--honey);
-  outline-offset: 2px;
+  /* The art is multi-coloured, so selection is a thick honey edge and a halo,
+     not the old honey fill the drawing would vanish into. */
+  background: var(--panel-solid);
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 14px -2px var(--glow-accent);
 }
 
 .avatar-badge {
@@ -1280,7 +1115,6 @@
   color: var(--honey);
 }
 
-.avatar-badge.dimmed { color: var(--out); }
 
 /* --- lobby: mode toggle + room preview ------------------------------------ */
 
@@ -1308,7 +1142,6 @@
 }
 
 .mode-option.selected { border-color: var(--honey); background: var(--bg); }
-.mode-option:focus-visible { outline: 2px solid var(--honey); outline-offset: 2px; }
 
 .mode-name { font-family: var(--font-display); font-weight: 600; font-size: 0.95rem; }
 .mode-blurb { font-size: 0.72rem; line-height: 1.3; color: var(--muted); }
@@ -1342,7 +1175,7 @@
 
 /* Layout / rhythm.
    Everything below is scoped under .turn-screen. .prompt-card, .lead-in,
-   .guess-input, .timer-track, .feedback and .result-note are all SHARED with
+   .answer-field, .timer-track, .feedback and .result-note are all SHARED with
    RoundScreen, so an unscoped tweak here would silently move singleplayer and
    race mode.
 
@@ -1410,7 +1243,6 @@
   color: var(--muted);
 }
 
-.turn-screen .guess-input:disabled { opacity: 0.7; }
 
 /* The "2.1s, 61 WPM" tail on a correct answer. Lighter than the "Correct!" it
    extends, because it is detail rather than the verdict — and it is part of the
@@ -1856,3 +1688,9 @@
 }
 
 .standing-score { flex: none; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Buttons, fields and the answer field live in ui.css (redesign stage 3). The
+   few layout nudges that belong to a screen stay here. */
+.skip-btn { margin-top: 16px; }
+.settings-section .btn { margin-right: 8px; margin-top: 4px; }
+.avatar-badge.dimmed { filter: grayscale(1); opacity: 0.65; }

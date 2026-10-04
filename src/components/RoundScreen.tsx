@@ -9,6 +9,8 @@ import { useAnnouncedWord } from "../hooks/useAnnouncedWord";
 import { useSfxForOutcome } from "../hooks/useSfxForOutcome";
 import { ScoreBar } from "./ScoreBar";
 import { TimerBar } from "./TimerBar";
+import { Button } from "./ui/Button";
+import { AnswerField } from "./ui/AnswerField";
 
 /** Unlock a submitted answer that never got a verdict (the request failed). */
 const PENDING_TIMEOUT_MS = 5000;
@@ -115,12 +117,12 @@ export function RoundScreen({
             <div className="exit-confirm">
               <span className="exit-confirm-text">Quit? This game won't be scored.</span>
               <div className="exit-confirm-actions">
-                <button className="danger-btn" onClick={handleExit}>
+                <Button variant="danger" size="sm" onClick={handleExit}>
                   Quit game
-                </button>
-                <button className="secondary-btn" onClick={() => setConfirmingExit(false)}>
+                </Button>
+                <Button size="sm" onClick={() => setConfirmingExit(false)}>
                   Keep playing
-                </button>
+                </Button>
               </div>
             </div>
           ) : (
@@ -184,9 +186,9 @@ export function RoundScreen({
           onSubmit(guess);
         }}
       >
-        <input
-          ref={inputRef}
-          className={`guess-input ${feedback ?? ""}`}
+        <AnswerField
+          inputRef={inputRef}
+          state={feedback}
           value={guess}
           onChange={(e) => setGuess(e.target.value)}
           onFocus={scrollInputIntoView}
@@ -235,7 +237,8 @@ export function RoundScreen({
       {!awaitingOthers && resultNote && <p className="result-note">{resultNote}</p>}
 
       {state.status === "playing" && canSkip && (
-        <button
+        <Button
+          variant="text"
           className="skip-btn"
           onClick={() => {
             onSkip();
@@ -245,7 +248,7 @@ export function RoundScreen({
           }}
         >
           Skip
-        </button>
+        </Button>
       )}
     </div>
   );

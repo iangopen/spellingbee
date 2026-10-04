@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import "./App.css";
 import { ModeSelect } from "./components/ModeSelect";
 import { HoneycombBackground } from "./components/HoneycombBackground";
+import { WobbleFilters } from "./components/ui/WobbleFilters";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { DifficultySelect } from "./components/DifficultySelect";
 import { RoundScreen } from "./components/RoundScreen";
@@ -30,6 +31,7 @@ function Shell({ children, onBestsReset }: { children: ReactNode; onBestsReset?:
   return (
     <div className="app-shell">
       <HoneycombBackground />
+      <WobbleFilters />
       <SettingsPanel onBestsReset={onBestsReset} />
       {children}
     </div>

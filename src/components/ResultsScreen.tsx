@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { ArrowLeft, RotateCcw, Trophy } from "lucide-react";
 import { useScreenFocus } from "../hooks/useScreenFocus";
+import { Button } from "./ui/Button";
 
 // Two callers with different next moves. Singleplayer can replay or change
 // difficulty. A finished race can only leave the room: there is no rematch,
@@ -48,19 +49,17 @@ export function ResultsScreen({
       </p>
       <div className="results-actions">
         {onLeaveRoom ? (
-          <button ref={primaryRef} className="primary-btn" onClick={onLeaveRoom}>
-            <ArrowLeft size={16} aria-hidden />
+          <Button ref={primaryRef} variant="primary" icon={<ArrowLeft size={16} aria-hidden />} onClick={onLeaveRoom}>
             Back to lobby
-          </button>
+          </Button>
         ) : (
           <>
-            <button ref={primaryRef} className="primary-btn" onClick={onReplay}>
-              <RotateCcw size={16} aria-hidden />
+            <Button ref={primaryRef} variant="primary" icon={<RotateCcw size={16} aria-hidden />} onClick={onReplay}>
               Play again
-            </button>
-            <button className="ghost-btn" onClick={onMenu}>
+            </Button>
+            <Button variant="text" onClick={onMenu}>
               Change difficulty
-            </button>
+            </Button>
           </>
         )}
       </div>

@@ -1,4 +1,5 @@
 import { AVATARS, type AvatarKey } from "../lib/avatars";
+import { AvatarArt } from "./ui/Art";
 
 /**
  * Pick one of the fixed avatar presets.
@@ -24,7 +25,7 @@ export function AvatarPicker({
         {label}
       </span>
       <div className="avatar-picker" role="radiogroup" aria-labelledby="avatar-picker-label">
-        {AVATARS.map(({ id, label: name, Icon }) => {
+        {AVATARS.map(({ id, label: name }) => {
           const selected = id === value;
           return (
             <button
@@ -37,7 +38,7 @@ export function AvatarPicker({
               className={`avatar-option${selected ? " selected" : ""}`}
               onClick={() => onChange(id)}
             >
-              <Icon size={22} aria-hidden />
+              <AvatarArt avatar={id} size={36} />
             </button>
           );
         })}
@@ -48,7 +49,7 @@ export function AvatarPicker({
 
 /**
  * An avatar as it appears next to a name, in rosters and turn banners.
- * `size` is the glyph size; the badge scales around it.
+ * `size` is the drawing's box in px.
  */
 export function AvatarBadge({
   avatar,
@@ -59,10 +60,10 @@ export function AvatarBadge({
   size?: number;
   dimmed?: boolean;
 }) {
-  const { Icon, label } = AVATARS.find((a) => a.id === avatar) ?? AVATARS[0];
+  const { label } = AVATARS.find((a) => a.id === avatar) ?? AVATARS[0];
   return (
     <span className={`avatar-badge${dimmed ? " dimmed" : ""}`} title={label}>
-      <Icon size={size} aria-hidden />
+      <AvatarArt avatar={avatar} size={size} />
     </span>
   );
 }
