@@ -46,13 +46,13 @@ export function ResultsScreen({
       )}
       <h2 id="results-title">Round complete</h2>
       <div className="results-stats">
-        <div className="stat">
-          <span className="stat-value">{score}</span>
-          <span className="stat-label">final score</span>
+        <div className="results-stat">
+          <span className="results-value">{score}</span>
+          <span className="results-label">final score</span>
         </div>
-        <div className="stat">
-          <span className="stat-value">{bestStreak}</span>
-          <span className="stat-label">best streak</span>
+        <div className="results-stat">
+          <span className="results-value">{bestStreak}</span>
+          <span className="results-label">best streak</span>
         </div>
       </div>
       {practice ? (
