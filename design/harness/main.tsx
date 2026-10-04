@@ -31,7 +31,7 @@ applyTheme(theme);
 if (params.get("peak") === "1") document.documentElement.setAttribute("data-peak", "1");
 
 const SCREENS: Record<string, () => ReactNode> = {
-  home: () => <ModeSelect onSingle={noop} onMulti={noop} />,
+  home: () => <ModeSelect onSingle={noop} onMulti={noop} bests={BESTS} />,
   difficulty: () => (
     <div className="sp-home">
       <button className="back-link">

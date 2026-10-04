@@ -83,7 +83,7 @@ function App() {
   if (mode === null) {
     return (
       <Shell onBestsReset={() => setBests(getAllBests())}>
-        <ModeSelect onSingle={() => setMode("single")} onMulti={() => setMode("multi")} />
+        <ModeSelect onSingle={() => setMode("single")} onMulti={() => setMode("multi")} bests={bests} />
       </Shell>
     );
   }

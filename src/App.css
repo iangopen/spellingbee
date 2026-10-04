@@ -727,77 +727,58 @@
   align-items: center;
 }
 
-/* Mode select */
-.mode-select {
-  text-align: center;
-  max-width: 480px;
+/* Home (stage 4a). Text sits on panels; the honeycomb is only ever behind them. */
+.home {
+  width: 100%; max-width: 1120px; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center;
+  padding-top: 44px;
 }
-
-.mode-select h1 {
-  font-family: var(--font-display);
-  font-size: 40px;
-  font-weight: 700;
-  margin: 0;
-  color: var(--honey);
+.hero { padding: 56px 36px 30px; }
+.hero h1 {
+  margin: 0 0 14px; font: 400 clamp(3.6rem, 8.4vw, 6.3rem)/0.9 var(--hand); letter-spacing: 0.005em; color: var(--heading);
+  rotate: -1.4deg; transform-origin: 0 80%; text-wrap: balance;
 }
-
-.mode-footer {
-  margin-top: 24px;
-  text-align: center;
-  font-size: 14px;
+/* a hand-drawn underline, drawn as a mask so it takes the heading colour */
+.hero h1::after, .bests h2::after {
+  content: ""; display: block; height: 10px; width: min(11ch, 78%); margin-top: 0.3em; background: var(--heading); opacity: 0.75;
+  -webkit-mask: var(--squiggle) left center / 100% 100% no-repeat; mask: var(--squiggle) left center / 100% 100% no-repeat;
 }
-
+.hero .sticker { left: 18px; top: -19px; }
+.hero-mascot { position: absolute; right: 22px; top: -84px; width: 112px; height: 112px; }
+.tagline { margin: 0 0 8px; font: 700 1.3rem/1.3 var(--display); }
+.lede { margin: 0 0 28px; max-width: 34ch; font-size: 1.1rem; color: var(--muted); text-wrap: pretty; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.home-footer { margin: 22px 0 0; font-size: 14px; }
 /* A plain text link, padded out to the 44px target every control here meets. */
-.mode-footer a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 12px;
-  color: var(--muted);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+.home-footer a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px 0 0; color: var(--muted);
+  text-decoration: underline; text-underline-offset: 3px;
 }
-
-.mode-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.mode-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 24px 18px;
-  text-align: left;
-  color: var(--text);
-  box-shadow: var(--shadow);
-  transition: border-color 0.15s ease, transform 0.1s ease;
-}
-
-.mode-card:hover {
-  border-color: var(--honey);
-  transform: translateY(-2px);
-}
-
-.mode-card-icon {
-  color: var(--honey);
-  margin-bottom: 10px;
-}
-
-.mode-title {
-  display: block;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--text);
-}
-
-.mode-blurb {
-  display: block;
-  font-size: 13px;
-  color: var(--muted);
-  margin-top: 4px;
+.bests { padding: 28px; }
+.bests h2 { margin: 0 0 4px; font: 400 2rem/1 var(--hand); letter-spacing: 0.012em; color: var(--heading); }
+.bests h2::after { margin-top: 0.2em; }
+.bests p { margin: 12px 0 16px; color: var(--muted); font-size: 0.95rem; }
+.bests ol { list-style: none; margin: 0; padding: 0; }
+.bests li { display: grid; grid-template-columns: 1fr auto; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--panel-edge); }
+.bests li:last-child { border-bottom: 0; }
+.bests .tier { font-weight: 700; }
+.bests .score { font: 700 1.1rem/1 var(--display); font-variant-numeric: tabular-nums; }
+.bests .score.none { color: var(--muted); font: 400 0.95rem var(--body); }
+.rosette-float { position: absolute; top: -40px; right: -16px; width: 96px; height: 96px; transform: rotate(8deg); }
+/* The old difficulty ramp as a small swatch beside each tier name. The name
+   carries the meaning; the colour is the old site's character. */
+.swatch { display: inline-block; width: 10px; height: 18px; border-radius: 3px; margin-right: 10px; vertical-align: -3px; background: var(--t); }
+[data-tier="novice"] { --t: var(--t-novice); } [data-tier="easy"] { --t: var(--t-easy); } [data-tier="building"] { --t: var(--t-building); }
+[data-tier="medium"] { --t: var(--t-medium); } [data-tier="advanced"] { --t: var(--t-advanced); } [data-tier="hard"] { --t: var(--t-hard); }
+[data-tier="expert"] { --t: var(--t-expert); } [data-tier="master"] { --t: var(--t-master); }
+@media (max-width: 760px) {
+  .home { grid-template-columns: 1fr; gap: 56px; padding-top: 56px; }
+  .hero { padding: 54px 22px 22px; }
+  .hero .sticker { left: 12px; top: -17px; font-size: 1.25rem; }
+  .hero h1 { font-size: clamp(3.4rem, 17vw, 4.6rem); }
+  /* clear of the fixed Settings button (top-right), so its focus ring never touches the bee */
+  .hero-mascot { width: 88px; height: 88px; top: -70px; right: 84px; }
+  .actions .btn { flex: 1 1 100%; }
+  .rosette-float { width: 72px; height: 72px; top: -32px; right: -4px; }
 }
 
 /* Shared back link (singleplayer home + lobby) */

@@ -105,3 +105,7 @@
   inset: 0 !important; width: auto !important; transform: none !important;
   -webkit-mask-image: none !important; mask-image: none !important; }
 :root[data-peak="1"] .bg-light .lit { animation: none !important; transform: none !important; inset: 0 !important; width: auto !important; }
+/* Measuring: rotations off. A rotated text's bounding box takes in pixels that
+   are not under any letter (the sticker's edge, the heading's underline), so
+   the check would measure the wrong thing. Tilts are 5 degrees or less. */
+:root[data-peak="1"] * { rotate: none !important; }
