@@ -1,4 +1,4 @@
-# Phase 3: design system and build plan (stages 0 and 1 built; the rest is planned)
+# Phase 3: design system and build plan (all stages built; ready for review)
 
 **Direction (Ian, 2026-09-28, revised 2026-10-02 and 2026-10-03):**
 - **Honey and ribbon** (honey hybrid variant b): honey carries everything a player
@@ -249,9 +249,9 @@ middle stages alone would show a half-old, half-new UI.
 | 4f ✅ | **Settings dialog** restyle (the theme picker stays Light/Dark) | `SettingsPanel.tsx` (classes), CSS | a dialog test: focus in / trap / Escape / restore, still green in Chrome |
 | 4g ✅ | **Lobby + waiting room:** panels side by side at desktop, new inputs (fixes the 1.47:1 edges), avatar picker with bee contestants | `LobbyScreen.tsx`, `WaitingRoom.tsx` | contrast of every input edge; name validation copy unchanged |
 | 4h ✅ | **Elimination:** TurnScreen HUD, bee contestant tokens, ghost state, knockout overlay; EliminationResults | `TurnScreen.tsx`, `EliminationResults.tsx` | the Session 21 rules re-verified (tokens not focusable, the reserved feedback slot, ghost drift decoration-only) |
-| 5 | **Rename.** "Spelling Race" becomes "Spelling Bee" in `<title>` ("Spelling Bee \| Hear the word. Spell it right."), the meta description (rewritten, no "race game"), the two `<h1>`s, and the CLAUDE.md heading and naming note. The mode "Race" is unchanged. Slug, base, `package.json` name and localStorage keys are unchanged. | `index.html`, `ModeSelect.tsx`, `DifficultySelect.tsx`, `CLAUDE.md` | grep: 0 user-facing "Spelling Race"; `vite.config.ts` base still `/spellingbee/` |
-| 6 | **Assets.** Rosette favicon (SVG + 32px PNG), 180px apple-touch-icon, `manifest.webmanifest` (name/short_name "Spelling Bee", `theme_color` `#070b1c`, `background_color` `#050814`, 192/512 icons, start_url `/spellingbee/`), `theme-color` meta, OG/Twitter tags + a 1200×630 card (rosette + bee on the honeycomb). Remove the unused Vite scaffold files (`public/icons.svg`, `src/assets/*`). | `public/*`, `index.html`, `CREDITS.md` | manifest validates; the icons resolve under `/spellingbee/`; the card renders in a share preview |
-| 7 | **Polish.** The miss sound becomes a soft **bell**: inharmonic sine partials (about 1 : 2.76 : 5.4) with a fast attack and ~0.6s decay, as gentle as today's, never a buzzer, still in `sfx.ts` only. Screen transitions (a same-document View Transition around screen changes, reduced motion is instant). Delete the aliased old tokens. Final full passes: keyboard traces of every flow, a screen reader smoke test, contrast on the real app in both themes, a **real mid-range Android check** of the shimmer, and a bundle check. | `lib/sfx.ts`, `App.css`, `index.css` | sfx unit test (the bell fires once per miss via `useSfxForOutcome`); bundle budget |
+| 5 ✅ | **Rename.** "Spelling Race" becomes "Spelling Bee" in `<title>` ("Spelling Bee \| Hear the word. Spell it right."), the meta description (rewritten, no "race game"), the two `<h1>`s, and the CLAUDE.md heading and naming note. The mode "Race" is unchanged. Slug, base, `package.json` name and localStorage keys are unchanged. | `index.html`, `ModeSelect.tsx`, `DifficultySelect.tsx`, `CLAUDE.md` | grep: 0 user-facing "Spelling Race"; `vite.config.ts` base still `/spellingbee/` |
+| 6 ✅ | **Assets.** Rosette favicon (SVG + 32px PNG), 180px apple-touch-icon, `manifest.webmanifest` (name/short_name "Spelling Bee", `theme_color` `#16130f`, `background_color` `#0f0c08` (the plan's `#070b1c` / `#050814` were Blue Ribbon leftovers), 192/512 icons, start_url `/spellingbee/`), `theme-color` meta, OG/Twitter tags + a 1200×630 card (rosette + bee on the honeycomb). Remove the unused Vite scaffold files (`public/icons.svg`, `src/assets/*`). | `public/*`, `index.html`, `CREDITS.md` | manifest validates; the icons resolve under `/spellingbee/`; the card renders in a share preview |
+| 7 ✅ | **Polish.** The miss sound becomes a soft **bell**: inharmonic sine partials (about 1 : 2.76 : 5.4) with a fast attack and ~0.6s decay, as gentle as today's, never a buzzer, still in `sfx.ts` only. Screen transitions (a same-document View Transition around screen changes, reduced motion is instant). Delete the aliased old tokens. Final full passes: keyboard traces of every flow, a screen reader smoke test, contrast on the real app in both themes, a **real mid-range Android check** of the shimmer, and a bundle check. | `lib/sfx.ts`, `App.css`, `index.css` | sfx unit test (the bell fires once per miss via `useSfxForOutcome`); bundle budget |
 
 **Budgets:**
 - no new runtime dependencies
@@ -397,4 +397,29 @@ token cleared the other failure the screen had (digits over the token's ring).
 `.prompt-card`, `.score-bar`, `.stat*`, `.replay-btn` and the base `.lead-in` style
 are deleted; `.timer-track` and `.feedback` were still rendered, so they are one
 shared rule each. The unused-selector check went from 3 to 0.
+
+## Stages 5 to 7: what was built (2026-10-04)
+
+- **5 rename:** already on `main`; verified (no user-facing "Spelling Race", `base`
+  `/spellingbee/`, package name `spelling-bee`).
+- **6 assets:** fixed hand-placed bee, avatar and rosette art in `src/lib/beeArt.ts`;
+  the rosette favicon (not a hexagon), icons, maskable icon, 1200x630 share card and
+  manifest, all generated from that drawing by `design/harness/build-brand-assets.mjs`;
+  `index.html` carries the matching tags; scaffold files removed.
+- **7 polish:** the bell, View Transitions for player-initiated screen changes, panel
+  rise, zeroed animation and transition delays under reduced motion, the aliased
+  tokens and the old fonts deleted, the build fails when a font lacks its licence text
+  or its credit.
+
+**Budgets, measured against `main` built with the same `.env`:**
+
+| | main | branch | change | budget |
+|---|---|---|---|---|
+| JS gzip | 160.6 kB | 164.3 kB | +3.6 kB | <= +6 kB |
+| CSS gzip | 6.5 kB | 11.2 kB | +4.7 kB | |
+| fonts on disk | 170.5 kB | 172.3 kB | +1.8 kB | a page loads the latin files only: 126.9 kB (<= 150 kB) |
+| first load (html+js+css+every font) | 338.0 kB | 348.5 kB | +10.5 kB (+3%) | |
+
+Icons and the share card (335 kB on disk) are not part of the first load: only a
+browser installing the app or a crawler building a preview asks for them.
 

@@ -930,27 +930,86 @@ Open notes (Ian only, deliberately NOT in any published file):
   heading. They are retaken after the redesign merges, because it changes every
   screen.
 
-## Redesign (planning, started 2026-09-28)
+## Redesign (built and ready for Ian's review; started 2026-09-28)
 
 The game is being renamed **Spelling Bee** (Ian's decision, 2026-09-28) and given
 a distinct visual identity. Work happens on branch `redesign/spelling-bee`.
 **Nothing merges to `main` without Ian's OK**, because pushing `main` redeploys
 the live site.
 
+### Merge-readiness checklist (2026-10-04)
+The branch is `redesign/spelling-bee`; `main` was merged in first (it had nothing
+newer). Stage numbers follow `design/PHASE3.md`: 0 groundwork, 1 tokens, 2 honeycomb,
+3 shared components, 4a-4h the screens, 5 rename, 6 assets, 7 polish. All are built.
+
+**Verified, with the command that shows it** (`PW_MODULE=... node design/harness/run-checks.mjs`
+runs the browser ones in one go; 9 of 10 browser scripts run (plus the two unused-* checks), the 10th is
+`check-glow.mjs`, the Blue Ribbon prototype's check, which fails honey by design):
+- [x] `npm run build`, `npm run lint` (0 errors, 11 warnings, all in old scripts or the harness except the old `TurnScreen` hook one),
+  `npm test` (117 tests in 16 files: logic, screens, standings, sounds, brand assets,
+  licences), `npm run test:db` (94). There is no Playwright SPEC suite in the repo (it
+  is deliberately not a dependency); the browser checks are the scripts above.
+- [x] Contrast: 841 pairs, 0 failing, every screen, both themes, both widths
+  (`measure.mjs`, results in `design/stage-results/final-contrast-app.*`).
+- [x] Focus: every focus ring passes; tier bars (tap target + rim 7.35:1 at worst);
+  Settings dialog (proven against three focus mutations; two others it cannot see).
+- [x] `unused-selectors.mjs` 0, `unused-tokens.mjs` 0 (the old aliases, Inter and
+  Space Grotesk are gone).
+- [x] Reduced motion: 68/68 screen configurations are still and match the in-app
+  switch (46 pixel-identical, 22 within a 0.2% anti-aliasing tolerance that is printed).
+  Proven able to fail (remove the global block and it fails).
+- [x] A full 30-word game in the production build: each outcome sounds exactly once
+  (miss = tick + one bell, 4 oscillators; correct = tick + chime, 3), no utterance is
+  interrupted (60 of 60 ended normally), and every request goes to the site's own
+  origin. Proven able to fail (a cancel on the lead-in; a double bell).
+- [x] Network: all 18 screens x 2 themes make no request off-origin.
+- [x] Keyboard-only passes: the real built app (home, difficulty, round, results,
+  settings) and the mocked elimination screens (`keyboard-real-app.mjs`,
+  `keyboard-elimination.mjs`). One real bug was found and fixed (focus lost on the
+  Leave/Quit confirm).
+- [x] Licences: every font family has an OFL file with a copyright line and a CREDITS
+  row or the build FAILS (shown failing for Caveat Brush); `third-party-licenses.txt`
+  carries the fonts, the artwork notice and CREDITS.md.
+- [x] Guarded paths (`src/hooks`, `rooms.ts`, `auth.ts`, `captcha.ts`, `supabase/`):
+  `git diff main` is empty.
+- [x] Bundle vs `main` (same `.env`, so Supabase is in both): JS +3.6 kB gzip (budget 6),
+  CSS +4.7, fonts +1.8, first load 338.0 -> 348.5 kB gzip (+3%). A page downloads the
+  latin font files only (126.9 kB of the 172 kB on disk).
+- [x] README and PRIVACY.md match the visible app and what it contacts (singleplayer:
+  the site's own files only).
+
+**Only Ian can do** (no real device, second identity or taste test here):
+- [ ] The shimmer on a REAL mid-range phone. Headless Chrome at 4x CPU slowdown gave
+  a 16.7 ms median frame; the static glow is the fallback (set `.bg-light` to
+  `display: none`) if it stutters.
+- [ ] A two-browser keyboard pass of the multiplayer screens (waiting room, race,
+  results, elimination live), now that localhost is allowed on the Turnstile widget.
+  Needs `.env.local` and the live Supabase project; I did not open those screens,
+  because that signs a guest in on the live site.
+- [ ] A final look at the screenshots (`docs/review/`, 16 side-by-sides) and at the
+  share card (`public/og-card.png`), and the call on the name (HARDENING #14).
+- [ ] Merging to `main` (which redeploys the live site). Nothing else needs doing
+  first; `package.json` is already `spelling-bee`.
+
+**Preview on a phone:** `npm run build && npx vite preview --host --port 4173`, then
+open `http://<laptop LAN address>:4173/spellingbee/` on a phone on the same Wi-Fi
+(`ipconfig`; this laptop was 10.45.84.181). Singleplayer works fully; multiplayer will
+NOT sign in from that address (Turnstile only allows the hostnames on its widget).
+If the network blocks it (client isolation, a work or guest Wi-Fi) or Windows
+Firewall asks, allow Node on Private networks; otherwise use a tunnel
+(`npx cloudflared tunnel --url http://localhost:4173`, or `npx localtunnel --port 4173`),
+or an Android phone on USB (`adb reverse tcp:4173 tcp:4173`, then open
+`http://localhost:4173/spellingbee/`), or Chrome DevTools device mode on the laptop.
+
 ### Status
 - Phase 1 (audit) and Phase 2 (brand plus three directions) are done, in
   `design/`. See `design/README.md` for the map.
-- **FINAL DIRECTION (Ian, 2026-09-28):**
-  - **Blue Ribbon:** palette, Bricolage Grotesque + Atkinson Hyperlegible,
-    rosette, contestant placards, bell
-  - a **slow-shimmer** blue honeycomb (decoration only) at the **old live
-    site's cell size** (28×49px tile, from `main` src/index.css:181-189)
-  - a **bee mascot and bee contestant avatars**
-  - **C's race lanes** for race results
-  - **dark as the default theme**
-
-  Reference prototype: `design/prototypes/blue-ribbon-glow/` (its defaults
-  are these picks; start at `compare.html`).
+- **Superseded direction (2026-09-28):** the Blue Ribbon palette (blue honeycomb, no
+  yellow). It is kept in `design/prototypes/blue-ribbon-glow/` as history. What
+  survived into the build: Bricolage Grotesque + Atkinson Hyperlegible, the rosette,
+  contestant placards, the slow-shimmer honeycomb at the old site's 28x49 cell size,
+  the bee mascot and avatars, race lanes, dark as the default. The palette is the
+  honey hybrid picked below.
 - **Honey hybrid picked: variant b, Honey and ribbon (Ian, 2026-10-02).** Honey
   carries everything a player acts on (buttons, focus, field, timer); ribbon blue
   appears only on the award marks. The other three directions are closed. The
@@ -1086,6 +1145,32 @@ the live site.
     2026-10-03 (see docs/history.md), and exits 1 on any failing configuration.
   - Shipped to `main` separately (Ian, 2026-09-29): the current fonts
     self-hosted (HARDENING #24) and the race results button fix.
+  - **Stages 5, 6 and 7 are done (2026-10-04).**
+    - **5 rename:** was already on `main` (title, meta, both `<h1>`s, README, PRIVACY,
+      this file). `package.json` is `spelling-bee`; a grep finds no user-facing
+      "Spelling Race"; `base` is still `/spellingbee/`.
+    - **6 assets:** `src/lib/beeArt.ts` is now FIXED hand-placed path data (no runtime
+      jitter); `design/harness/build-brand-assets.mjs` renders `public/favicon.svg`
+      (the rosette, deliberately not a hexagon), `favicon-32.png`, `apple-touch-icon.png`,
+      `icon-192/512.png`, a maskable icon and `og-card.png` (1200x630) from that same
+      drawing, reading the palette from `src/index.css`. `public/manifest.webmanifest`
+      (name and short name Spelling Bee, start_url and scope `/spellingbee/`, theme
+      `#16130f`, background `#0f0c08`), `theme-color`, Open Graph and Twitter tags with
+      absolute URLs under the deployed base. The Vite scaffold files are deleted.
+      `scripts/tests/brandAssets.test.mjs` pins all of it. PHASE3's old
+      colours (`#070b1c`) were Blue Ribbon leftovers and are corrected there.
+    - **7 polish:** the miss sound is a soft bell (`sfx.ts` only: three inharmonic sine
+      partials 1 : 2.76 : 5.4, one event, ~0.7 s); screen changes the player asks for
+      go through `lib/viewTransition.ts` (no transition is started, and the update runs
+      at once, under reduced motion); panels rise on first appearance; the
+      correct-answer light-up and "+N" already existed from 4c. The global
+      reduced-motion blocks now zero `animation-delay` and `transition-delay` too (a
+      delayed ghost drift had kept moving). The aliased tokens, Inter, Space Grotesk and
+      7 dead custom properties are deleted. `npm test` now runs `src` and `scripts`.
+    - Rules these add: never hand-edit `public/` PNGs (rerun the build script); a new
+      self-hosted font needs its `OFL-*.txt` and a CREDITS row or the build fails; a
+      screen change the GAME causes is not wrapped in a view transition; every
+      animation needs a resting state that reads the same (`check-reduced-motion.mjs`).
 
 ### Rules for the build, whatever the direction
 - **Presentation only.** Don't touch any of these:
@@ -1142,22 +1227,16 @@ the live site.
   in both palettes" and "motion only decorates a visible state".
 
 ### Open
-- Stages 5 (rename: mostly done on `main`; manifest, icons, share card), 6 (assets) and
-  7 (polish: bell sound, view transitions, delete the aliased old tokens, real-phone
-  shimmer check, bundle check) are next. The contrast gate is at 0 and must stay there.
-  `.text-input` uses `--field-edge` (aliased to `--edge`, >=3:1 on every field
-  surface); do not fold it back into `--border`.
-- Nothing fails contrast. Not done yet: a keyboard-only pass of the REAL multiplayer
-  flow (waiting room, race, results need a live server and a second identity; the
-  elimination screens were driven on mocked state only). `check-settings-dialog.mjs`
-  cannot see two focus mutations (see docs/history.md), because Chrome restores focus
-  itself on close.
-- A real-phone check of the shimmer (in stage 7). The perf numbers so far are
-  headless Chrome with the CPU throttled 4×. The static glow is the fallback.
-- The name itself: a distinct look lowers the risk of being mistaken for NYT's
-  game but doesn't clear the name. See HARDENING #14 / §C10.
-- Found in the audit and worth fixing in the build (presentation only):
-  - Race results reuse the solo results screen: they always say "new best!",
-    show no winner or standings, and the secondary button is mislabelled.
-  - ~~Lobby and Settings text inputs fail 3:1 edge contrast.~~ Fixed on `main`
-    2026-09-29 (`--field-edge`); carry it into stage 1 (see above).
+- Merge-readiness: see the checklist at the top of this section. What is left is only
+  what Ian can do (a real phone, a two-browser multiplayer pass, a final look, the
+  merge).
+- `.text-input` uses `--edge` (>=3:1 on every field surface); keep it that way.
+- The name itself: a distinct look lowers the risk of being mistaken for NYT's game but
+  doesn't clear the name. See HARDENING #14 / §C10. The favicon is a bee rosette on
+  purpose (a plain hexagon was the closest overlap in the audit).
+- Known limits, recorded rather than hidden: `check-settings-dialog.mjs` cannot see
+  two focus mutations (Chrome restores focus itself on close); the reduced-motion check
+  tolerates up to 0.2% of a page in anti-aliasing noise and prints each case; the
+  elimination keyboard pass ran on mocked state; the lane subtitles from the prototype
+  ("8 of 10 spelled") are not shown because the client has no per-player correct count.
+- Not in the redesign and untouched on purpose: game logic, `supabase/`, edge functions.

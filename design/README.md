@@ -29,6 +29,15 @@ The harness tooling:
 | `shoot-hybrid.mjs` | The honey hybrid's screenshots, reduced-motion stills, and its lemon-yellow, grey-tile and decoration-only checks. Its contrast runs through `measure.mjs` with `TARGET=hybrid`. |
 | `contrast.mjs` | Checks the WCAG ratios. |
 | `icons.mjs` | Emits the lucide icons inline for the prototypes. |
+| `run-checks.mjs` | Builds, serves the build and the harness, runs every check below, prints one table. `PW_MODULE=... node design/harness/run-checks.mjs`. |
+| `measure.mjs` (`TARGET=app`) | Contrast of the real screens at the shimmer's peak. Writes into `design/baseline/`; `run-checks.mjs` moves the output to `design/stage-results/` and restores the baseline. |
+| `check-tier-bars.mjs`, `check-tier-focus.mjs` | Tier bars: tap target and focus rim on the real app / on a prototype copy. |
+| `check-settings-dialog.mjs`, `keyboard-elimination.mjs`, `keyboard-real-app.mjs` | Dialog focus; keyboard-only passes. |
+| `check-reduced-motion.mjs` | Every screen is still under reduced motion and matches the in-app switch. |
+| `check-real-app.mjs`, `check-network-screens.mjs` | A 30-word game in the build (sound, speech, network); every screen's requests. |
+| `unused-selectors.mjs`, `unused-tokens.mjs` | Dead CSS classes and custom properties. |
+| `build-brand-assets.mjs` | Renders the favicon, icons and share card into `public/` from `src/lib/beeArt.ts`. |
+| `shoot-readme.mjs`, `shoot-final.mjs`, `bundle-size.mjs` | README screenshots; side-by-sides with the prototype (`docs/review/`); bundle bytes against another build. |
 
 ## Re-running the screenshots
 

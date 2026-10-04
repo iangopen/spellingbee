@@ -158,3 +158,50 @@ Failures 45, 2, 2, 0, 0 across the four sub-steps; pushed after each commit.
   digits (2.83:1). Moving it below the name fixed it; padding and a shadow did not.
 - **Ghost names:** `--out` as text colour was 2.88:1. It stays a disc colour.
 
+## 2026-10-04: stages 5 to 7 and the review pass
+
+Merged `main` into the branch first (nothing newer; "already up to date"), then built the
+rest of PHASE3 and verified it. Pushed after every commit.
+
+- **Art:** the stage 3 bee was drawn at run time from a seeded random wobble. It is now fixed
+  path data, hand-placed, and the favicon, icons and share card are rendered from the same
+  drawing. The first share card used a system font because `setContent` pages cannot load
+  local fonts; it now renders from a real `file://` page.
+- **A commit that broke the build:** the brand-asset test imported `node:fs` inside the typed
+  app, and `tsc -b` failed; I had pushed it before running the build. Fixed in the next commit by
+  moving the test to `scripts/tests/` (and `npm test` now runs it). Lesson kept: run
+  `npm run build`, not only the unit tests, before a commit.
+- **Reduced motion found a real bug:** the global block collapsed animation durations but not
+  delays, so the ghost drift (delayed 0 to 1.65 s) kept moving. Fixed (`animation-delay` and
+  `transition-delay` are zeroed). The checker itself needed three fixes before it said
+  anything true: seed `Math.random` (the lead-in phrase is random), await `document.fonts.ready`
+  (a late font swap read as motion), and inject the caret-hiding style before load (adding it to
+  a live page forced a re-raster that showed as 300-pixel "differences"). It then reported
+  46 identical and 22 within a printed 0.2% tolerance. Negative control: removing the OS
+  reduced-motion block makes the elimination screens fail (1300+ pixels move). An earlier
+  "control" (hiding the shimmer rule) did not fail, because the shimmer is also at opacity 0
+  without its animation, which is defence in depth, not a gap in the check.
+- **The sound and speech check has two negative controls:** a `cancel()` 200 ms into the first
+  lead-in fails two checks; making a miss play the bell twice fails the per-outcome count
+  (7 oscillators, not 4). The speech side uses a fake `speechSynthesis` with Chrome's cancel
+  semantics: real audio cannot be heard headless, so this catches the cause (a cancel landing on
+  live speech), not the sound.
+- **The first bundle comparison was wrong by 116 kB.** `main` built in a clean worktree has no
+  `.env.local`, so the Supabase client was tree-shaken out; the branch build had it. Built with
+  the same `.env`, the real difference is +3.6 kB gzip of JS. I bisected commit by commit
+  (140.5 kB gzip at the last commit, against 136.6 for a `.env`-less main) before finding it.
+- **I damaged `node_modules` and repaired it.** Removing the temporary worktree with a
+  directory junction to `node_modules` inside it deleted `node_modules/.bin`. `npm ci` fixed it
+  (it first failed with EPERM because two Vite servers held the rolldown binary). Everything
+  was re-run afterwards: build, 117 unit tests, 94 database tests and the whole browser
+  suite. No source or lockfile changed.
+- **Licences:** the build now checks fonts, not just lists them (see CLAUDE.md). Demonstrated:
+  removing `OFL-CaveatBrush.txt` fails the build naming the font; removing its CREDITS row fails
+  it too; restoring both passes.
+- **Choices I made without asking** (conservative): kept dark as the only default and the OS
+  setting ignored; kept `og:image` an absolute URL under `/spellingbee/`; left the multiplayer
+  screens untouched by real traffic (mocked only); tolerated 0.2% anti-aliasing noise in the
+  reduced-motion check, printed per case; used `--muted` rather than a new token for ghost
+  names; made `design/` scripts take `PW_MODULE` like the existing ones rather than adding
+  Playwright as a dependency.
+
