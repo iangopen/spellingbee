@@ -1038,9 +1038,10 @@ the live site.
     and solo results are on panels. Rules they keep:
     - Every line of text is on a `Panel` (or a scrim pill), never on the bare
       honeycomb. A new screen is not done until it measures 0.
-    - `.prompt-card`, `.lead-in`, `.feedback`, `.timer-track`, `.stat`, `.score-bar`
-      still serve TurnScreen and stay as they are until 4h; new round styling is
-      scoped under `.round-screen`.
+    - `.timer-track` and `.feedback` are SHARED by the round and turn screens (one
+      rule each, in the "Shared by RoundScreen and TurnScreen" block). `.prompt-card`,
+      `.score-bar`, `.stat*`, `.replay-btn` and the base `.lead-in` style were deleted
+      in 4h-4; do not reintroduce them.
     - `isNewBest` is decided in `App` against the PREVIOUS stored best. Never
       derive it as `score >= best` in a screen (ties, practice, races).
     - A pill or button must leave >= 24px before the next panel: the 7px focus moat
@@ -1055,11 +1056,31 @@ the live site.
     - `ResultsScreen` is solo-only; a finished race is `RaceResults`.
     - The settings drawer stays opaque (it holds forms), and its behaviour is
       checked by `design/harness/check-settings-dialog.mjs`.
-  - **App-wide contrast failures, the merge gate (must reach 0):** stage 1: 11;
-    2: 265; 3: 217; 4a: 212; 4b: 187; 4c: 90; 4d: 64; 4e: 63; 4f: 64; 4g: 45.
-    **All 45 left are elimination** (TurnScreen and EliminationResults, stage 4h).
-    Every focus ring passes. Results are in `design/stage-results/`;
-    `design/baseline/` is untouched.
+  - **Stage 4h is done (2026-10-03): elimination is on panels.** Turn screen (HUD
+    pill, turn banner, pronouncer, answer + timer + feedback slot, the table of
+    tokens), the knockout overlay and the results (winner card, survival standings).
+    Rules it keeps, on top of Session 20/21's:
+    - Lives sit BELOW a token, never across its rim (a count laid over the ring has
+      the ring's pixels behind its digits: that is what failed 2.83:1).
+    - A ghost's NAME is read at `--muted` (struck through, and the aria-label says
+      "out"). `--out` is a state colour for the disc, not for text (2.88:1).
+    - The Leave/Quit confirm focuses "Keep playing" when it opens and returns focus
+      to the link when it closes (it used to drop focus to `<body>`, in both the
+      round and the turn screen).
+    - Placement is survival order, not score, and the screen says so.
+  - **App-wide contrast failures, the merge gate: 0.** stage 1: 11; 2: 265; 3: 217;
+    4a: 212; 4b: 187; 4c: 90; 4d: 64; 4e: 63; 4f: 64; 4g: 45; 4h-1: 2; 4h-2: 2;
+    4h-3: **0**; after the 4h-4 cleanup: **0 of 843 pairs**, both themes, both widths,
+    every screen including the knockout (a harness screen that mounts alive and flips
+    to eliminated, so the real latch fires). Every focus ring passes. Results are in
+    `design/stage-results/`; `design/baseline/` is untouched.
+  - `design/harness/unused-selectors.mjs` lists class selectors no source file can
+    produce (comments stripped; the few run-time-built names are listed in the
+    script with what builds them). It reports 0, and a planted dead class proves it
+    can fail. Run it after any CSS deletion.
+  - `design/harness/keyboard-elimination.mjs` drives the elimination screens by
+    keyboard alone on mocked state; `check-settings-dialog.mjs` now FAILS (rather
+    than crashes) when Escape does nothing and was proven against focus mutations.
   - `design/harness/check-tier-focus.mjs` runs only the tier-bar focus check
     against any copy of the prototype (`HM_DIR`). It was proven able to fail on
     2026-10-03 (see docs/history.md), and exits 1 on any failing configuration.
@@ -1121,13 +1142,16 @@ the live site.
   in both palettes" and "motion only decorates a visible state".
 
 ### Open
-- Stage 4h (elimination) is next, then 5 to 7. It must take the total from 45 to 0.
+- Stages 5 (rename: mostly done on `main`; manifest, icons, share card), 6 (assets) and
+  7 (polish: bell sound, view transitions, delete the aliased old tokens, real-phone
+  shimmer check, bundle check) are next. The contrast gate is at 0 and must stay there.
   `.text-input` uses `--field-edge` (aliased to `--edge`, >=3:1 on every field
   surface); do not fold it back into `--border`.
-- Still failing after 4g (45): elimination only. Includes the eliminated name's
-  `--out` (2.86 to 2.88:1).
-- Not done yet: a keyboard-only multiplayer pass (waiting room, race, results).
-  `check-settings-dialog.mjs` has no negative control.
+- Nothing fails contrast. Not done yet: a keyboard-only pass of the REAL multiplayer
+  flow (waiting room, race, results need a live server and a second identity; the
+  elimination screens were driven on mocked state only). `check-settings-dialog.mjs`
+  cannot see two focus mutations (see docs/history.md), because Chrome restores focus
+  itself on close.
 - A real-phone check of the shimmer (in stage 7). The perf numbers so far are
   headless Chrome with the CPU throttled 4×. The static glow is the fallback.
 - The name itself: a distinct look lowers the risk of being mistaken for NYT's

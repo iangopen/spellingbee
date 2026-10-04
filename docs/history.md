@@ -136,3 +136,25 @@ Race results, settings, lobby and waiting room. Failures 64, 63, 64, 45 after 4d
 - **The tied-race screenshots drove a wording rule:** a tie is never worded as a
   win for whoever's row is first, and a zero-point race has no winner or rosette.
 
+## 2026-10-03: stage 4h (elimination), contrast gate at 0
+
+Failures 45, 2, 2, 0, 0 across the four sub-steps; pushed after each commit.
+
+- **The keyboard pass found a real bug the contrast work could not:** Enter on Leave
+  replaced the link with the confirm and focus fell to `<body>`; Keep playing did it
+  again on the way back. RoundScreen's Quit had the same defect (since the Session 13
+  era). Fixed in both: the confirm focuses Keep playing, the link takes focus back.
+- **Dialog check, negative control:** three mutations of `SettingsPanel.tsx` in turn,
+  each restored with a byte-identical check against HEAD. `show()` instead of
+  `showModal()` with no focus-in: FAIL 5 (Tab reaches the page behind, Escape does
+  nothing). Dropping focus to `<body>` on open: FAIL 2. Removing the explicit
+  `triggerRef.focus()` on close, and replacing it with a blur: PASS, not detected.
+  Chrome restores focus to the opener itself when a modal dialog closes, so that line
+  is redundant in Chrome and the check cannot tell; this is a limit of the check, not
+  evidence the line is needed. The first control attempt crashed the script (Escape
+  timed out); the check now converts a timeout into a FAIL.
+- **A count laid across a ring is a contrast failure by construction.** The lives
+  badge sat on the token's border, and the measurer saw the border colour behind the
+  digits (2.83:1). Moving it below the name fixed it; padding and a shadow did not.
+- **Ghost names:** `--out` as text colour was 2.88:1. It stays a disc colour.
+

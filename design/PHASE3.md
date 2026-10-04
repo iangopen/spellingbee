@@ -248,7 +248,7 @@ middle stages alone would show a half-old, half-new UI.
 | 4e ✅ | **Race results:** the new `RaceResults` (winner + lanes). `App.tsx` routes race to it. This fixes the audit bugs: no false "new best!", a real winner and standings, and the button says what it does. | `components/RaceResults.tsx`, `App.tsx` (routing line only) | unit test: order by score, the "you" row, ties, 2 to 8 players; lane positions ∝ score |
 | 4f ✅ | **Settings dialog** restyle (the theme picker stays Light/Dark) | `SettingsPanel.tsx` (classes), CSS | a dialog test: focus in / trap / Escape / restore, still green in Chrome |
 | 4g ✅ | **Lobby + waiting room:** panels side by side at desktop, new inputs (fixes the 1.47:1 edges), avatar picker with bee contestants | `LobbyScreen.tsx`, `WaitingRoom.tsx` | contrast of every input edge; name validation copy unchanged |
-| 4h | **Elimination:** TurnScreen HUD, bee contestant tokens, ghost state, knockout overlay; EliminationResults | `TurnScreen.tsx`, `EliminationResults.tsx` | the Session 21 rules re-verified (tokens not focusable, the reserved feedback slot, ghost drift decoration-only) |
+| 4h ✅ | **Elimination:** TurnScreen HUD, bee contestant tokens, ghost state, knockout overlay; EliminationResults | `TurnScreen.tsx`, `EliminationResults.tsx` | the Session 21 rules re-verified (tokens not focusable, the reserved feedback slot, ghost drift decoration-only) |
 | 5 | **Rename.** "Spelling Race" becomes "Spelling Bee" in `<title>` ("Spelling Bee \| Hear the word. Spell it right."), the meta description (rewritten, no "race game"), the two `<h1>`s, and the CLAUDE.md heading and naming note. The mode "Race" is unchanged. Slug, base, `package.json` name and localStorage keys are unchanged. | `index.html`, `ModeSelect.tsx`, `DifficultySelect.tsx`, `CLAUDE.md` | grep: 0 user-facing "Spelling Race"; `vite.config.ts` base still `/spellingbee/` |
 | 6 | **Assets.** Rosette favicon (SVG + 32px PNG), 180px apple-touch-icon, `manifest.webmanifest` (name/short_name "Spelling Bee", `theme_color` `#070b1c`, `background_color` `#050814`, 192/512 icons, start_url `/spellingbee/`), `theme-color` meta, OG/Twitter tags + a 1200×630 card (rosette + bee on the honeycomb). Remove the unused Vite scaffold files (`public/icons.svg`, `src/assets/*`). | `public/*`, `index.html`, `CREDITS.md` | manifest validates; the icons resolve under `/spellingbee/`; the card renders in a share preview |
 | 7 | **Polish.** The miss sound becomes a soft **bell**: inharmonic sine partials (about 1 : 2.76 : 5.4) with a fast attack and ~0.6s decay, as gentle as today's, never a buzzer, still in `sfx.ts` only. Screen transitions (a same-document View Transition around screen changes, reduced motion is instant). Delete the aliased old tokens. Final full passes: keyboard traces of every flow, a screen reader smoke test, contrast on the real app in both themes, a **real mid-range Android check** of the shimmer, and a bundle check. | `lib/sfx.ts`, `App.css`, `index.css` | sfx unit test (the bell fires once per miss via `useSfxForOutcome`); bundle budget |
@@ -380,4 +380,21 @@ waiting room (4g). Race results already pass because it shares `ResultsScreen`;
   by side at desktop, one column on phones; the hint and error moved into the
   "you" panel. The waiting room is a column of panels (code, avatar, players,
   start). `.lobby-panel` and `.lobby-divider` are gone.
+
+## Stage 4h: what was built (2026-10-03)
+
+| After | Failing |
+|---|---|
+| 4g | 45 (all elimination) |
+| 4h-1 turn screen | 2 (elimination results) |
+| 4h-2 knockout | 2 |
+| 4h-3 elimination results | **0** |
+| 4h-4 cleanup | **0** (843 pairs) |
+
+The eliminated player's name was 2.88:1 because it was drawn in `--out`; it is now
+`--muted`, struck through and labelled "out" for assistive tech. Lives under a
+token cleared the other failure the screen had (digits over the token's ring).
+`.prompt-card`, `.score-bar`, `.stat*`, `.replay-btn` and the base `.lead-in` style
+are deleted; `.timer-track` and `.feedback` were still rendered, so they are one
+shared rule each. The unused-selector check went from 3 to 0.
 
