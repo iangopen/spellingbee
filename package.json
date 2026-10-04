@@ -9,7 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "vitest run src",
+    "test": "vitest run src scripts",
     "test:db": "vitest run supabase/tests"
   },
   "dependencies": {

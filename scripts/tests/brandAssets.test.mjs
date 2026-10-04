@@ -6,11 +6,11 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const pub = (f: string) => resolve("public", f);
+const pub = (f) => resolve("public", f);
 const html = readFileSync(resolve("index.html"), "utf8");
 const manifest = JSON.parse(readFileSync(pub("manifest.webmanifest"), "utf8"));
 
-function pngSize(file: string): [number, number] {
+function pngSize(file) {
   const b = readFileSync(file);
   expect(b.subarray(1, 4).toString()).toBe("PNG");
   return [b.readUInt32BE(16), b.readUInt32BE(20)];
@@ -26,12 +26,12 @@ describe("brand assets", () => {
   });
 
   it("every manifest icon exists at its declared size, and one is maskable", () => {
-    for (const icon of manifest.icons as { src: string; sizes: string }[]) {
+    for (const icon of manifest.icons) {
       expect(existsSync(pub(icon.src))).toBe(true);
       const [w, h] = icon.sizes.split("x").map(Number);
       expect(pngSize(pub(icon.src))).toEqual([w, h]);
     }
-    expect((manifest.icons as { purpose: string }[]).some((i) => i.purpose === "maskable")).toBe(true);
+    expect(manifest.icons.some((i) => i.purpose === "maskable")).toBe(true);
   });
 
   it("the favicon, touch icon and share card exist at the right sizes", () => {
@@ -57,7 +57,7 @@ describe("brand assets", () => {
   it("the favicon is not a plain hexagon (the audit's closest overlap with another game's imagery)", () => {
     const svg = readFileSync(pub("favicon.svg"), "utf8");
     expect(svg).toContain("clipPath"); // the bee, not just an outline
-    expect(svg.match(/<path/g)!.length).toBeGreaterThan(10);
+    expect(svg.match(/<path/g).length).toBeGreaterThan(10);
     expect(svg).not.toMatch(/<polygon/);
   });
 
