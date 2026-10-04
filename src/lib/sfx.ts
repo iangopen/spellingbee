@@ -138,15 +138,24 @@ export function playCorrect(): void {
 }
 
 /**
- * Incorrect. A short descending pair, and deliberately NOT a buzzer: this fires
- * on a miss and on every timeout, several times a game, and a harsh sound there
- * is punishing rather than informative. Sine waves an octave below the correct
- * chime, gliding down — unmistakably "no" without being unpleasant.
+ * Incorrect: a soft BELL, never a buzzer. This fires on a miss and on every timeout,
+ * several times a game, and a harsh sound there is punishing rather than informative.
+ *
+ * A struck bell is a few sine partials at INHARMONIC ratios (about 1 : 2.76 : 5.4) that
+ * die away at different speeds, the high ones first. Three tones start together (one
+ * event, not three), with the same soft 12ms attack as every other sound here, and the
+ * whole thing is gone in about 0.7s. The fundamental is a note below the correct chime,
+ * so it is unmistakably "no" without being unpleasant.
  */
+export const BELL_FUNDAMENTAL = 330;
+export const BELL_PARTIALS: readonly { ratio: number; seconds: number; peak: number }[] = [
+  { ratio: 1, seconds: 0.7, peak: 0.2 },
+  { ratio: 2.76, seconds: 0.45, peak: 0.08 },
+  { ratio: 5.4, seconds: 0.22, peak: 0.035 },
+];
 export function playIncorrect(): void {
   play((_ac, now) => {
-    tone(now, 392, 0.16, 0.18, "sine", 349.23);
-    tone(now + 0.12, 261.63, 0.26, 0.16, "sine", 233.08);
+    for (const p of BELL_PARTIALS) tone(now, BELL_FUNDAMENTAL * p.ratio, p.seconds, p.peak, "sine");
   });
 }
 

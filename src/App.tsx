@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import "./App.css";
 import { ModeSelect } from "./components/ModeSelect";
 import { HoneycombBackground } from "./components/HoneycombBackground";
+import { withViewTransition } from "./lib/viewTransition";
 import { WobbleFilters } from "./components/ui/WobbleFilters";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { DifficultySelect } from "./components/DifficultySelect";
@@ -62,8 +63,10 @@ function App() {
         // client back to the lobby rather than trapping them in the room.
       }
     }
-    mp.resetToMenu();
-    setMpRoom(null);
+    withViewTransition(() => {
+      mp.resetToMenu();
+      setMpRoom(null);
+    });
   }
 
   // True only for the run that beat the PREVIOUS stored best. Decided here, at the
@@ -93,7 +96,7 @@ function App() {
   if (mode === null) {
     return (
       <Shell onBestsReset={() => setBests(getAllBests())}>
-        <ModeSelect onSingle={() => setMode("single")} onMulti={() => setMode("multi")} bests={bests} />
+        <ModeSelect onSingle={() => withViewTransition(() => setMode("single"))} onMulti={() => withViewTransition(() => setMode("multi"))} bests={bests} />
       </Shell>
     );
   }
@@ -104,8 +107,8 @@ function App() {
       return (
         <Shell onBestsReset={() => setBests(getAllBests())}>
           <LobbyScreen
-            onExitToModes={() => setMode(null)}
-            onEnterRoom={(room, isHost) => setMpRoom({ room, isHost })}
+            onExitToModes={() => withViewTransition(() => setMode(null))}
+            onEnterRoom={(room, isHost) => withViewTransition(() => setMpRoom({ room, isHost }))}
           />
         </Shell>
       );
@@ -176,11 +179,11 @@ function App() {
     <Shell onBestsReset={() => setBests(getAllBests())}>
       {state.status === "idle" && (
         <div className="sp-home">
-          <button className="back-link" onClick={() => setMode(null)}>
+          <button className="back-link" onClick={() => withViewTransition(() => setMode(null))}>
             <ArrowLeft size={15} aria-hidden />
             Modes
           </button>
-          <DifficultySelect bests={bests} onSelect={startGame} />
+          <DifficultySelect bests={bests} onSelect={(tier, options) => withViewTransition(() => startGame(tier, options))} />
         </div>
       )}
 
@@ -192,7 +195,7 @@ function App() {
           // Singleplayer only. resetToMenu drops straight back to idle, so the
           // run is discarded rather than finished — no best score is recorded,
           // which is the point of quitting.
-          onExit={resetToMenu}
+          onExit={() => withViewTransition(resetToMenu)}
         />
       )}
 
@@ -208,12 +211,14 @@ function App() {
           // back to timed-with-definition.
           onReplay={() =>
             state.tier &&
-            startGame(state.tier, {
-              untimed: state.untimed,
-              hideDefinition: state.hideDefinition,
-            })
+            withViewTransition(() =>
+              startGame(state.tier!, {
+                untimed: state.untimed,
+                hideDefinition: state.hideDefinition,
+              })
+            )
           }
-          onMenu={resetToMenu}
+          onMenu={() => withViewTransition(resetToMenu)}
         />
       )}
     </Shell>

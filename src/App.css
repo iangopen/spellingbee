@@ -1178,3 +1178,21 @@
 /* The "2.1s, 61 WPM" tail on a correct answer: detail, not the verdict, and part
    of the same <p> as "Correct!", never a second feedback element. */
 .feedback-detail { font-weight: 400; font-size: 0.85em; color: var(--muted); }
+
+/* ---------------------------------------------------------------------------
+   Screen changes (stage 7). A tap that changes screen is wrapped in a same-document
+   View Transition (lib/viewTransition.ts): the old screen fades out quickly, the new
+   one rises in. Panels also rise when they first appear, which dresses the changes
+   the game causes (a round ending) that are deliberately not wrapped.
+
+   All of it is decoration on a change that has already happened. Under reduced
+   motion (the OS setting or the in-app switch) no transition is started, and the
+   global block in index.css collapses anything that is left, so the screen is just
+   there. */
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-reduce-motion="true"]) ::view-transition-old(root) { animation: 0.16s ease both vt-fade-out; }
+  :root:not([data-reduce-motion="true"]) ::view-transition-new(root) { animation: 0.32s var(--ease-out) both vt-rise; }
+  :root:not([data-reduce-motion="true"]) .panel { animation: vt-rise 0.45s var(--ease-out) both; }
+}
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-rise { from { opacity: 0; transform: translateY(10px); } }
