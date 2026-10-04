@@ -3738,23 +3738,23 @@
  {
   "page": "sp-round",
   "theme": "light",
-  "w": "desktop",
+  "w": "phone",
   "kind": "text",
-  "label": "Your word is:",
+  "label": "Next word:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    592.828125,
-    313.515625,
-    719.171875,
-    347.515625
+    158.078125,
+    254.796875,
+    263.921875,
+    288.796875
    ]
   ],
   "fg": "#2346d8",
-  "worst": 6.87,
-  "wp": "#fffaf1",
-  "where": "desktop"
+  "worst": 6.64,
+  "wp": "#fcf6ea",
+  "where": "phone"
  },
  {
   "page": "sp-round",
@@ -3981,27 +3981,6 @@
   "wp": "#fef9ef",
   "focused": true,
   "where": "desktop"
- },
- {
-  "page": "sp-round",
-  "theme": "light",
-  "w": "phone",
-  "kind": "text",
-  "label": "Spell this word:",
-  "color": "rgb(35, 70, 216)",
-  "need": 3,
-  "rects": [
-   [
-    135.171875,
-    254.796875,
-    286.8125,
-    288.796875
-   ]
-  ],
-  "fg": "#2346d8",
-  "worst": 6.64,
-  "wp": "#fcf6ea",
-  "where": "phone"
  },
  {
   "page": "sp-round",
@@ -4531,14 +4510,14 @@
   "theme": "dark",
   "w": "phone",
   "kind": "text",
-  "label": "Spell this word:",
+  "label": "Next word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    135.171875,
+    158.078125,
     254.796875,
-    286.8125,
+    263.921875,
     288.796875
    ]
   ],
@@ -4810,14 +4789,14 @@
   "theme": "light",
   "w": "desktop",
   "kind": "text",
-  "label": "Get ready:",
+  "label": "Next word:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    604.5625,
+    603.078125,
     319.515625,
-    707.4375,
+    708.921875,
     353.515625
    ]
   ],
@@ -5075,14 +5054,14 @@
   "theme": "light",
   "w": "phone",
   "kind": "text",
-  "label": "Next word:",
+  "label": "Here's your word:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    158.078125,
+    126.125,
     254.796875,
-    263.921875,
+    295.859375,
     288.796875
    ]
   ],
@@ -5352,23 +5331,23 @@
  {
   "page": "sp-incorrect",
   "theme": "dark",
-  "w": "desktop",
+  "w": "phone",
   "kind": "text",
-  "label": "Here's your word:",
+  "label": "Try spelling this:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    571.125,
-    319.515625,
-    740.859375,
-    353.515625
+    128.5625,
+    254.796875,
+    293.421875,
+    288.796875
    ]
   ],
   "fg": "#a3b5ff",
-  "worst": 8.37,
-  "wp": "#231e14",
-  "where": "desktop"
+  "worst": 7.34,
+  "wp": "#30281b",
+  "where": "phone"
  },
  {
   "page": "sp-incorrect",
@@ -5619,27 +5598,6 @@
   "theme": "dark",
   "w": "phone",
   "kind": "text",
-  "label": "Try spelling this:",
-  "color": "rgb(163, 181, 255)",
-  "need": 3,
-  "rects": [
-   [
-    128.5625,
-    254.796875,
-    293.421875,
-    288.796875
-   ]
-  ],
-  "fg": "#a3b5ff",
-  "worst": 7.34,
-  "wp": "#30281b",
-  "where": "phone"
- },
- {
-  "page": "sp-incorrect",
-  "theme": "dark",
-  "w": "phone",
-  "kind": "text",
   "label": "A strong, regular repeated pattern of sound",
   "color": "rgb(245, 239, 227)",
   "need": 4.5,
@@ -5877,14 +5835,14 @@
   "theme": "light",
   "w": "desktop",
   "kind": "text",
-  "label": "Your word is:",
+  "label": "Get ready:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    592.828125,
+    604.5625,
     319.515625,
-    719.171875,
+    707.4375,
     353.515625
    ]
   ],
@@ -6142,14 +6100,14 @@
   "theme": "light",
   "w": "phone",
   "kind": "text",
-  "label": "Next word:",
+  "label": "Here's your word:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    158.078125,
+    126.125,
     254.796875,
-    263.921875,
+    295.859375,
     288.796875
    ]
   ],
@@ -11657,14 +11615,14 @@
   "theme": "dark",
   "w": "desktop",
   "kind": "text",
-  "label": "Spell this word:",
+  "label": "Here's your word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    580.171875,
+    571.125,
     307.515625,
-    731.8125,
+    740.859375,
     341.515625
    ]
   ],
@@ -11835,14 +11793,14 @@
   "theme": "dark",
   "w": "phone",
   "kind": "text",
-  "label": "Try spelling this:",
+  "label": "Next word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    128.5625,
+    158.078125,
     190.796875,
-    293.421875,
+    263.921875,
     224.796875
    ]
   ],
@@ -12091,23 +12049,23 @@
  {
   "page": "race-round",
   "theme": "light",
-  "w": "phone",
+  "w": "desktop",
   "kind": "text",
   "label": "Here's your word:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    126.125,
-    190.796875,
-    295.859375,
-    224.796875
+    571.125,
+    307.515625,
+    740.859375,
+    341.515625
    ]
   ],
   "fg": "#2346d8",
-  "worst": 6.64,
-  "wp": "#fcf6ea",
-  "where": "phone"
+  "worst": 6.87,
+  "wp": "#fffaf1",
+  "where": "desktop"
  },
  {
   "page": "race-round",
@@ -12265,6 +12223,27 @@
   "wp": "#fffdf8",
   "focused": true,
   "where": "desktop"
+ },
+ {
+  "page": "race-round",
+  "theme": "light",
+  "w": "phone",
+  "kind": "text",
+  "label": "Get ready:",
+  "color": "rgb(35, 70, 216)",
+  "need": 3,
+  "rects": [
+   [
+    159.5625,
+    190.796875,
+    262.4375,
+    224.796875
+   ]
+  ],
+  "fg": "#2346d8",
+  "worst": 6.64,
+  "wp": "#fcf6ea",
+  "where": "phone"
  },
  {
   "page": "race-round",
@@ -12506,23 +12485,23 @@
  {
   "page": "race-locked",
   "theme": "dark",
-  "w": "phone",
+  "w": "desktop",
   "kind": "text",
   "label": "Get ready:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    159.5625,
-    190.796875,
-    262.4375,
-    224.796875
+    604.5625,
+    287.515625,
+    707.4375,
+    321.515625
    ]
   ],
   "fg": "#a3b5ff",
-  "worst": 7.32,
-  "wp": "#31281a",
-  "where": "phone"
+  "worst": 8.35,
+  "wp": "#241e14",
+  "where": "desktop"
  },
  {
   "page": "race-locked",
@@ -12707,6 +12686,27 @@
   "wp": "#16130f",
   "focused": true,
   "where": "desktop"
+ },
+ {
+  "page": "race-locked",
+  "theme": "dark",
+  "w": "phone",
+  "kind": "text",
+  "label": "Your word is:",
+  "color": "rgb(163, 181, 255)",
+  "need": 3,
+  "rects": [
+   [
+    147.828125,
+    190.796875,
+    274.171875,
+    224.796875
+   ]
+  ],
+  "fg": "#a3b5ff",
+  "worst": 7.32,
+  "wp": "#31281a",
+  "where": "phone"
  },
  {
   "page": "race-locked",
@@ -13413,14 +13413,14 @@
   "theme": "dark",
   "w": "desktop",
   "kind": "text",
-  "label": "Your word is:",
+  "label": "Spell this word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    592.828125,
+    580.171875,
     276.515625,
-    719.171875,
+    731.8125,
     310.515625
    ]
   ],
@@ -13675,14 +13675,14 @@
   "theme": "dark",
   "w": "phone",
   "kind": "text",
-  "label": "Next word:",
+  "label": "Your word is:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    158.078125,
+    147.828125,
     190.796875,
-    263.921875,
+    274.171875,
     224.796875
    ]
   ],
@@ -13912,14 +13912,14 @@
   "theme": "light",
   "w": "desktop",
   "kind": "text",
-  "label": "Spell this word:",
+  "label": "Next word:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    580.171875,
+    603.078125,
     276.515625,
-    731.8125,
+    708.921875,
     310.515625
    ]
   ],
@@ -14174,14 +14174,14 @@
   "theme": "light",
   "w": "phone",
   "kind": "text",
-  "label": "Here's your word:",
+  "label": "Get ready:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    126.125,
+    159.5625,
     190.796875,
-    295.859375,
+    262.4375,
     224.796875
    ]
   ],
@@ -15911,14 +15911,14 @@
   "theme": "dark",
   "w": "desktop",
   "kind": "text",
-  "label": "Get ready:",
+  "label": "Your word is:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    604.5625,
+    592.828125,
     316.390625,
-    707.4375,
+    719.171875,
     350.390625
    ]
   ],
@@ -16235,14 +16235,14 @@
   "theme": "dark",
   "w": "phone",
   "kind": "text",
-  "label": "Your word is:",
+  "label": "Spell this word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    147.828125,
+    135.171875,
     354,
-    274.171875,
+    286.8125,
     388
    ]
   ],
@@ -16541,14 +16541,14 @@
   "theme": "light",
   "w": "desktop",
   "kind": "text",
-  "label": "Here's your word:",
+  "label": "Get ready:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    571.125,
+    604.5625,
     316.390625,
-    740.859375,
+    707.4375,
     350.390625
    ]
   ],
@@ -16865,14 +16865,14 @@
   "theme": "light",
   "w": "phone",
   "kind": "text",
-  "label": "Get ready:",
+  "label": "Your word is:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    159.5625,
+    147.828125,
     354,
-    262.4375,
+    274.171875,
     388
    ]
   ],
@@ -17169,23 +17169,23 @@
  {
   "page": "elim-myturn",
   "theme": "dark",
-  "w": "phone",
+  "w": "desktop",
   "kind": "text",
-  "label": "Here's your word:",
+  "label": "Spell this word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    126.125,
-    354,
-    295.859375,
-    388
+    580.171875,
+    316.390625,
+    731.8125,
+    350.390625
    ]
   ],
   "fg": "#a3b5ff",
-  "worst": 7.35,
-  "wp": "#30281a",
-  "where": "phone"
+  "worst": 8.37,
+  "wp": "#231e14",
+  "where": "desktop"
  },
  {
   "page": "elim-myturn",
@@ -17520,6 +17520,27 @@
   "theme": "dark",
   "w": "phone",
   "kind": "text",
+  "label": "Get ready:",
+  "color": "rgb(163, 181, 255)",
+  "need": 3,
+  "rects": [
+   [
+    159.5625,
+    354,
+    262.4375,
+    388
+   ]
+  ],
+  "fg": "#a3b5ff",
+  "worst": 7.35,
+  "wp": "#30281a",
+  "where": "phone"
+ },
+ {
+  "page": "elim-myturn",
+  "theme": "dark",
+  "w": "phone",
+  "kind": "text",
   "label": "\"",
   "color": "rgb(245, 239, 227)",
   "need": 4.5,
@@ -17803,23 +17824,23 @@
  {
   "page": "elim-myturn",
   "theme": "light",
-  "w": "desktop",
+  "w": "phone",
   "kind": "text",
-  "label": "Get ready:",
+  "label": "Here's your word:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    604.5625,
-    316.390625,
-    707.4375,
-    350.390625
+    126.125,
+    354,
+    295.859375,
+    388
    ]
   ],
   "fg": "#2346d8",
-  "worst": 6.87,
-  "wp": "#fffaf1",
-  "where": "desktop"
+  "worst": 6.64,
+  "wp": "#fcf6eb",
+  "where": "phone"
  },
  {
   "page": "elim-myturn",
@@ -18148,27 +18169,6 @@
   "wp": "#fffdf8",
   "focused": true,
   "where": "desktop"
- },
- {
-  "page": "elim-myturn",
-  "theme": "light",
-  "w": "phone",
-  "kind": "text",
-  "label": "Your word is:",
-  "color": "rgb(35, 70, 216)",
-  "need": 3,
-  "rects": [
-   [
-    147.828125,
-    354,
-    274.171875,
-    388
-   ]
-  ],
-  "fg": "#2346d8",
-  "worst": 6.64,
-  "wp": "#fcf6eb",
-  "where": "phone"
  },
  {
   "page": "elim-myturn",

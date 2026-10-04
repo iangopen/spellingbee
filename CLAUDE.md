@@ -956,7 +956,7 @@ runs the browser ones in one go; 9 of 10 browser scripts run (plus the two unuse
 - [x] `unused-selectors.mjs` 0, `unused-tokens.mjs` 0 (the old aliases, Inter and
   Space Grotesk are gone).
 - [x] Reduced motion: 68/68 screen configurations are still and match the in-app
-  switch (46 pixel-identical, 22 within a 0.2% anti-aliasing tolerance that is printed).
+  switch (47 pixel-identical, 21 within a 0.2% anti-aliasing tolerance that is printed; the split varies by a case or two run to run).
   Proven able to fail (remove the global block and it fails).
 - [x] A full 30-word game in the production build: each outcome sounds exactly once
   (miss = tick + one bell, 4 oscillators; correct = tick + chime, 3), no utterance is
