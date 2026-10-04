@@ -657,13 +657,41 @@ The spec is `docs/multiplayer-modes-spec.md` (branch `plan/multiplayer-modes`,
 - **Dash** (first to 3 round wins), **Hourglass** (a shrinking time bank) and
   **Spotlight** (one speller, watched live).
 
-Nothing is built. It assumes the redesign has merged first. Before building:
-- Read §9 first: the flagged conflicts and the defaults Ian has not yet
-  confirmed. In particular, a miss in Hourglass is capped at 4 s, and Spotlight
-  keeps lives.
-- Follow §8's stage order. Stage 1 is the `timeout-turn` edge function, which
-  fixes the Elimination gap above.
-- Migrations start at 0021, and each extends the rollback file.
+Nothing is built. It assumes the redesign has merged first.
+
+Ian reviewed it on 2026-10-04, and **every decision in §9 is resolved**:
+- Dash: a void round uses up one of the five; tied leaders play sudden death,
+  capped at 10 rounds, then a draw.
+- Hourglass: a miss costs at most 4 s (tuned with real players), and the dead
+  band stays at 200 ms.
+- Spotlight keeps lives.
+- Dash replaces Race and Spotlight replaces Elimination; the old modes are
+  removed in the last stage.
+- No spoken lead-in: a countdown, then the word alone at one server moment.
+  The speech-rate setting stays.
+
+Timing (§4.5):
+- answers are stamped at edge-function entry;
+- a latency credit is measured by the server from echo round trips (median,
+  capped at 100 ms, so the exposure stays under the 200 ms band);
+- every game call is pinned to the DB region. Supabase's docs confirm this is
+  available, with no plan restriction documented.
+
+Build order (§8):
+1. fixes that stand alone: the `timeout-turn` fast path, multi-sample clock
+   sync, the device-independent word start;
+2. avatars;
+3. Dash (**stopping point A**);
+4. Spotlight (**stopping point B**);
+5. Hourglass (optional);
+6. old-mode cleanup.
+
+About 18 sessions without Hourglass, 22 with it. Real players are needed only
+for Dash, Spotlight and Hourglass. Spotlight's screen-reader check is Ian's own
+NVDA pass (§8.1).
+
+Migration numbers are assigned in ship order, and each extends the rollback
+file.
 
 Issues the spec found in TODAY's race, not yet fixed:
 - each client rolls its own random lead-in (`tts.ts`), so players hear phrases
