@@ -21,6 +21,10 @@ export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
+  // How long a browser may cache the preflight answer. Without this the default is
+  // 5 s, shorter than a race round, so most answers paid an extra OPTIONS round trip.
+  // Browsers clamp it (Chromium 2 h, Firefox 24 h), so 7200 is the most that helps.
+  "Access-Control-Max-Age": "7200",
 };
 
 export function json(body: unknown, status = 200): Response {
