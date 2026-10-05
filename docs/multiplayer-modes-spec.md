@@ -3,7 +3,9 @@
 Status: **spec only** (2026-10-04, branch `plan/multiplayer-modes`, cut from `main` at `8b979dc`).
 Reviewed by Ian on 2026-10-04: every decision in §9 is resolved, timing gained a server-measured latency
 credit (§4.5), region pinning was checked against Supabase's docs (§4.4.1), and the build plan was
-reordered with two stopping points (§8).
+reordered with two stopping points (§8). A fourth pass the same day checked that the echo measures
+the route answers take, dealt with cold starts and CORS preflights, re-picked the credit cap (70 ms)
+and the Dash settle window (250 ms), and stated the echo's flood exposure (§4.5.3–4.5.5).
 No code and no migrations were written. Every statement about current behaviour cites the file it
 comes from. Paths without a branch are on `main`; paths marked *(redesign)* are on
 `redesign/spelling-bee` and were read with `git show`, not checked out.
@@ -131,6 +133,19 @@ bank.
 3. **The clock sync is one sample** (`serverClock.ts:36-47`). One slow or asymmetric round trip
    skews it.
 4. **Elimination has no client timeout fast path** (`useMultiplayerGame.ts:604-625`).
+5. **Most race answers pay an extra network round trip before they are even sent** (found
+   2026-10-04, fourth pass, §4.5.3).
+   - `callEdge` sends `apikey`, `Authorization` and a JSON `Content-Type` (`rooms.ts:300-307`), so
+     every call is a CORS request that needs a preflight.
+   - The functions' CORS headers set no `Access-Control-Max-Age` (`_shared/mod.ts:20-24`), so a
+     browser keeps a preflight for only 5 s (MDN's documented default).
+   - Race rounds are 13 s or longer, so each round's single `submit-answer` almost always runs an
+     `OPTIONS` round trip first. The preflight is answered by the function itself
+     (`_shared/mod.ts:127`), so on a cold worker it also pays the boot.
+   - Slow connections lose twice: once on the preflight, once on the POST.
+6. **Today's race answer is timed inside the database, after the Auth check** (`0015:197-198`,
+   `_shared/mod.ts:45-56,131`). Upload latency, a cold worker's boot, the edge function's Auth round
+   trip and its call to PostgREST all count against the player. §4.5.3 has the breakdown.
 
 ### 1.7 Citation spot-check (2026-10-04, review pass)
 
@@ -371,9 +386,11 @@ reduced-motion block removes it with no information lost.
 1. Each round, everyone gets the same word at the same reveal instant.
 2. The correct answer with the lowest **adjusted** time wins the round. The adjusted time is the
    server-measured time minus the player's server-measured latency credit (§4.5).
-   - The round is awarded 150 ms after the first correct arrival (the 100 ms credit cap plus 50 ms),
-     or as soon as every contender has an attempt, whichever is first. This is because a later
-     arrival can still have the lower adjusted time.
+   - The round is awarded 250 ms after the first correct arrival at the database, or as soon as
+     every contender has an attempt, whichever is first. This is because a later arrival can still
+     have the lower adjusted time. The window is the 70 ms credit cap plus edge clock jitter plus the
+     spread in how long answers take from the edge to the database (re-picked in §4.5.4; it was
+     150 ms).
    - It is +1 to that player's `round_wins`.
    - Points, if shown at all, are not used for ranking.
 3. A wrong answer uses up your attempt for that round. You wait out the round.
@@ -398,7 +415,8 @@ feedback window, then advances, exactly as Race does today.
 | Case | What happens |
 |---|---|
 | Two correct answers with the same adjusted time | The earlier `round_attempts.created_at` wins. Resolution runs once, inside `close_round_tx` under the room lock, with the `ended_at IS NULL` conditional update (the `0006:304-320` pattern), so exactly one winner is recorded however many clients and sweepers ask. |
-| Second correct answer arrives inside the 150 ms settle window with a bigger latency credit | It can win: the comparison is on adjusted time. That is the purpose of the window. |
+| Second correct answer arrives inside the 250 ms settle window with a bigger latency credit | It can win: the comparison is on adjusted time. That is the purpose of the window. |
+| A correct answer that would have won on adjusted time arrives after the window (for example a cold-landed answer with a boot credit, §4.5.4) | The round stands as awarded and is never re-awarded. The late row is marked `settled_late` for the stage 7 measurement. |
 | Correct but below the human floor (§4.4) | Refused as `too_fast` **before** the word is compared, so it reveals nothing. The attempt is NOT used up; the player may resubmit. |
 | Wrong answer | Attempt used. "Not quite — wait for the next word." The word is not revealed until the round ends (the hardening #13 rule in `announce.ts`). |
 | Nobody answers before the deadline | Void round. It uses up a regular slot; in sudden death it repeats. |
@@ -696,7 +714,10 @@ so it needs no pinning. §4.5.1 has the arithmetic.
 4. **What is subtracted.**
    - Inside the submit transaction, SQL reads this player's closed samples for this round and takes
      the **median** `rtt_ms`.
-   - `credit = min(median / 2, CAP)`, with CAP = 100 ms.
+   - `credit = min(median / 2, CAP)`, with **CAP = 70 ms** (re-picked from 100 in the fourth pass:
+     the budget below gained two rows it had been missing).
+   - Plus, for an answer that landed on a freshly booted worker, the **boot credit** of §4.5.4
+     (the server-measured boot, at most 500 ms), only if stage 6 validates the measurement.
    - **With fewer than 3 samples, the credit is 0.**
    - No client value is involved anywhere: the submit request is unchanged
      (`{room_id, round_num, guess}`).
@@ -709,36 +730,63 @@ so it needs no pinning. §4.5.1 has the arithmetic.
 **Exposure (stated plainly):**
 - A hostile client cannot fake a sample: both stamps are the server's own. It has two levers, and
   neither touches any other player:
-  - **Sending the next call before the previous answer arrives (pipelining).** The per-player lock
-    serialises the calls, so this produces a near-zero sample, which only *lowers* its own credit.
+  - **Sending the next call before the previous answer arrives (pipelining).** A call that overlaps
+    one still running is refused as `throttled` by the non-waiting per-player lock (§4.5.5). One that
+    arrives just after produces a near-zero sample, which only *lowers* its own credit.
   - **Waiting before replying.** That inflates samples, and so claims a credit up to the cap however
     good its connection is.
-- **Its gain per round is at most `CAP − its true one-way delay` ≤ 100 ms.** Samples are keyed to
+- **Its gain per round is at most `CAP − its true one-way delay` ≤ 70 ms.** Samples are keyed to
   `auth.uid()` and to the upcoming round, so they can't be borrowed from another player or carried
   over from an earlier round.
 
 **Choosing the cap and the dead band together.** The dead band (200 ms, Ian's decision) is the
 difference Hourglass treats as noise. The rule is that a cheater's maximum gain, plus the honest
 measurement error, must fit inside it, so cheating can never manufacture a charge difference the
-band would otherwise count.
+band would otherwise count. Ian fixed the band at 200 ms and made the cap the number that moves
+(D7b), so when the budget grows, the cap shrinks.
 
-| Item in the 200 ms budget | Worst case (ms) | Why |
-|---|---|---|
-| Cheater's maximum unearned credit (= CAP) | **100** | Delays echoes to claim the full cap |
-| Error of the RTT/2 one-way estimate for an honest player | 30 | Up/down asymmetry; the median of 5 rejects outliers |
-| Device start skew from clock sync (5-sample min-RTT) | 20 | §4.2 |
-| Edge stamp jitter within one pinned region | 10 | Different machines, NTP-synced |
-| Path difference: echo via the API gateway and PostgREST vs. the answer via the pinned edge | 10 | Same region, a little more server hop time on the echo, so the credit runs slightly high, never low |
-| **Total** | **170** | |
-| **Dead band** | **200** | **Margin: 30 ms** |
+**Revised 2026-10-04, fourth pass.** The third-pass table totalled 170 ms with a 30 ms margin, but
+it left out two things:
+- **Network jitter on the answer itself.** The 10 ms row is the edge machines' clock jitter, not the
+  network's. One upload can differ from that player's typical one-way delay by tens of
+  milliseconds on Wi-Fi or mobile data, and the median of five earlier samples cannot see it.
+- **Cold starts and CORS preflights,** which §4.5.3–4.5.4 found on the answer path. Each adds far
+  more than the whole band when it happens.
 
-Why 100 and not another cap:
+The table now has a column per case. "Warm" assumes the two fixes in §4.5.4: the
+`Access-Control-Max-Age` header and the warm-up call.
 
-| CAP | Who is fully compensated (one-way = RTT/2) | Budget total | Fits 200 ms? |
+| Item (ms, worst case for one pair of players) | Warm answer | Cold-landed, boot credit on | Cold-landed, no boot credit | Why |
+|---|---|---|---|---|
+| Cheater's maximum unearned credit (= CAP) | **70** | 70 | 70 | Delays echoes to claim the full cap |
+| Error of the RTT/2 one-way estimate, honest player | 30 | 30 | 30 | Up/down asymmetry; the median of 5 rejects outliers |
+| **Jitter on this one upload against the median (new)** | **30** | 30 | 30 | Wi-Fi and 4G per-request variation. A planning figure, measured in stage 7 (§8, the stage 7 measurement). |
+| Device start skew from clock sync (5-sample min-RTT) | 20 | 20 | 20 | §4.2 |
+| Edge stamp jitter and edge-vs-DB clock skew, one pinned region | 10 | 10 | 10 | Different machines, NTP-synced. Stage 7 measures it as the spread of `commit_lag_ms` (§4.5.4). |
+| Path difference, echo route vs answer route | 10 | 10 | 10 | §4.5.3: the echo's extra PostgREST and commit time. It runs the credit slightly high, the same way for everyone. |
+| **CORS preflight (new)** | **0** | 0 | 0 | Removed by `Access-Control-Max-Age` plus the warm-up priming the cache (§4.5.4). Without the fix: one full extra round trip, 20–400 ms. |
+| **Worker boot before the stamp (new)** | **0** | ≤ 20 (measurement error, the stage 6 acceptance limit) | 42 avg / 86 P95 / **460 P99** | Supabase's published boot times (§4.5.4) |
+| **Total** | **170** | **190** | 212 / 256 / **630** | |
+| **Dead band** | **200** (margin 30) | **200** (margin 10) | **exceeded** | |
+
+How the cap was re-picked: the warm column's other rows sum to 100 ms. Keeping the old 30 ms
+margin needs `CAP + 100 ≤ 200 − 30`, so **CAP ≤ 70**.
+
+| CAP | Who is fully compensated (one-way = RTT/2) | Warm total | Fits 200 ms with a 30 ms margin? |
 |---|---|---|---|
-| 50 ms | Wired and Wi-Fi only (one-way 10–50) | 120 | Yes, but 4G players keep up to ~30 ms of uncompensated delay |
-| **100 ms** | **Wired, Wi-Fi and typical 4G/5G (one-way 30–80)** | **170** | **Yes** |
-| 150 ms | Also poor mobile | 220 | **No**: a cheater plus normal error can exceed the band |
+| 50 ms | Wired and Wi-Fi only (one-way 10–50) | 150 | Yes, but 4G players keep up to ~30 ms of uncompensated delay |
+| **70 ms** | **Wired, Wi-Fi and most 4G/5G (one-way 30–80)** | **170** | **Yes** |
+| 100 ms (third pass) | Also the slow end of 4G | 200 | **No**: zero margin once jitter is counted |
+
+**The cold-landed columns are why §4.5.4 exists.** The dead band is not widened to cover a cold
+worker. Covering the P99 boot would mean ignoring gaps of 0.6 s in every Hourglass round, to absorb
+an event that hits a small share of answers. Instead:
+- the warm-up makes cold landings rare;
+- the boot credit, if stage 6 validates it, removes most of the cost when one happens anyway;
+- stage 7 measures how often it happens.
+
+If the boot measurement fails validation, a cold-landed answer keeps its boot time. That is
+documented as residual, like voice start-up (§4.6).
 
 Planning figures for one-way delay to a same-continent region:
 - wired 10–30 ms;
@@ -747,15 +795,16 @@ Planning figures for one-way delay to a same-continent region:
 - poor mobile or another continent 100–200 ms.
 
 These are estimates, to be **measured in stage 7** (`round_scores.credit_ms`). A player beyond the cap
-is compensated 100 ms and keeps the rest: still better than today, where they keep all of it.
+is compensated 70 ms and keeps the rest: still better than today, where they keep all of it.
 
 **What the exposure means in play:**
-- **Hourglass:** each round, a cheater can at most turn a true gap of up to 300 ms (band plus cap) into
+- **Hourglass:** each round, a cheater can at most turn a true gap of up to 270 ms (band plus cap) into
   0, or shave 0.1 s (one quantum) off a larger charge. Over a 20-round game that is at most 2 s of a
   10 s bank. That is real but bounded, and it needs a modified client. The band itself is unchanged.
-- **Dash:** there is no band, so the credit decides rounds closer than 100 ms. A cheater wins those
-  close rounds, and only those. The 150 ms settle window (§3.1) is what makes the credit usable in
-  Dash: the winner is picked by adjusted time once every answer that could still win has arrived.
+- **Dash:** there is no band, so the credit decides rounds closer than 70 ms. A cheater wins those
+  close rounds, and only those. The 250 ms settle window (§3.1, re-picked in §4.5.4) is what makes the
+  credit usable in Dash: the winner is picked by adjusted time once every answer that could still win
+  has normally arrived.
 
 #### 4.5.1 Protecting the echo, and its budget (added 2026-10-04, third pass)
 
@@ -776,7 +825,7 @@ legitimate maximum below):
 | Limit | Value | Legitimate maximum it must allow |
 |---|---|---|
 | Per player, per upcoming round | **8** served calls | 6 (a chain of 6 calls gives 5 samples), plus 2 retries |
-| Per player, per rolling minute, all rooms | **120** | 108: at most 18 rounds a minute, because the fastest possible round is 1.5 s countdown + 0.45 s floor + 0.15 s settle + 1.1 s feedback = 3.2 s; 18 × 6 = 108 |
+| Per player, per rolling minute, all rooms | **120** | 108: at most 18 rounds a minute, because the fastest possible round is 1.5 s countdown + 0.45 s floor + 0.25 s settle + 1.1 s feedback = 3.3 s (60 / 3.3 = 18.2, with the fourth pass's 250 ms window); 18 × 6 = 108 |
 | Per player, per rolling 24 h | **6,000** | 1,000 rounds a day, about 66 full Dash games or 33 Hourglass games |
 | Per room, per upcoming round | **64** | 8 players × 8 |
 | Per room, per rolling minute | **900** | 8 × 108 = 864 |
@@ -815,26 +864,42 @@ rejected.
   This is also **not new** (`submit-answer` has had this exposure since Session 9a). The answer is
   detection and response (§6.6), not prevention.
 
-**Invocation budget for honest play, with the echo moved off Edge Functions:**
-- Per player per round: 1 submit.
+**Invocation budget for honest play, with the echo moved off Edge Functions and the warm-up added
+(revised 2026-10-04, fourth pass):**
+- Per player per round:
+  - 1 submit;
+  - **1 warm-up** to `submit-round` (§4.5.4), Dash and Hourglass only. Spotlight compares no
+    answer with another player's, so it has none.
 - Per room per round: about 2 `close-round` calls.
 - Per game: 1 start.
 
-| Game | Invocations | Games a month on Free (500,000) |
-|---|---|---|
-| Dash, 8 players, ~8 rounds: 8 × 8 + 2 × 8 + 1 | 81 | ~6,170 |
-| Hourglass, 8 players, ~20 rounds: 8 × 20 + 2 × 20 + 1 | 201 | ~2,480 |
-| Dash, 4 players, ~6 rounds: 4 × 6 + 2 × 6 + 1 | 37 | ~13,500 |
+| Game | Without warm-up (third pass) | With a warm-up every round | Games a month on Free (500,000), with warm-up | With a warm-up before round 1 only (the fallback, below) |
+|---|---|---|---|---|
+| Dash, 8 players, ~8 rounds | 8×8 + 2×8 + 1 = 81 | 81 + 8×8 = **145** | **~3,450** | 81 + 8 = 89, ~5,620 |
+| Hourglass, 8 players, ~20 rounds | 8×20 + 2×20 + 1 = 201 | 201 + 8×20 = **361** | **~1,385** | 201 + 8 = 209, ~2,390 |
+| Dash, 4 players, ~6 rounds | 4×6 + 2×6 + 1 = 37 | 37 + 4×6 = **61** | **~8,200** | 37 + 4 = 41, ~12,200 |
 
-The previous draft allowed about 1,077 eight-player Dash games; this allows about 6,170.
+- Warm-ups are the single largest new cost: **they add 79% to an 8-player game** (Dash 145 vs 81;
+  Hourglass 361 vs 201). It is still about 3.2× what the first draft's edge echo cost (1,077
+  eight-player Dash games a month).
+- They are switchable without a deploy: the `warmup_enabled` runtime flag (§4.5.2) stops them. The
+  arithmetic then falls back to the third-pass column.
+- Stage 7 measures whether warming before every round removes more cold landings than warming
+  before round 1 alone (§4.5.4). If not, the client warms before round 1 only, and the last column
+  applies.
 
-**One more limit for the answer path:** a host may start **at most 60 games a rolling 24 h**
-(`max_games_started_per_host_per_day`, counted in `start_match_tx`). Without it, one hostile room
-that plays nonstop *legitimately* would spend its way through the quota. The existing 20 rooms an
-hour allows 20 games an hour; at Hourglass's 201 invocations a game that is 4,020 an hour, so the
-whole quota in about 124 hours (5 days). At 60 games a day the worst is 60 × 201 = 12,060 a day, so
-500,000 lasts 41 days, longer than a billing month. Honest hosts are nowhere near 60 games a day.
-More hosts multiply it, and the Turnstile check on every guest sign-in is what limits that.
+**One more limit for the answer path, re-picked: a host may start at most 30 games a rolling
+24 h** (`max_games_started_per_host_per_day`, counted in `start_match_tx`; it was 60).
+- Without a cap, one hostile room that plays nonstop *legitimately* spends its way through the
+  quota. The existing 20 rooms an hour allow 20 games an hour. At Hourglass's 361 invocations a game
+  that is 7,220 an hour, so the whole quota goes in about 69 hours (3 days).
+- At the old 60 a day the worst case is now 60 × 361 = 21,660 a day. 500,000 would last only 23
+  days, inside a billing month, so 60 no longer does its job.
+- **At 30 a day: 30 × 361 = 10,830 a day, so 500,000 lasts 46 days,** longer than a billing month.
+  That is the same protection the 60-game cap gave before warm-ups (60 × 201 = 12,060 a day, 41 days).
+- 30 Dash games is roughly an hour and a half of nonstop hosting. A group playing longer can pass
+  the host role to someone else. Honest use is expected to be far below it.
+- More hosts multiply it, and the Turnstile check on every guest sign-in is what limits that.
 
 #### 4.5.2 When the echo fails, is throttled, or is switched off
 
@@ -849,11 +914,15 @@ exactly as it would without §4.5 (the server-stamped, scheduled-reveal timing o
 | 402 or any 5xx from PostgREST | Stops for this game | — | Same |
 | Echo still in flight at the reveal | Abandons it. **The reveal, the input and the submit never `await` an echo.** | A late call is `outside_window` | None |
 | Reading the samples fails inside the submit transaction | — | The credit read is in its own `begin … exception when others then credit := 0` block, so it can't abort the answer | Credit 0; the round scores |
+| **Warm-up fails** (network error, 5xx, no reply by the reveal), fourth pass | Abandons it at the reveal and **does not retry**: a retry is another billed invocation, and the answer itself boots a worker if one is needed. After a 402 or 5xx it sends no more warm-ups this game. | Nothing to do: a warm-up writes nothing | None, except that the answer may land cold, in which case §4.5.4's boot credit applies if it is on. **The answer is never held back to wait for a warm-up.** |
+| `warmup_enabled` false (§4.5.4) | Sends no warm-ups until a later echo reply says true | — | Only the cold-landing rate changes |
 
 **The kill switch: no deploy needed.**
 - `private.runtime_flags (key text primary key, value jsonb, updated_at timestamptz)` is created by
   the migration with its starting rows: `echo_enabled` true, `live_feed` true,
-  `feed_budget_msgs_per_s` 40 (§5.3), `multiplayer_open` true.
+  `feed_budget_msgs_per_s` 40 (§5.3), `multiplayer_open` true, and (fourth pass) `warmup_enabled`
+  true and `boot_credit` false (switched on only after stage 6 validates the boot measurement,
+  §4.5.4).
 - Only SQL reads it. Clients never do, and anon and `authenticated` get 42501 on it.
 - Ian flips a flag with one statement in the dashboard's SQL editor:
 
@@ -889,13 +958,266 @@ For this game:
 **How the project learns it's close:** the runbook in §6.6, a weekly usage check and an estimate
 query. Supabase's documented notification only arrives *after* the quota is exceeded.
 
+#### 4.5.3 Where each answer is stamped, and whether the echo measures the same route (added 2026-10-04, fourth pass)
+
+The credit only helps if the echo crosses the network the answer crosses. So this section checks
+both routes, and both stamps, line by line.
+
+**Where the answer's time is stamped:**
+
+| | Today's race (`main`) | Dash and Hourglass (this spec) |
+|---|---|---|
+| Stamp | **Inside the database transaction:** `v_now := now()`, then `v_elapsed_ms` from `round_started_at` (`0015:197-198`). `now()` is the start of the transaction PostgREST opened for the edge function's RPC call. | **At edge-function entry:** `Date.now()` as the first statement of `submit-round`'s handler, before auth, passed to SQL as `p_received_at` (§4.4 option B, §6.3). SQL keeps the window check of §4.4. |
+| Inside the measured time | <ol><li>a CORS preflight round trip, whenever the browser's 5 s cache has lapsed (§1.6 item 5)</li><li>upload</li><li>the worker's boot, if it is cold</li><li>the Auth server check (`getCallerId`, `_shared/mod.ts:45-56`, called at `:131`)</li><li>body parsing</li><li>the edge function's call to PostgREST (`_shared/mod.ts:65-74`)</li></ol> | <ol><li>a preflight, if needed</li><li>upload</li><li>the worker's boot, if it is cold</li></ol> |
+| Client-side wait before the request leaves | `callEdge` awaits `auth.getSession()` (`rooms.ts:291`). It normally resolves from memory, but refreshes the token over the network first if it has expired. | The same, unless fixed (§4.5.4, part 4). |
+
+**Which route each one travels:**
+
+| | Echo (`public.echo`, §4.5) | Answer (`submit-round`) |
+|---|---|---|
+| Client call | supabase-js `rpc("echo")` → `https://<ref>.supabase.co/rest/v1/rpc/echo`. It is the route `server_now()` takes today (`serverClock.ts:39`). | `fetch` → `https://<ref>.supabase.co/functions/v1/submit-round?forceFunctionRegion=<region>`, as `callEdge` does today (`rooms.ts:300`) |
+| After the front door | API gateway → PostgREST → Postgres | API gateway → an edge worker in the pinned region |
+| Stamped by | the database clock, at both ends of a sample (`T2`, `t1`, §4.5 item 1) | the edge worker's clock at entry, against the database-clock reveal |
+| What one sample, or the measured time, contains | down to the client, the client's turnaround, back up, plus PostgREST's work and the sample's commit on each pass | up only, plus the gateway's hop to the worker |
+
+**What is shared, and what isn't:**
+- **Shared:** the leg from the player to Supabase's front door, which is the only part that differs
+  much between players. Both requests go to the same host, so a browser sends them over the same
+  HTTP/2 connection.
+- **Not shared:**
+  - **The last hop.** The echo's RTT/2 includes half of gateway → PostgREST → database and back,
+    plus PostgREST's request handling and the sample's commit. The answer's includes the gateway →
+    edge-worker hop instead. All of it is inside Supabase's region and is about the same for every
+    player, so it mostly cancels in `t − F`. Planning figure: under 10 ms, and the credit runs
+    slightly *high*. That is the budget's 10 ms "path difference" row.
+  - **The clocks.** A sample is a difference of two database-clock readings, so the database
+    clock's offset cancels. The answer is an edge-clock reading minus a database-clock reveal, so
+    edge-to-database skew enters directly. It is the same sign for every player, which `t − F`
+    cancels, and its spread is the budget's 10 ms row. Stage 7 measures it as the spread of
+    `commit_lag_ms` (§4.5.4).
+  - **A phone's radio state** (not compensated). The echo chain runs just before the reveal, while
+    the answer may leave seconds later. If the radio dropped to idle in between, the answer pays a
+    wake-up delay that no echo saw. This is measured in stage 7 as part of the phone's answer-time
+    error, and is a residual like voice start-up.
+
+**Is the credit still valid? Yes, under two conditions the spec already requires:**
+1. **The answer is pinned to the database's region** (§4.4.1). Unpinned, the answer would run in
+   the edge region nearest the player, so the two routes could differ by a continent. If pinning is
+   ever unavailable, the credit is switched off (§4.4.1's fallback).
+2. **No preflight, cold boot or token refresh sits in front of the answer.** None of these is in
+   any echo sample, and each is larger than the whole dead band. §4.5.4 removes them or credits
+   them.
+
+The extra error from the routes differing is then the 10 ms path row plus the 10 ms clock row, both
+already in the budget.
+
+#### 4.5.4 Cold starts, preflights and the warm-up (added 2026-10-04, fourth pass)
+
+**The earlier figures, confirmed.** Commit `1b7d1a4` (2026-09-27) records the race's
+`submit-answer` round trip as "309-667 ms warm, 1.3 s cold, measured live". They are in that commit
+message only, not in `docs/history.md` or CLAUDE.md, so this pass adds them to the history.
+- They are **round trips seen by the client** (Enter → reply), not stamp errors. They include the
+  download, the Auth check, the database call and probably a preflight (§1.6 item 5).
+- The cold excess, about 650 to 1,000 ms, can't be split from that measurement. Part of it is the
+  fresh worker opening new connections to Auth and PostgREST, which option B moves out of the
+  measured time.
+- **The boot itself** is what still counts. Supabase's published figures (blog "Persistent Storage
+  and 97% Faster Cold Starts for Edge Functions", 2025-07-18) are **42 ms on average, 86 ms at P95
+  and 460 ms at P99**.
+
+**The stamp is taken after the boot.**
+- `Deno.serve` runs the handler only once the worker has booted and evaluated the module. "The
+  first line of the handler" therefore cannot run earlier.
+- No documented gateway header carries an earlier server receipt time.
+- Worse, on a cold worker with a lapsed preflight cache, the preflight boots the worker
+  (`_shared/mod.ts:127` answers `OPTIONS` in the function itself), and the POST is stamped one round
+  trip after that.
+
+So a cold landing adds its boot to that player's measured time: on average 42 ms, but 460 ms at P99,
+more than twice the dead band.
+
+**How often cold workers happen on Free** (Supabase "Edge Function limits" page):
+- A worker stays active at most 150 s on Free ("Maximum Duration (Wall clock limit)"; 400 s on
+  paid plans). So even a busy function boots a fresh worker at least every 150 s.
+- An idle function boots on its first call.
+- How requests are spread across workers is not documented. The architecture page says both that
+  "Isolates can remain active for a period … to handle subsequent requests" and that "A new V8
+  isolate is spun up for each invocation". Stage 6 measures which is true (the `edge_cold` rate
+  below).
+
+**The fix, in four parts.**
+
+1. **Cache the preflight** (stage 1, because it also fixes today's race and Elimination). Add
+   `Access-Control-Max-Age: 7200` to `corsHeaders` (`_shared/mod.ts:20-24`).
+   - MDN documents the caps: Chromium 76+ at 2 h, Firefox at 24 h, and the default without the
+     header is 5 s. Safari's cap isn't documented there; part 2 covers it, because a warm-up
+     refreshes the cache every round.
+   - Preflights aren't billed (Supabase's invocation billing page), so this changes no quota figure.
+
+2. **One warm-up per player per round to `submit-round`** (Dash and Hourglass).
+   - **Exactly the answer's URL and headers**, including the `forceFunctionRegion` query string, so
+     the preflight it triggers fills the cache entry the answer will use. The body is
+     `{"warm": true}`.
+   - **When:** at the start of the pre-start window, i.e. when the previous round closes, or when
+     the countdown starts for round 1. It goes before the first echo call, so its bytes never
+     overlap a sample.
+   - **Server:** stamps as usual, validates the token (which also opens the worker's connection to
+     Auth, shortening the answer's commit lag), and returns 204 **without calling the database**.
+     It writes nothing.
+   - **Cost:** one billed invocation, counted in §4.5.1 (Dash 8 players: 145 a game instead of 81).
+   - **Switch:** the echo's reply carries `warmup: true|false`, read from
+     `private.runtime_flags.warmup_enabled`. The client warms only while its latest echo reply said
+     true, and by default before round 1. Clients still never read the flags table itself.
+   - **Rule for a failed warm-up:** it never blocks anything and is never retried. The reveal, the
+     input and the submit don't wait for it. After a 402 or 5xx, no more warm-ups this game. The
+     answer is sent exactly as it would have been without one (§4.5.2 table).
+   - **What it cannot do:** keep a worker past its 150 s life. If the worker retires between the
+     warm-up and the answer, the answer lands cold. With one worker and a uniform retirement age,
+     that is about `(2.6 s + answer time) / 150 s`, roughly 5% for a 5 s answer. That is why part 3
+     exists.
+
+3. **Detect a cold landing on the server, and credit the boot** (stage 6).
+   - `submit-round` keeps a module-level counter. Module state lives for one worker, so the
+     worker's first request is reliably `edge_cold = true`.
+   - On that request it also takes `edge_boot_ms = Date.now() − performance.timeOrigin` at handler
+     entry. This assumes the runtime sets its time origin when the worker starts, which stage 6
+     verifies.
+   - Both go to SQL as parameters from the edge code, never from the client. They are stored on the
+     player's `round_scores` row.
+   - **Boot credit**, if `runtime_flags.boot_credit` is true: on a cold request only, the adjusted
+     time also subtracts `min(edge_boot_ms, 500)`. 500 covers the published P99 of 460 ms. It is
+     part of the adjusted time, so it is compared with the human floor too.
+   - **Validation, before it is switched on** (stage 6):
+     - force at least 20 cold boots (deploy, or wait out 150 s idle);
+     - compare each `edge_boot_ms` with the boot time in that worker's `booted` event (Dashboard →
+       Edge Functions → Logs, per Supabase's "Edge Function takes too long to respond" guide);
+     - **accept only if every one is within 20 ms**, and none is more than 20 ms larger.
+
+     Otherwise `boot_credit` stays false, and a cold landing keeps its boot as a documented residual.
+   - **Exposure:**
+     - No client sends this value.
+     - A client might steer its own answer onto a fresh worker, for example with a burst of
+       concurrent calls. Those are billed and capped by the daily limits. Even then it is credited
+       only the boot it actually suffered, so it gains at most the measurement error (≤ 20 ms,
+       inside the budget).
+     - The risk of over-crediting is a worker that started long before its first request. The
+       500 ms cap bounds it, and validation catches it, because the log's boot time would disagree.
+
+4. **Never refresh the token on the answer path.** In the pre-start window, the client refreshes a
+   session that expires within 60 s, so `getSession()` (`rooms.ts:291`) resolves from memory when
+   Enter is pressed.
+
+**The Dash settle window, re-picked: 250 ms (was 150).**
+- **What the window must cover.** A later correct answer B can still beat the first correct answer
+  A only if `stamp_B − stamp_A < credit_B − credit_A ≤ CAP`. B reaches the database at
+  `stamp_B + lag_B`, where the lag is the Auth check, the PostgREST call and the transaction. So,
+  counted from A's arrival at the database, the window must cover
+  `CAP + edge clock jitter + (lag_B − lag_A)`.
+- **The old 150 ms** (CAP + 50) left out the lag spread entirely.
+- **Planning figure for the lag spread:** 150 ms at P99, all in one region. Stage 7 measures it per
+  answer as `commit_lag_ms = now() − p_received_at`.
+- **So W ≥ 70 + 10 + 150 = 230 ms, which is picked as 250 ms.**
+  - It costs 100 ms more of the 1.1 s feedback window.
+  - The fastest possible round becomes 1.5 + 0.45 + 0.25 + 1.1 = 3.3 s, which is still 18 rounds a
+    minute (60 / 3.3 = 18.2), so §4.5.1's echo limits are unchanged.
+- **A cold-landed B** whose boot credit would have won, but which arrives after the window, loses
+  the round. The round is never re-awarded (one winner, the conditional update), and B's row is
+  marked `settled_late` for stage 7. This is a documented residual, not a silent one.
+- **Optional, engineering:** checking the JWT inside the edge function with the project's signing
+  keys, instead of the Auth round trip, would shrink the lag. Stage 6 may measure it; this spec
+  doesn't require it.
+
+#### 4.5.5 Flood exposure of the database echo (added 2026-10-04, fourth pass)
+
+The echo spends no Edge Function invocations, but it is still a public endpoint any signed-in guest
+can call as fast as their connection allows. **No limit inside the function can stop a flood.** This
+section says what a flood costs, how the project would notice, and what each defence actually
+protects.
+
+**What one rejected call costs.**
+- **Before the database:**
+  - Supabase's API gateway.
+  - PostgREST checks the JWT in memory. An invalid or expired token is refused there with 401,
+    which is the cheapest outcome.
+- **Inside the database, for a valid token:**
+  - PostgREST takes a connection from its fixed pool, opens a transaction, sets the role and
+    claims, and calls `echo`.
+  - A rejection then costs at most:
+    - one primary-key read of `runtime_flags`;
+    - the membership lookup;
+    - one `rooms` row;
+    - for a throttled call only, the lock and the count queries.
+  - It writes nothing (asserted in `echo.test.mjs`).
+  - An anon token is refused by Postgres at the permission check, which still takes a transaction.
+- **On the way out:** about 200 B of egress.
+- **Size:** of the order of a millisecond or a few of database time and pool-connection time per
+  call. This is an estimate, not a measurement. Stage 6's concurrency package measures it.
+
+**A fix found in this pass: the limit check's lock must not wait.**
+- `lock_for` is `pg_advisory_xact_lock` (`0019:79-85`), which **blocks** until the lock is free.
+- So N concurrent echo calls from one guest would each hold a PostgREST pool connection while
+  queuing on that guest's own lock. One guest could pin the pool, and the answer path's database
+  call (`_shared/mod.ts:65-74`, through the same PostgREST) would queue behind them.
+- **Rule:** the echo uses a new non-waiting helper, `try_lock_for(kind, id)`
+  (`pg_try_advisory_xact_lock`), and returns `throttled` at once if the lock is taken. A guest's
+  call then never waits on another of its own calls.
+- `lock_for` stays as it is for 0019's room and host locks, where waiting is the point.
+
+**What a sustained flood can still do:**
+- **Slow every API request on the project** by occupying database CPU and PostgREST connections.
+  On Free's smallest compute that may not need a large rate.
+  - It doesn't move any answer's **stamp**, which is taken before the database step (§4.5.3).
+  - It does lengthen the **commit lag**, so Dash rounds can overrun the 250 ms window
+    (`settled_late`), and rounds close later.
+- **Spend egress:** 5 GB ÷ 200 B ≈ 25 million rejected calls. At 100 calls a second that is about
+  2.9 days. Going over the egress quota on Free brings the same restrictions as the invocation
+  quota (§4.5.2).
+- **Spend no Edge Function invocations.**
+- **This is not new:** the same is already true of `server_now()` and of every table a guest can
+  read today. The echo's rejections cost a little more than `server_now()` because of the membership
+  and window reads. The non-waiting lock keeps the expensive part bounded.
+
+**How the project would notice** (added to the §6.6 runbook):
+- **Dashboard → Reports → API:** a spike in requests to `/rest/v1/rpc/echo`, mostly 4xx.
+- **Dashboard → Reports → Database:** CPU and connection count.
+- **Read-only SQL, week on week:** honest play makes about 6 calls per player per Dash or
+  Hourglass round (the §6.6 estimate query gives the player-rounds), so `calls` far above
+  `6 × player_rounds` is a flood:
+
+  ```sql
+  select calls, total_exec_time from extensions.pg_stat_statements where query ilike '%echo(%';
+  ```
+- **Who:** a guest at the daily 6,000 cap is the suspect:
+
+  ```sql
+  select player_id, n from private.echo_quota where day = current_date order by n desc limit 5;
+  ```
+
+  It counts served calls, so a guest flooding only rejections may not show here. Use the API
+  report's request metadata instead.
+
+**The defences, and what each protects.** None of them stops the requests from arriving.
+
+| Defence | What it protects | What it does not protect |
+|---|---|---|
+| Per-player, per-room and per-day limits (§4.5.1) | The rows written, the samples, every other player's credit, and how long one guest can hold the lock | Request rate. A throttled call still costs a transaction and egress. |
+| The non-waiting lock (this section) | The PostgREST pool, against one guest's parallel calls queuing | Calls from many guests |
+| Kill switch `echo_enabled` (§4.5.2) | Ends every call at the cheapest check and stops honest echo traffic; credits become 0 and games carry on | A script keeps sending, and every call still reaches PostgREST and Postgres |
+| Revoking `EXECUTE` on `echo` from `authenticated` (one SQL statement, the step after the kill switch) | Postgres refuses at the permission check, before any function code | The requests still arrive |
+| Turnstile CAPTCHA on guest creation | How many identities a script can mint, so the per-guest limits can't be multiplied cheaply | One identity's request rate |
+| Banning the guest (§6.6 step 4d) | Its token can't be refreshed. Within about an hour it expires, and PostgREST then refuses it with 401 before the database. | The hour before it expires |
+| Nothing in this project | — | Raw request volume. Only Supabase's own platform protections, or a support request, can stop that. |
+
 ### 4.6 How latency bias is limited (summary)
 
 | Bias | Before | After |
 |---|---|---|
 | Realtime download of the round | Counted (the race starts the clock at the commit) | **Removed** (scheduled reveal) |
 | Edge auth plus edge→DB | Counted | **Removed** (stamp at entry, pinned region) |
-| Upload latency, player → edge | Counted | **Credited up to 100 ms** by server-measured echoes (§4.5). Beyond that, still counted. |
+| Upload latency, player → edge | Counted | **Credited up to 70 ms** by server-measured echoes (§4.5). Beyond that, still counted. |
+| CORS preflight before the answer (§1.6 item 5) | Counted on most answers: one extra round trip | **Removed** (`Access-Control-Max-Age`, plus the warm-up priming the cache, §4.5.4) |
+| Cold worker boot | Counted (and today the cold worker's new connections to Auth and PostgREST too) | **Made rare** by the warm-up; **credited** (server-measured, at most 500 ms) if stage 6 validates the measurement; recorded either way (§4.5.4) |
+| Token refresh before sending | Possible on any answer | **Removed:** refreshed in the pre-start window (§4.5.4) |
 | Clock-sync error | One sample | 5-sample min-RTT, under 20 ms typical |
 | Voice start-up | Counted | Still counted. Measured in stage 7 (Dash test); the Hourglass dead band absorbs small cases. |
 
@@ -903,7 +1225,8 @@ query. Supabase's documented notification only arrives *after* the quota is exce
 
 Hourglass is the mode where 0.1 s matters, because charges add up. Five rules:
 
-1. **Same zero for everyone.** Every time is `p_received_at − turn_started_at − credit`, against
+1. **Same zero for everyone.** Every time is `p_received_at − turn_started_at − credit` (minus the
+   boot credit for a cold-landed answer, §4.5.4), against
    one reveal instant. F and t come from the same pinned clock pool, so `t − F` cancels any
    constant offset (edge-to-DB skew, the reveal itself).
 2. **Integer milliseconds in SQL**, no floats. Banks are `int` ms.
@@ -923,11 +1246,14 @@ feature flag.
 
 Dash no longer awards the round to the first arrival. Once the latency credit exists, a later
 arrival can have the lower adjusted time.
-- The round is settled by `close_round_tx` 150 ms after the first correct arrival (CAP plus 50 ms), or
-  as soon as every contender has an attempt.
+- The round is settled by `close_round_tx` 250 ms after the first correct arrival at the database
+  (CAP + edge clock jitter + the edge-to-database lag spread, §4.5.4), or as soon as every contender
+  has an attempt.
 - The winner is the lowest adjusted time, with ties going to the earlier attempt. It is recorded once
   with the conditional-update pattern from `0006:304-320`.
-- The cost is 150 ms of extra wait before the feedback appears, inside the existing 1.1 s window.
+- The cost is 250 ms of extra wait before the feedback appears, inside the existing 1.1 s window.
+- An answer that would have won but arrives after the window doesn't re-award the round. It is
+  marked `settled_late` and counted in stage 7.
 - The residual (voice start-up, delay beyond the cap) decides only genuinely close rounds. That is
   documented, not hidden (D12).
 
@@ -1172,7 +1498,7 @@ Also bump "Last checked against the code". Nothing else changes:
 | # | Name | Contents | Compatible with the deployed client because |
 |---|---|---|---|
 | — | `word_start` (stage 3) | Race: `start_game_tx` and `advance_round_tx` set `round_started_at = now() + preroll_ms`, and `submit_answer_tx` refuses an answer before it (`round_not_started`), so a negative elapsed can never score. Elimination: the opening turn also gets the preroll (later turns already start in the future, `0012:856-867`). `preroll_ms()` constant (1500), revoked from anon. | The client from stage 3 shows "Get ready" for a future start. It ships **before** this migration, so a client never meets a future start it can't display. The old client would merely show a full, still bar for 1.5 s. |
-| — | `echo_credit` (stage 6) | `public.echo(p_room_id)` RPC (granted to `authenticated` only, SECURITY DEFINER, `search_path` pinned); `private.echo_samples` and `private.echo_quota`; `purge_echo_samples()` plus a 10-minute cron job (expired quota rows go in the existing daily job); the credit is computed **inside** the submit transactions (median of samples, in an exception block that falls back to 0); `round_scores.credit_ms`; `timing_params()` gains `latency_cap_ms` (100) and `echo_min_samples` (3); `abuse_limits()` gains the five echo limits (§4.5.1) and `max_games_started_per_host_per_day` (60); `private.runtime_flags` with its four starting rows (§4.5.2); `rooms.feed_on boolean not null default false`. `purge_anonymous_users` adds `echo_samples.player_id` and `echo_quota.player_id` to its checks. | New objects only. `rooms.feed_on` has a default and isn't in the client INSERT grant (`0017`). |
+| — | `echo_credit` (stage 6) | `public.echo(p_room_id)` RPC (granted to `authenticated` only, SECURITY DEFINER, `search_path` pinned); `private.echo_samples` and `private.echo_quota`; `purge_echo_samples()` plus a 10-minute cron job (expired quota rows go in the existing daily job); the credit is computed **inside** the submit transactions (median of samples, in an exception block that falls back to 0); `round_scores.credit_ms`; `timing_params()` gains `latency_cap_ms` (**70**, fourth pass), `echo_min_samples` (3), `boot_credit_cap_ms` (500) and `settle_window_ms` (**250**); `abuse_limits()` gains the five echo limits (§4.5.1) and `max_games_started_per_host_per_day` (**30**, fourth pass); `private.runtime_flags` with its six starting rows (§4.5.2); the non-waiting `try_lock_for(kind, id)` helper the echo uses (§4.5.5), revoked from every client role like `lock_for`; `rooms.feed_on boolean not null default false`. `purge_anonymous_users` adds `echo_samples.player_id` and `echo_quota.player_id` to its checks. | New objects only. `rooms.feed_on` has a default and isn't in the client INSERT grant (`0017`). |
 | 0021 | `avatar_parts` | `avatar_options()`; `room_players.avatar_color` and `avatar_hat` plus CHECKs; backfill from `avatar`; the legacy sync trigger (§2.4); column grants re-issued with the two columns | The old client names only legacy columns; the trigger fills the parts. |
 | 0022 | `mode_schema` | Widen the `rooms.mode` CHECK to add `dash`, `hourglass` and `spotlight`. Add `room_players.round_wins int not null default 0`, `time_bank_ms int` (null until start) and `contending boolean not null default true`. Add `rooms.phase text` (`regular` / `sudden_death`, null otherwise). Add the `round_scores` table. Add `dash_params()`, `hourglass_params()`, `spotlight_params()` and `timing_params()`. **Extend the 0016 backstop trigger** to reject client rows with non-default `round_wins`, `time_bank_ms` or `contending`. | Purely additive. The old client never creates the new modes (its lobby offers Race and Elimination only), and the column grants are unchanged, so it cannot set the new columns. |
 | 0023 | `timing_core` | `p_received_at` overloads of the submit functions; `floor_ms()`; the `too_fast` path; nothing for `timeout-turn`: `timeout_turn_tx` already takes an optional caller and is already granted to `service_role` (`0012:1052-1057,1152-1157`), so stage 1 needs no migration. The old signatures stay until the old edge functions are redeployed. | The old edge functions call the old signatures, which are unchanged. |
@@ -1200,7 +1526,13 @@ number, so a branch at that one number is the smaller change.
   - `outcome` (`correct`, `wrong`, `missed`, `void`);
   - `response_time_ms` (nullable);
   - `charge_ms` (Hourglass, nullable);
-  - `bank_after_ms` (nullable).
+  - `bank_after_ms` (nullable);
+  - timing diagnostics (fourth pass, §4.5.4), all nullable: `credit_ms`, `boot_credit_ms`,
+    `edge_cold boolean`, `edge_boot_ms`, `commit_lag_ms` (`now() − p_received_at` at the
+    database) and `settled_late boolean` (Dash). The submit transaction stores them on the
+    player's `round_attempts` row (new nullable columns, still with no client grants), and the
+    close copies them here. They are timings, like `response_time_ms`, so PRIVACY.md's existing
+    "every guess with its timing" wording covers them.
 - PK `(room_id, round_num, player_id)`. `room_id` cascades from `rooms`, `player_id` from
   `auth.users`. Written only at round close by the engine.
 - Grants: `select` to `authenticated` plus a members-only SELECT policy (`is_room_member`), the same
@@ -1215,7 +1547,7 @@ number, so a branch at that one number is the smaller change.
 |---|---|---|
 | `timeout-turn` (stage 1) | `timeout_turn_tx(room, round, caller)` | Closes the known Elimination gap and serves Spotlight. Any member may nudge; SQL re-derives the deadline. |
 | `start-match` | `start_dash_tx` / `start_hourglass_tx` / `start_elimination_game_tx` | Routes on the room's mode **inside SQL** (`start_match_tx`), so the edge function stays auth plus HTTP. |
-| `submit-round` | `submit_dash_tx` / `submit_hourglass_tx` | Stamps `received_at` as the first line of the handler. |
+| `submit-round` | `submit_dash_tx` / `submit_hourglass_tx` | Stamps `received_at` as the first line of the handler. Fourth pass (§4.5.4): passes the worker's `edge_cold` flag and `edge_boot_ms` to SQL; answers a `{"warm": true}` body with 204 after the token check, without calling the database. |
 | `close-round` | `close_round_tx` / `close_hourglass_round_tx` | The client fast path, like `advance-round`. |
 | `submit-turn` (existing) | redeployed to pass `p_received_at` | |
 | (no `echo` edge function) | — | **Deliberately not an edge function** (third pass, §4.5): every edge invocation is billed even when rejected, so a public echo there would let any guest spend the monthly quota. The echo is the `public.echo()` database RPC. |
@@ -1304,10 +1636,15 @@ Every one returns only `{ok:false, error:"internal_error"}` on a 500 (hardening 
   - **Sample correctness:**
     - two calls separated by `pg_sleep(0.05)` give one closed sample with `rtt_ms >= 50`;
     - a pipelined second call (no sleep) gives a sample of about 0, never negative.
+  - **The lock never waits** (fourth pass, §4.5.5): with a second session holding
+    `try_lock_for('echo', player)`, the player's echo returns `throttled` immediately (asserted
+    under `SET lock_timeout = '50ms'`, so a waiting implementation fails with 55P03 instead of
+    passing), and writes nothing.
   - **Retention:** the round's close deletes its samples; `purge_echo_samples()` removes rows older
     than 10 min; the purge of anonymous users still works with echo rows present.
 - `echo_credit.test.mjs` (the credit, and **an unavailable echo never stops a round from scoring**):
-  - the credit is capped at 100 even for a 900 ms median;
+  - the credit is capped at `latency_cap_ms` (70) even for a 900 ms median, read from
+    `timing_params()`, never hard-coded;
   - the median, not the mean, of a sample set containing one outlier;
   - adjusted time is floored at 0 and compared with the human floor after the credit;
   - **zero credit, still scores:**
@@ -1318,6 +1655,14 @@ Every one returns only `{ok:false, error:"internal_error"}` on a 500 (hardening 
     - with `private.echo_samples` made unreadable inside the test transaction (a revoke from the
       function owner) to simulate a failure: the submit still commits, with `credit_ms = 0`. This
       proves the exception block.
+  - **cold-start columns** (fourth pass, §4.5.4):
+    - with `boot_credit` false, `p_edge_cold = true, p_edge_boot_ms = 300` stores both and leaves
+      the adjusted time unchanged;
+    - with it true, the adjusted time drops by 300, and by only 500 for `p_edge_boot_ms = 900`;
+    - a warm request (`p_edge_cold = false`) gets no boot credit, whatever `p_edge_boot_ms` says;
+    - the boot credit is applied before the human-floor comparison;
+    - `commit_lag_ms` is stored, and `settled_late` is set on a winning-time answer that commits
+      after the settle window, without changing the recorded winner.
 - `feed_admission.test.mjs`:
   - with a budget of 40, a first 8-player Spotlight room gets `feed_on`, and a second 8-player room
     doesn't;
@@ -1325,8 +1670,8 @@ Every one returns only `{ok:false, error:"internal_error"}` on a 500 (hardening 
   - a finished room frees its share;
   - `live_feed = false` admits none;
   - `rooms.feed_on` can't be written by a client (42501).
-- `abuse_limits.test.mjs` (extended): the 61st game start by one host in 24 h gives
-  `too_many_games_today`.
+- `abuse_limits.test.mjs` (extended): the 31st game start by one host in 24 h gives
+  `too_many_games_today` (the limit is read from `abuse_limits()`).
 - `dash_engine.test.mjs`:
   - first to 3, the 5-round cap, a void round uses a slot, sudden death limited to contenders;
   - `not_contending`, the 10-round draw;
@@ -1372,8 +1717,13 @@ control that must break the invariant:
 
 **Edge (`edge_errors.test.mjs` pattern):**
 - the new handlers stamp `received_at` before awaiting anything, and return the generic 500 shape;
-- `submit-round` still accepts exactly `{room_id, round_num, guess}` and ignores any extra
-  credit-like field a client sends.
+- `submit-round` still accepts exactly `{room_id, round_num, guess}`, or `{warm: true}`, and
+  ignores any extra credit-like or `edge_*` field a client sends;
+- **warm-up** (fourth pass): `{warm: true}` with a valid token returns 204 and makes **no** RPC call
+  (the stubbed `fetch` sees only the Auth request); without a token it returns 401;
+- **cold flag:** in one loaded module, the first request passes `p_edge_cold = true` and the second
+  `false`;
+- **preflight:** `OPTIONS` returns `Access-Control-Max-Age: 7200` from every function.
 
 **Client (Vitest), the echo never blocks play:**
 - with fake timers and an echo promise that **never resolves**, the reveal still enables the input
@@ -1382,9 +1732,22 @@ control that must break the invariant:
   that round (the call count is asserted);
 - after `disabled`, no further call for the rest of the game;
 - `roomErrors` maps `http_402` to the friendly "Multiplayer is resting" message.
+- **The warm-up never blocks play** (fourth pass):
+  - with a warm-up promise that never resolves, the reveal enables the input on time and Enter
+    sends `submit-round` at once;
+  - a failed warm-up is not retried (call count asserted), and after a 402 or 5xx none is sent for
+    the rest of the game;
+  - an echo reply with `warmup: false` stops warm-ups until one says `true`;
+  - the warm-up uses the same URL, query string and headers as the answer (asserted on the stubbed
+    `fetch`), so it fills the same preflight cache entry;
+  - a session expiring within 60 s is refreshed in the pre-start window, and `getSession()` makes
+    no network call when Enter is pressed.
 
 **Concurrency package (real Postgres 17):** 20 parallel echo calls from one player in one round leave
-exactly 8 rows. *Negative control:* with `lock_for()` stubbed to a no-op, the count goes past 8.
+at most 8 rows, and the rest return `throttled` **without waiting**: no echo backend shows up in
+`pg_locks` with `granted = false`. *Negative control:* with `try_lock_for()` stubbed to always
+return true, the count goes past 8. *Second control:* with the echo switched to the waiting
+`lock_for()`, waiting backends appear. That is the pool-pinning the fourth pass removed (§4.5.5).
 
 ### 6.6 Runbook: quotas, usage checks and the runtime switches (added 2026-10-04)
 
@@ -1416,16 +1779,32 @@ exactly 8 rows. *Negative control:* with `lock_for()` stubbed to a no-op, the co
    where rr.ended_at >= '2026-10-01';
    ```
 
-   Expected invocations ≈ `player_rounds + 2 × rounds + games` (§4.5.1 budget).
+   Expected invocations ≈ `2 × player_rounds + 2 × rounds + games` (§4.5.1 budget, fourth pass:
+   one submit and one warm-up per player per Dash or Hourglass round). Spotlight turns and rounds
+   played with `warmup_enabled` off have no warm-up, so for them the estimate overstates. Treat
+   it as an upper bound.
    - **A dashboard figure well above twice the estimate means calls are arriving that aren't
      games.** Open Edge Functions → Logs and look for one user id making most of the calls.
    - Rooms older than 30 days are already purged, so the estimate undercounts a cycle that began
      more than 30 days ago. Use it only within the current cycle.
+3b. **Check the echo for a flood** (fourth pass, §4.5.5). Compare
+   `select calls from extensions.pg_stat_statements where query ilike '%echo(%';` with last week's
+   figure and with `6 × player_rounds` from step 3. Look at Reports → API for `/rest/v1/rpc/echo` and
+   Reports → Database for CPU. If one guest stands out,
+   `select player_id, n from private.echo_quota where day = current_date order by n desc limit 5;`
+   names the guests with the most served calls.
 4. **Respond.** Each of these is one SQL statement in the dashboard; there's no deploy. Note every
    flip in `docs/history.md`.
    - **a. Echo misbehaving or loading the database:**
      `update private.runtime_flags set value='false', updated_at=now() where key='echo_enabled';`
-     The latency credit becomes 0 and games carry on (§4.5.2).
+     The latency credit becomes 0 and games carry on (§4.5.2). If a flood continues, the next
+     step is `revoke execute on function public.echo(uuid) from authenticated;`, which makes every
+     call fail at the permission check. Neither stops requests arriving (§4.5.5). Re-grant when it
+     is over.
+   - **a2. Invocations rising faster than games** (fourth pass): set `warmup_enabled` to false.
+     Warm-ups stop at each client's next echo reply, which removes up to 44% of a game's
+     invocations (Hourglass: 160 of 361). Cold landings become more likely until it is switched
+     back.
    - **b. Realtime close to its per-second cap, or a disconnect storm:** set `live_feed` to false,
      then `update public.rooms set feed_on=false where mode='spotlight' and status='active';`
      (§5.3.1).
@@ -1510,15 +1889,15 @@ project.
 |---|---|---|---|---|
 | 0 | **Merge the redesign** (Ian) | 0 | the redesign | (already listed in CLAUDE.md) |
 | | ***Fixes that stand alone (they improve today's Race and Elimination)*** | | | |
-| 1 | **Elimination timeout fast path:** a `timeout-turn` edge function plus the client nudge in `useMultiplayerGame` (replacing the early return at `:604-625`). No migration: `timeout_turn_tx` already takes an optional caller (`0012:1052-1057`). | 1 | expired turns end in ~150 ms instead of up to ~5 s | Ian alone, two browsers (Chrome + Edge are two guest identities): let a turn expire and watch it advance. |
+| 1 | **Elimination timeout fast path:** a `timeout-turn` edge function plus the client nudge in `useMultiplayerGame` (replacing the early return at `:604-625`). No migration: `timeout_turn_tx` already takes an optional caller (`0012:1052-1057`). **Also** `Access-Control-Max-Age: 7200` in `_shared/mod.ts`'s CORS headers, redeploying every function (§1.6 item 5, §4.5.4 part 1). | 1 | expired turns end in ~150 ms instead of up to ~5 s; race answers stop paying a preflight round trip | Ian alone, two browsers (Chrome + Edge are two guest identities): let a turn expire and watch it advance. |
 | 2 | **Multi-sample clock sync:** 5 `server_now()` samples, keep the min-RTT one, re-sync every 10 rounds (`serverClock.ts` only). Done **before** stage 3, which depends on it: a word start shared across devices is only as good as the clocks that agree on it. | 0.5 | a steadier countdown | Unit tests only |
 | 3 | **Word start that doesn't depend on the device:** the `word_start` migration (scheduled reveal for Race and Elimination's opening turn), the "Get ready" countdown, a word-only announcement at the reveal, and no spoken lead-in in multiplayer. The speech-rate setting stays. **Ship the client before the migration** (§6.2). | 2 | every player hears the word at the same server moment | Ian alone, two browsers side by side (one on a slow voice, one fast): the word starts together. |
 | | ***Avatars*** | | | |
 | 4 | `avatar_parts` migration: schema, sync trigger, backfill, rollback, plus the §6.5 range and no-game-state tests | 1 | nothing visible | test:db |
 | 5 | Avatar maker UI, hats art, 8 colour tokens, localStorage migration, contrast gate at 0, keyboard pass | 2 | the new picker | Ian: a taste check on screenshots plus a keyboard pass |
 | | ***Dash*** | | | |
-| 6 | **Dash engine plus timing core:** `mode_schema`, `timing_core`, `echo_credit` and `dash_engine` migrations; the `start-match`, `submit-round` and `close-round` edge functions; the `echo` database RPC with its limits and the runtime flags (§4.5.1–4.5.2); feed admission columns; region pinning (`forceFunctionRegion`); edge stamps; human floor; Dash sweeper; test:db plus concurrency | 3 | nothing visible | Tests only |
-| 7 | Dash UI behind `?modes=next`: Get ready, pips, sudden death, `DashResults` | 2 | Dash (flagged) | **Real players:** 3–4 people, at least one phone on mobile data. Log `credit_ms`, `t − F` and voice start-up per device. |
+| 6 | **Dash engine plus timing core:** `mode_schema`, `timing_core`, `echo_credit` and `dash_engine` migrations; the `start-match`, `submit-round` and `close-round` edge functions; the `echo` database RPC with its limits and the runtime flags (§4.5.1–4.5.2); feed admission columns; region pinning (`forceFunctionRegion`); edge stamps; human floor; Dash sweeper; test:db plus concurrency. **Fourth pass:** the warm-up handling, the `edge_cold` / `edge_boot_ms` / `commit_lag_ms` columns, the non-waiting `try_lock_for`, and the **boot-measurement validation** of §4.5.4 part 3 (20+ forced cold boots against the dashboard's `booted` events; `boot_credit` is switched on only if every one is within 20 ms). It also records how often a request lands cold over 20 back-to-back calls, which settles whether workers are reused at all. | 3 | nothing visible | Tests, plus Ian alone for the boot validation (a deploy, then waits of over 150 s) |
+| 7 | Dash UI behind `?modes=next`: Get ready, pips, sudden death, `DashResults`; **the answer-time error measurement below** | 2 | Dash (flagged) | **Real players:** 3–4 people, at least one phone on mobile data. Log `credit_ms`, `t − F` and voice start-up per device, **plus answer-time error, cold and warm (below)**. |
 | 8 | Dash replaces Race in the lobby (flag off for Dash) | 0.5 | Dash live | — |
 | | **⏸ Stopping point A: a good game.** Dash for everyone, plus Elimination (with the fast timeout) and the avatar maker. Nothing below is needed for the site to be complete. | | | |
 | | ***Spotlight*** | | | |
@@ -1536,6 +1915,42 @@ project.
 - to stopping point B: 12 + 2 + 2.5 = **16.5**;
 - with Hourglass: 16.5 + 4 = **20.5**;
 - with the cleanup: **about 18 without Hourglass, about 22 with it**.
+
+**Stage 7: measuring answer-time error, cold and warm (added 2026-10-04, fourth pass).** The aim
+is to set the dead band, the credit cap and the settle window from data instead of from the planning
+figures in §4.5.
+
+- **What "answer-time error" is.** For each answer: `e = adjusted server time − the player's own
+  reveal-to-Enter time`.
+  - The client measures the second term with `performance.now()`, from its scheduled reveal to the
+    keydown.
+  - It is only ever a diagnostic. It is shown in a `?diag=1` panel the tester copies out as JSON, is
+    **never sent to the server**, and plays no part in scoring.
+  - The server columns come from `round_scores` (`credit_ms`, `boot_credit_ms`, `edge_cold`,
+    `edge_boot_ms`, `commit_lag_ms`, `settled_late`).
+  - Because the dead band compares players with each other, what matters is the **spread** of `e`
+    across devices, not its mean.
+- **Devices:** at least a wired or Wi-Fi laptop, a second laptop or desktop on another network, and
+  a phone on mobile data (Ian's own devices are enough if fewer testers are available).
+- **Cold against warm, as an A/B on the runtime flag:**
+  - about 10 Dash games, alternating `warmup_enabled` true and false per game, flipped in the SQL
+    editor between games and noted in `docs/history.md`;
+  - at least one game starts after the function has been idle for over 150 s, so round 1 is
+    genuinely cold;
+  - `edge_cold` on each answer says which answers landed cold, whatever the flag.
+- **Targets** (with 4 players over ~10 games, about 300 answers):
+
+  | Measure | Target | If it misses |
+  |---|---|---|
+  | Spread of `e`, warm answers (P95 − P5 across all devices) | **≤ 130 ms** (band 200 − CAP 70) | Lower the cap first (down to 50). If that is still not enough, the band has to grow, and that is Ian's call (D7b). |
+  | Spread of `e`, cold-landed answers with `boot_credit` on | ≤ 130 ms, the same | Switch `boot_credit` off and treat cold landings as residual. |
+  | Share of answers landing cold, with warm-ups on | **≤ 2%** (1 in 50) | Keep warm-ups and report it. If warm-ups on and off give about the same share after round 1, warm before round 1 only (§4.5.1's fallback column). |
+  | `commit_lag_ms`, P99 − P1 | **≤ 170 ms** (so window 250 ≥ 70 + 10 + spread) | Raise `settle_window_ms` to cover it, up to 400 ms, or measure local JWT verification (§4.5.4). |
+  | `settled_late` rounds | **0** in warm rounds | The window is too short; as above. |
+
+- **Output:** a short table in `docs/history.md` with the measured figures, and the values chosen
+  for `latency_cap_ms`, `settle_window_ms`, `boot_credit` and the warm-up rule. Stage 12 repeats the
+  spread measurement for Hourglass before its band is confirmed.
 
 **Stage 13, the cleanup, in detail.** A `retire_old_modes` migration, with its own rollback section.
 1. A NOT VALID CHECK so new rooms can't be `race` or `elimination`. Old rows are gone by then; NOT
@@ -1638,7 +2053,7 @@ question.
 | **C6** | Spotlight had no end condition without lives. | **Spotlight keeps lives.** | **Resolved 2026-10-04 (Ian)** |
 | **C7** | Speech rate, lead-ins and voice start-up make "fastest" partly a device property. | **No spoken lead-in: every round starts with the countdown, then the word alone at the same server moment on every device. The speech-rate setting stays.** Upload latency is credited up to 100 ms by server-measured echoes (§4.5). Voice start-up is measured in stage 7. | **Resolved 2026-10-04 (Ian)** |
 | **C8** | Old cached clients mislabel a new-mode room as "Race", then fail safely with `wrong_mode`. | Accepted. A reload fixes it, and the guards prevent corruption. Stage 13 removes the old modes after 30+ days. | Resolved 2026-10-04 (default) |
-| **C9** (new) | The latency credit lets a hostile client that delays its echoes claim up to the cap every round. | Cap 100 ms, under the 200 ms dead band with a 30 ms margin (§4.5 budget, revised for the RPC path). At most 0.1 s per Hourglass round, and only rounds closer than 100 ms in Dash. | Resolved 2026-10-04 (this review) |
+| **C9** (new) | The latency credit lets a hostile client that delays its echoes claim up to the cap every round. | Cap **70 ms** (fourth pass; it was 100), under the 200 ms dead band with a 30 ms margin once upload jitter, preflights and cold starts are in the budget (§4.5). At most 0.1 s per Hourglass round, and only rounds closer than 70 ms in Dash. | Resolved 2026-10-04 (this review; cap re-picked in the fourth pass under D7b's rule) |
 | **C10** (new, third pass) | **The monthly Edge Function quota is shared by every game, and anyone signed in can spend it.** Supabase bills every invocation whatever the response, so no check inside a function stops a script calling the answer endpoints. Running out can bring 402s for the whole project until the next cycle. This is pre-existing (`submit-answer` has always been exposed); the spec doesn't widen it, because the echo is moved off Edge Functions (D26). | Accept on Free, with the per-host daily game cap (D30), the weekly usage check and estimate query, and the response ladder (§6.6). The alternative is Pro: a 2,000,000 quota and paid overage instead of a shutdown. | Resolved 2026-10-04 (default) |
 
 ### 9.2 Decisions
@@ -1657,7 +2072,7 @@ question.
 | D9 | Spotlight clock | × 0.94 per correct turn, a 6 s floor, a full reset on any miss or timeout, no player-count trigger | One sentence a player can learn | Default |
 | D10 | Hourglass bank | A fixed 10 s in v1 | One less control | Default |
 | D11 | Speech in timed modes | **No spoken lead-in, a countdown, then the word alone at one server moment; the speech-rate setting stays.** This applies to Race and Elimination too, from stage 3. | Fairness, and accessibility for the rate | **Ian** |
-| D12 | Dash winner | **Changed 2026-10-04:** the lowest *adjusted* time (server-measured time minus the capped latency credit), settled 150 ms after the first correct arrival or when every contender has answered. It was first correct arrival. | The credit makes arrival order no longer speed order (§4.8). | Resolved (this review) |
+| D12 | Dash winner | **Changed 2026-10-04:** the lowest *adjusted* time (server-measured time minus the capped latency credit), settled 250 ms after the first correct arrival at the database (**150 until the fourth pass**, D33) or when every contender has answered. It was first correct arrival. | The credit makes arrival order no longer speed order (§4.8). | Resolved (this review) |
 | D13 | Human floor | 300 ms + 50 ms per letter, compared with adjusted time; `too_fast` doesn't use the attempt and is checked before the word is compared. | It never costs a human anything, and it isn't an oracle. | Default |
 | D14 | Presence for "left the game"? | No | It is client-asserted. Timeouts handle leaving. | Default |
 | D15 | Feed content | Letters | The spectacle is the point; C3 covers privacy. | Default |
@@ -1669,11 +2084,16 @@ question.
 | D21 | Plan tier | Stay on Free. Move to Pro only if the Realtime cap (stage 10) or Edge invocations (§4.5 table) bind. | The estimates fit Free at hobby scale. | Default |
 | D22 | Hourglass round cap | 30 rounds, then the most time left wins | Bounded games | Default |
 | D23 | Live speed for watchers | Yes, labelled "live", replaced by the official time | Ian asked for "how fast". | Default |
-| D24 (new) | Latency credit | **Server-measured echoes:** 6 chained calls (5 samples) before each reveal; the median RTT; credit `min(median/2, 100 ms)`; 0 with fewer than 3 samples. Used by Dash and Hourglass, not Spotlight. **Third pass:** the echo is a database RPC, not an edge function (D26), and a failed echo only ever zeroes the credit (§4.5.2). | A slower connection isn't charged for network delay, and the exposure stays inside the dead band. | Resolved (this review) |
+| D24 (new) | Latency credit | **Server-measured echoes:** 6 chained calls (5 samples) before each reveal; the median RTT; credit `min(median/2, 70 ms)` (100 until the fourth pass, D32); 0 with fewer than 3 samples. Used by Dash and Hourglass, not Spotlight. **Third pass:** the echo is a database RPC, not an edge function (D26), and a failed echo only ever zeroes the credit (§4.5.2). | A slower connection isn't charged for network delay, and the exposure stays inside the dead band. | Resolved (this review) |
 | D26 (new, third pass) | Where the echo runs | A database RPC (`public.echo`) with token, membership, pre-start-window and rate-limit checks, not an edge function | Supabase bills every edge invocation "regardless of the response status code". An edge echo would let one script use up the 500,000 monthly quota in about 7 hours; the RPC uses none of it (§4.5.1). | Engineering |
 | D27 (new) | When the live feed is offered | Only while the project's feed budget (40 msg/s on Free) has room. Otherwise that Spotlight game plays without the live view and says so. | It keeps the feed from ever tripping the Realtime cap that disconnects every game (§5.3.1). | Default |
 | D28 (new) | What players see if the monthly quota is nearly or fully used | A "multiplayer is paused" switch Ian can flip, and a "multiplayer is resting until next month" message on 402. Singleplayer always works. | A clear message instead of failed requests (§4.5.2, §6.6) | Default |
 | D29 (new) | Storing echo timings | Kept server-side, linked to the guest ID, deleted within 10 minutes; one PRIVACY.md sentence | Needed to compute the credit server-side without trusting the client | Default |
-| D30 (new) | Daily game cap per host | At most 60 games started per host in a rolling 24 h | Bounds what one room playing nonstop can spend from the invocation quota: 41 days for the full quota instead of 5 (§4.5.1) | Default |
+| D30 (new) | Daily game cap per host | At most **30** games started per host in a rolling 24 h (**60 until the fourth pass**: warm-ups raised an 8-player Hourglass game from 201 to 361 invocations, so 60 would have let one room spend the quota in 23 days) | Bounds what one room playing nonstop can spend from the invocation quota: 46 days for the full quota instead of 3 (§4.5.1) | Default |
 | D31 (new) | Echo rate limits | 8 per player per round, 120 per player per minute, 6,000 per player per day, 64 per room per round, 900 per room per minute | Each sits above the legitimate maximum (§4.5.1), so honest play never meets it | Engineering |
+| D32 (new, fourth pass) | Latency credit cap | **70 ms** (was 100) | D7b fixed the band at 200 ms and made the cap the number that moves. Counting upload jitter (30 ms) leaves room for 70 with the old 30 ms margin (§4.5). Stage 7 can lower it further from data. | Engineering (follows D7b) |
+| D33 (new, fourth pass) | Dash settle window | **250 ms** after the first correct arrival at the database (was 150) | The old window left out the spread in edge-to-database time, so a faster answer could arrive after the award. 70 + 10 + 150 = 230 (§4.5.4). Costs 100 ms more of the feedback pause. | Default |
+| D34 (new, fourth pass) | Warm-up before each round | One warm-up call per player per Dash or Hourglass round, switchable by `warmup_enabled`; never retried, never waited for | Makes a cold worker, which can add up to ~0.5 s to one player's time, rare. Costs 79% more invocations per 8-player game. Stage 7 decides between every round and round 1 only (§4.5.4). | Default |
+| D35 (new, fourth pass) | Crediting a cold start | The server measures a cold worker's boot and subtracts it, capped at 500 ms, **only if stage 6 validates the measurement** (`boot_credit` flag); otherwise it is recorded and not credited | A player whose answer lands on a booting worker isn't charged for the boot. A client can't send or inflate the value (§4.5.4). | Default |
+| D36 (new, fourth pass) | Plumbing found in the fourth pass | `Access-Control-Max-Age: 7200` on every function (stage 1); the echo's non-waiting `try_lock_for`; token refresh moved out of the answer path | Each removes a delay or a pool-pinning risk that no player chooses (§4.5.3–4.5.5) | Engineering |
 | D25 (new) | Build order | Fixes that stand alone, then avatars, Dash, Spotlight, Hourglass (optional), cleanup. Stopping points after Dash and after Spotlight. Clock sync before the word start it supports. | Ian's order. The one swap is explained in §8. | **Ian** (the order) / this review (the swap) |
