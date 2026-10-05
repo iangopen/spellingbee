@@ -175,3 +175,71 @@ and a response ladder.
 - 22 items remain Default.
 
 They are listed in plain language in `docs/multiplayer-decisions-for-ian.md`.
+
+## 2026-10-04: answer stamp, cold starts and the echo's flood exposure (plan/multiplayer-modes)
+
+Docs only. No code, migrations or edge functions were changed.
+
+**The earlier lag figures, confirmed:** commit `1b7d1a4` (2026-09-27) measured
+the race's `submit-answer` at 309-667 ms warm and about 1.3 s cold. They were
+in that commit message only, not in this file or CLAUDE.md, so they are
+recorded here. They are client round trips (Enter → reply), not stamp errors.
+
+**Where answers are stamped** (spec §4.5.3):
+- today's race: `now()` inside `submit_answer_tx` (`0015:197-198`), after the
+  edge function's Auth check (`_shared/mod.ts:45-56,131`) and its PostgREST
+  call. Upload, a cold boot, the Auth round trip and the DB hop all count;
+- Dash and Hourglass (spec): `Date.now()` at handler entry, which is still
+  **after the worker boots**. No in-request time is available before that.
+- The echo (database RPC) and the answer (pinned edge function) share the
+  player → Supabase leg and one HTTP/2 connection; they differ only inside the
+  region. Planning error 10 ms (path) + 10 ms (edge vs DB clock), both already
+  in the budget. The credit is valid only with region pinning and with no
+  preflight, cold boot or token refresh in front of the answer.
+
+**Found while reading:** most race answers today pay a CORS preflight round
+trip. `callEdge` sends non-simple headers (`rooms.ts:300-307`), the functions
+set no `Access-Control-Max-Age` (`_shared/mod.ts:20-24`), the browser default
+cache is 5 s, and race rounds are 13 s or more apart.
+
+**Supabase docs read today:** a Free worker lives at most 150 s (400 s paid);
+published boot times are 42 ms average, 86 ms P95, 460 ms P99 (blog,
+2025-07-18); preflights aren't billed; worker reuse across requests isn't
+clearly documented. MDN: `Access-Control-Max-Age` caps at 2 h in Chromium 76+
+and 24 h in Firefox.
+
+**Fixes specified** (§4.5.4):
+- `Access-Control-Max-Age: 7200` on every function, moved into stage 1;
+- one warm-up per player per Dash/Hourglass round to the exact answer URL,
+  never retried or awaited, switchable by `warmup_enabled`;
+- server-side cold detection (`edge_cold`, `edge_boot_ms`) and a boot credit
+  capped at 500 ms, switched on (`boot_credit`) only if stage 6 matches it to
+  the dashboard's `booted` events within 20 ms;
+- the session token refreshed in the pre-start window, not on Enter.
+
+**Budget re-picked:** adding upload jitter (30 ms) left no margin at a 100 ms
+cap, so under D7b the cap is now **70 ms** (warm total 170, margin 30; cold
+with boot credit 190; cold without it 212 / 256 / 630 at avg / P95 / P99).
+The dead band stays at 200 ms. The Dash settle window goes from 150 to
+**250 ms**, because the old one left out the edge-to-DB lag spread.
+
+**Invocations with warm-ups:** an 8-player Dash game is 145 (was 81, ~3,450 a
+month on Free), Hourglass 361 (was 201, ~1,385). The host daily game cap goes
+from 60 to **30**, because 60 × 361 would spend the quota in 23 days; 30 gives
+46.
+
+**Flood exposure** (§4.5.5): rejected echo calls cost a transaction, a pool
+connection and ~200 B each, and spend no invocations; a sustained flood can
+slow every API request and spend egress (~25M calls for 5 GB). Found:
+`lock_for` waits (`0019:79-85`), so one guest's parallel calls could pin the
+PostgREST pool. The echo now uses a non-waiting `try_lock_for`. Detection and
+the defences, with what each does and doesn't protect, are in §4.5.5 and the
+runbook.
+
+**Stage 7** gains an answer-time error measurement, cold vs warm, as an A/B on
+`warmup_enabled`, with targets: warm spread ≤ 130 ms, cold landings ≤ 2%,
+commit-lag spread ≤ 170 ms, no `settled_late` in warm rounds.
+
+**§9:** D32 (cap 70, engineering), D33 (settle 250), D34 (warm-up), D35 (boot
+credit), D36 (plumbing, engineering); D30 changed to 30. 25 items are now
+Default, all listed in `docs/multiplayer-decisions-for-ian.md`.

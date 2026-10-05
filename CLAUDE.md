@@ -673,7 +673,8 @@ Ian reviewed it on 2026-10-04, and **every decision in §9 is resolved**:
 Timing (§4.5):
 - answers are stamped at edge-function entry;
 - a latency credit is measured by the server from echo round trips (median,
-  capped at 100 ms, so the exposure stays under the 200 ms band);
+  capped at **70 ms** since the fourth pass, so the exposure plus measured
+  error stays under the 200 ms band, which D7b fixed);
 - every game call is pinned to the DB region. Supabase's docs confirm this is
   available, with no plan restriction documented.
 
@@ -690,7 +691,24 @@ The Spotlight feed is admitted against a 40 msg/s budget, so it can't trip
 the Realtime cap that disconnects every game. §6.6 is the usage and quota
 runbook.
 
-`docs/multiplayer-decisions-for-ian.md` lists, in plain language, the 22 items
+Fourth pass (2026-10-04), timing route and cold starts (§4.5.3–4.5.5):
+- answers are stamped at edge-function entry, which is AFTER the worker boots;
+  the echo shares the player → Supabase leg with the answer, so the credit is
+  valid given region pinning and nothing (preflight, cold boot, token
+  refresh) in front of the answer;
+- a warm-up call per player per round (Dash and Hourglass), never retried or
+  awaited, behind the `warmup_enabled` flag; a server-measured boot credit
+  (≤ 500 ms) behind `boot_credit`, on only if stage 6 validates it;
+- Dash settle window 250 ms (was 150); host daily game cap 30 (was 60),
+  because warm-ups take an 8-player Hourglass game from 201 to 361
+  invocations;
+- the echo's rate lock must be non-waiting (`try_lock_for`): 0019's
+  `lock_for` blocks, and one guest's parallel calls could pin the PostgREST
+  pool. No limit stops a request flood; §4.5.5 says what each defence does
+  protect;
+- stage 7 measures answer-time error, cold vs warm, with targets.
+
+`docs/multiplayer-decisions-for-ian.md` lists, in plain language, the 25 items
 still on their default, for Ian to confirm or change.
 
 Build order (§8):
@@ -712,7 +730,13 @@ file.
 Issues the spec found in TODAY's race, not yet fixed:
 - each client rolls its own random lead-in (`tts.ts`), so players hear phrases
   of different lengths before the same word;
-- the server-clock sync takes one sample.
+- the server-clock sync takes one sample;
+- most answers pay a CORS preflight round trip: the edge functions set no
+  `Access-Control-Max-Age` (`_shared/mod.ts:20-24`), so the browser's 5 s
+  default lapses between rounds. The spec moves the fix into stage 1;
+- the answer is timed inside the DB transaction (`0015:197-198`), so the edge
+  function's Auth round trip and DB call count against the player.
+  Measured (commit `1b7d1a4`): 309-667 ms round trip warm, ~1.3 s cold.
 
 ## Naming note
 Local dev folder/npm package name may still say "spelling-race" from
