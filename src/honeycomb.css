@@ -58,7 +58,7 @@
 .bg-cells { background: var(--cell-line); opacity: var(--cells-opacity); }
 .bg-cells-glow { background: var(--cell-line); filter: blur(6px); opacity: var(--cells-glow-opacity); transform: translateZ(0); }
 
-.bg-grain { inset: 0; background-image: var(--grain); background-size: 200px 200px; opacity: var(--grain-bg-opacity); }
+.bg-grain { inset: 0; background-image: var(--grain); background-size: 200px 200px; opacity: var(--hm-texture); }
 
 /* A calm band at the top so the header controls never sit on the brightest
    cells, then a soft vignette toward the corners. */

@@ -50,7 +50,7 @@
 .tier-select { width: 100%; max-width: 480px; margin: 0 auto; text-align: center; padding-top: 8px; }
 .tier-head { padding: 24px 20px 18px; margin-bottom: 28px; }
 .tier-select h1 {
-  margin: 0; font: 400 clamp(3.4rem, 11vw, 4.4rem)/0.95 var(--hand); letter-spacing: 0.012em; color: var(--heading); rotate: -1deg;
+  margin: 0; font: 400 clamp(3.4rem, 11vw, 4.4rem)/0.95 var(--hand); letter-spacing: 0.012em; color: var(--heading); rotate: calc(var(--hm-tilt) * -1);
 }
 .tier-select h1::after {
   content: ""; display: block; height: 10px; width: min(11ch, 78%); margin: 0.3em auto 0; background: var(--heading); opacity: 0.75;
@@ -477,7 +477,7 @@
 .hero { padding: 56px 36px 30px; }
 .hero h1 {
   margin: 0 0 14px; font: 400 clamp(3.6rem, 8.4vw, 6.3rem)/0.9 var(--hand); letter-spacing: 0.005em; color: var(--heading);
-  rotate: -1.4deg; transform-origin: 0 80%; text-wrap: balance;
+  rotate: calc(var(--hm-tilt) * -1.4); transform-origin: 0 80%; text-wrap: balance;
 }
 /* a hand-drawn underline, drawn as a mask so it takes the heading colour */
 .hero h1::after, .bests h2::after {
@@ -1114,7 +1114,7 @@
 --------------------------------------------------------------------------- */
 .race-results { width: 100%; max-width: 820px; margin: 0 auto; padding-top: 12px; text-align: left; }
 .winner { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; padding: 30px 28px 34px; }
-.winner .sticker { right: 22px; bottom: -15px; left: auto; top: auto; rotate: 4deg; }
+.winner .sticker { right: 22px; bottom: -15px; left: auto; top: auto; rotate: calc(var(--hm-tilt) * 4); }
 .winner-rosette { width: 116px; height: 116px; }
 @media (prefers-reduced-motion: no-preference) {
   .winner-rosette { animation: rosette-pin 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) both 0.2s; }

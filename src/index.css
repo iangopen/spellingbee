@@ -70,7 +70,22 @@
   --sticker-bg: #e8a63d; --sticker-ink: #1a1610; --sticker-line: rgba(26, 22, 16, 0.3);
   --btn-sheen: rgba(255, 244, 220, 0.14);
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.62' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .9 0 0 0 0 .72 1.2 0 0 0 -.5'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  --grain-bg-opacity: 0.16;
+
+  /* THE HOMEMADE STRENGTH. Three numbers, taken from the approved prototype's "light"
+     strength (design/prototypes/homemade, ?h=light). Moving toward "more" starts
+     here, not in the rules that use them:
+       --hm-roughness  how far the drawn panel outline wanders, in px: the
+                       displacement scale WobbleFilters reads (more: 5)
+       --hm-tilt       one degree of the hand-placed tilts; each tilted thing is a
+                       multiple of it (title -1.4, sticker -5, placard -1.6 ...)
+       --hm-texture    peak opacity of the paper grain on the page (more: 0.24).
+                       Texture is measured by its WORST pixel, so re-run
+                       measure.mjs after raising it.
+     Not a token: the wobble of the bee art (lib/beeArt.ts, ART_WOBBLE), because
+     the same drawing is also rendered at build time into the favicon and icons. */
+  --hm-roughness: 2.4;
+  --hm-tilt: 1deg;
+  --hm-texture: 0.16;
 
   /* type, radius, motion (not themed, so they live on :root only) */
   --display: 'Bricolage Grotesque', system-ui, sans-serif;
