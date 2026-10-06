@@ -32,12 +32,11 @@
   content: ""; position: absolute; inset: -3px; border: 2px solid var(--sketch); border-radius: inherit;
   pointer-events: none; filter: url(#hm-wobble-s);
 }
-@media (hover: hover) and (pointer: fine) and (min-width: 900px) {
-  /* Blur only where it is cheap: phones get the opaque panel instead. */
-  .panel { -webkit-backdrop-filter: blur(12px) saturate(1.2); backdrop-filter: blur(12px) saturate(1.2); }
-}
+/* No backdrop blur at any width: the homemade light strength sets it to none, so
+   the honeycomb reads through a panel like paper over a pattern, not frosted glass.
+   (Stage 3 copied the hybrid's desktop blur and missed that override.) */
 @media (prefers-reduced-transparency: reduce) {
-  .panel { background: var(--panel-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .panel { background: var(--panel-solid); }
 }
 
 /* ---- Sticker and Placard -------------------------------------------------- */
