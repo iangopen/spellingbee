@@ -984,26 +984,28 @@ a distinct visual identity. Work happens on branch `redesign/spelling-bee`.
 **Nothing merges to `main` without Ian's OK**, because pushing `main` redeploys
 the live site.
 
-### Merge-readiness checklist (2026-10-04)
-The branch is `redesign/spelling-bee`; `main` was merged in first (it had nothing
-newer). Stage numbers follow `design/PHASE3.md`: 0 groundwork, 1 tokens, 2 honeycomb,
+### Merge-readiness checklist (2026-10-04, re-run 2026-10-06)
+The branch is `redesign/spelling-bee`; `main` was merged in again on 2026-10-06 (the
+edge-function CORS preflight cache, 64f65f3 / 21c2601). Stage numbers follow `design/PHASE3.md`: 0 groundwork, 1 tokens, 2 honeycomb,
 3 shared components, 4a-4h the screens, 5 rename, 6 assets, 7 polish. All are built.
 
 **Verified, with the command that shows it** (`PW_MODULE=... node design/harness/run-checks.mjs`
 runs the browser ones in one go; 9 of 10 browser scripts run (plus the two unused-* checks), the 10th is
 `check-glow.mjs`, the Blue Ribbon prototype's check, which fails honey by design):
 - [x] `npm run build`, `npm run lint` (0 errors, 11 warnings, all in old scripts or the harness except the old `TurnScreen` hook one),
-  `npm test` (117 tests in 16 files: logic, screens, standings, sounds, brand assets,
-  licences), `npm run test:db` (94). There is no Playwright SPEC suite in the repo (it
+  `npm test` (119 tests in 16 files: logic, screens, standings, sounds, brand assets,
+  licences, the pinned bee art), `npm run test:db` (97, with main's CORS tests). There is no Playwright SPEC suite in the repo (it
   is deliberately not a dependency); the browser checks are the scripts above.
-- [x] Contrast: 841 pairs, 0 failing, every screen, both themes, both widths
-  (`measure.mjs`, results in `design/stage-results/final-contrast-app.*`).
+- [x] Contrast: 842 pairs, 0 failing (2026-10-06, over the restored grain and with no
+  backdrop blur), every screen, both themes, both widths (`measure.mjs`, results in
+  `design/stage-results/final-contrast-app.*`). The pair COUNT moves by one or two run
+  to run because the lead-in phrase is random and is part of each pair's key.
 - [x] Focus: every focus ring passes; tier bars (tap target + rim 7.35:1 at worst);
   Settings dialog (proven against three focus mutations; two others it cannot see).
 - [x] `unused-selectors.mjs` 0, `unused-tokens.mjs` 0 (the old aliases, Inter and
   Space Grotesk are gone).
 - [x] Reduced motion: 68/68 screen configurations are still and match the in-app
-  switch (47 pixel-identical, 21 within a 0.2% anti-aliasing tolerance that is printed; the split varies by a case or two run to run).
+  switch (2026-10-06: 60 pixel-identical, 8 within a 0.2% anti-aliasing tolerance that is printed; the split varies by a case or two run to run).
   Proven able to fail (remove the global block and it fails).
 - [x] A full 30-word game in the production build: each outcome sounds exactly once
   (miss = tick + one bell, 4 oscillators; correct = tick + chime, 3), no utterance is
@@ -1018,10 +1020,15 @@ runs the browser ones in one go; 9 of 10 browser scripts run (plus the two unuse
   row or the build FAILS (shown failing for Caveat Brush); `third-party-licenses.txt`
   carries the fonts, the artwork notice and CREDITS.md.
 - [x] Guarded paths (`src/hooks`, `rooms.ts`, `auth.ts`, `captcha.ts`, `supabase/`):
-  `git diff main` is empty.
+  `git diff main` is empty (re-checked after the 2026-10-06 merge of main).
 - [x] Bundle vs `main` (same `.env`, so Supabase is in both): JS +3.6 kB gzip (budget 6),
   CSS +4.7, fonts +1.8, first load 338.0 -> 348.5 kB gzip (+3%). A page downloads the
   latin font files only (126.9 kB of the 172 kB on disk).
+- [x] **Homemade strength verified against the prototype, touch by touch** (2026-10-06):
+  20 light touches, all present, each with a prototype-vs-app side-by-side at both
+  widths and themes in `docs/review/touches/` (see "Homemade strength, touch by touch").
+  Seven had been missing or partial and were restored. Bundle against the branch
+  before that session: first load 348.9 -> 348.5 kB gzip (JS -0.4, CSS 0), icons -23 kB.
 - [x] README and PRIVACY.md match the visible app and what it contacts (singleplayer:
   the site's own files only).
 
@@ -1033,8 +1040,9 @@ runs the browser ones in one go; 9 of 10 browser scripts run (plus the two unuse
   results, elimination live), now that localhost is allowed on the Turnstile widget.
   Needs `.env.local` and the live Supabase project; I did not open those screens,
   because that signs a guest in on the live site.
-- [ ] A final look at the screenshots (`docs/review/`, 16 side-by-sides) and at the
-  share card (`public/og-card.png`), and the call on the name (HARDENING #14).
+- [ ] A final look at the screenshots (`docs/review/`, 16 whole-screen side-by-sides,
+  and `docs/review/touches/`, one per homemade touch) and at the share card
+  (`public/og-card.png`, regenerated 2026-10-06 with the wobbly bee), and the call on the name (HARDENING #14).
 - [ ] Merging to `main` (which redeploys the live site). Nothing else needs doing
   first; `package.json` is already `spelling-bee`.
 
@@ -1047,6 +1055,85 @@ Firewall asks, allow Node on Private networks; otherwise use a tunnel
 (`npx cloudflared tunnel --url http://localhost:4173`, or `npx localtunnel --port 4173`),
 or an Android phone on USB (`adb reverse tcp:4173 tcp:4173`, then open
 `http://localhost:4173/spellingbee/`), or Chrome DevTools device mode on the laptop.
+
+### Homemade strength, touch by touch (2026-10-06)
+Ian felt the built app was less handmade than the approved `light` prototype. The
+whole-screen comparisons had passed because a lost touch hides at that scale, so each
+touch was compared on its own, cropped and shown at 2x:
+`design/harness/shoot-touches.mjs` writes `docs/review/touches/<touch>--<width>--<theme>.jpg`
+(17 touches x desktop/phone x dark/light), and `before--*.jpg` for the seven that were
+missing or partial. Source: `design/prototypes/homemade/homemade.css` (line numbers
+below), `homemade.js` and `art.js`, at `?h=light`.
+
+| Touch | Prototype source | Before | Where it was lost | Now |
+|---|---|---|---|---|
+| Wobbly panel corners | homemade.css 97, 158-160 | present | | present |
+| One hand-drawn panel outline (SVG displacement) | 165-168, homemade.js `hm-wobble-s` | present | | present |
+| Buttons: wobbly corners, marker shadows, press | 187-193 | present | | present |
+| Chips (mode, replay): wobbly corners | 194 | present | | present |
+| Settings button: wobbly corners, marker shadow, control edge | 195 + style.css 170 | missing | never restyled; the Session 13 round button (8253cdc) | present |
+| Answer field and text inputs: wobbly corners | 196, `--hm-r-field` | present | | present |
+| Placard: tilt, wobbly corners, marker shadow | 197 | present | | present |
+| Avatar token: wobbly corners | 198 | present | | present |
+| Hand lettering: title, headings, kickers, stickers | 127-135 | present | | present |
+| Drawn underline: title, difficulty title, best scores, winner name | 137-142 | partly (no winner) | stage 4e (418b8dd) never added `.winner h1::after` | present |
+| Sticker on home and results cards | 148-155 | present | | present |
+| Paper grain on the page | 106-107, 123-124, homemade.js (appended LAST in `.bg`) | partly | stage 2 (e3444b4) stacked it under `.bg-depth`: gone from the top band, 25-30% weaker at edges | present |
+| No backdrop blur | 161 | partly (phones only) | stage 3 (5c5b61e) copied the hybrid's desktop blur, missed the override | present |
+| Calmer glow | 109, 118 | present | | present |
+| Hand tilts (title -1.4, difficulty title -1, sticker -5/+4, placard -1.6) | 131-132, 151, 155, 197 | present | | present |
+| Bee and avatars: slightly wobbly line | art.js `blobPath`, AMP 0.8 | partly (smooth line) | stage 6 (f80906f) swapped the jittered blobs for smooth fixed curves | present |
+| Rosette: wobbly petals and ring, marker drop shadow | art.js `rosette()`, 223 | partly (smooth line) | same, f80906f | present |
+| Difficulty bars | homemade.css section 1 | present | | present |
+| Focus rule outranks every marker shadow | 240 | present | | present |
+
+Correctly absent (they are `more` only, closed): washi tape, grain inside panels, a
+double outline, tilts on panels/tier bars/tokens, irregular hexagons, wobbly icons.
+The `--tape*` and `--grain-panel-opacity` tokens dropped in stages 1 and 3 were these.
+The prototype's brand wordmark in the header has no counterpart: the app has no brand
+header, which is layout, not a homemade touch.
+
+**The strength is three tokens** in `src/index.css` (the "THE HOMEMADE STRENGTH" block):
+`--hm-roughness` 2.4 (the outline's displacement; `WobbleFilters` reads it with
+`getPropertyValue`, because an SVG filter's scale is an attribute CSS cannot set),
+`--hm-tilt` 1deg (every tilt is a multiple of it), `--hm-texture` 0.16 (page grain
+opacity, was `--grain-bg-opacity`). The bee art's wobble is `ART_WOBBLE` 0.8 in
+`lib/beeArt.ts`, not a CSS token, because the same drawing is rendered at build time
+into the favicon and icons. Going to `more` is these four numbers plus adding the
+`more`-only touches above, and every contrast table must be re-run (texture is
+measured by its worst pixel).
+
+Rules this adds:
+- `beeArt.ts` is the prototype's jittered-blob drawing again, seeded per key and
+  memoized. `ui.test.tsx` pins the wobble (blob segment counts) and a digest of every
+  drawing. Never swap it for smooth curves; after any change rerun
+  `build-brand-assets.mjs` and update the digest.
+- `.bg-grain` is the LAST layer of `HoneycombBackground`.
+- No `backdrop-filter` on panels.
+- `unused-tokens.mjs` now also counts `getPropertyValue("--x")` as a use.
+
+**Where a restored touch changes how an outline overlaps a decoration** (for the
+layering and hover-flash session, which has not been run on any machine yet). No
+z-index or stacking was changed in Panel, Sticker, BeeMascot or Rosette; the only
+stacking change is inside `.bg`, which sits below every panel.
+1. Home hero: the bee mascot hangs over the hero panel's top edge, and the drawn
+   outline (`.panel::after`) paints OVER it. The bee's silhouette changed (wobbly
+   blobs, no stinger), so where the line crosses the lower body changed.
+2. Home best scores: the rosette (`.rosette-float`) straddles the panel's top-right
+   corner and the outline paints over it. The petals are now separate lobes, so the
+   line shows between them at different points.
+3. Every panel at desktop: without the backdrop blur, the outline's outer 3px and the
+   panel interior now sit over crisp honeycomb lines instead of blurred ones, so the
+   wobbly outline and the cell lines can read as tangled where they run parallel.
+4. Settings button: fixed, z-index 20, now with a 2px 3px marker shadow. When a page
+   scrolls under it, the button and its shadow cross panel outlines, stickers and the
+   mascot.
+5. Race and elimination winner cards: the new underline sits under the name. The
+   "Race over"/"Game over" sticker hangs off the bottom-right edge; they do not touch
+   at either width, but a long name that wraps to two lines moves the underline down
+   toward it.
+6. The grain moved above `.bg-depth` and `.bg-light`, still inside `.bg` (z-index -1
+   inside `.app-shell`), so it never covers a panel or an outline.
 
 ### Status
 - Phase 1 (audit) and Phase 2 (brand plus three directions) are done, in
@@ -1196,8 +1283,9 @@ or an Android phone on USB (`adb reverse tcp:4173 tcp:4173`, then open
     - **5 rename:** was already on `main` (title, meta, both `<h1>`s, README, PRIVACY,
       this file). `package.json` is `spelling-bee`; a grep finds no user-facing
       "Spelling Race"; `base` is still `/spellingbee/`.
-    - **6 assets:** `src/lib/beeArt.ts` is now FIXED hand-placed path data (no runtime
-      jitter); `design/harness/build-brand-assets.mjs` renders `public/favicon.svg`
+    - **6 assets:** `src/lib/beeArt.ts` was made fixed hand-placed path data here; that
+      lost the wobbly line and was reverted on 2026-10-06 (see "Homemade strength,
+      touch by touch" below). `design/harness/build-brand-assets.mjs` renders `public/favicon.svg`
       (the rosette, deliberately not a hexagon), `favicon-32.png`, `apple-touch-icon.png`,
       `icon-192/512.png`, a maskable icon and `og-card.png` (1200x630) from that same
       drawing, reading the palette from `src/index.css`. `public/manifest.webmanifest`
@@ -1267,7 +1355,8 @@ or an Android phone on USB (`adb reverse tcp:4173 tcp:4173`, then open
   - CSS/SVG only; animate only `transform` and `opacity`
   - pause when the tab is hidden
   - under reduced motion the still version is exactly the static glow
-  - backdrop blur on desktop fine-pointer only
+  - no backdrop blur on panels at any width (the light strength sets it to none;
+    restored 2026-10-06)
 - **Lean bundle:** no animation or UI libraries without asking. Self-host fonts
   (HARDENING #24). Assets must be original or properly licensed, with credits.
 - The existing CLAUDE.md rules still bind, especially "every colour is a token
@@ -1277,6 +1366,9 @@ or an Android phone on USB (`adb reverse tcp:4173 tcp:4173`, then open
 - Merge-readiness: see the checklist at the top of this section. What is left is only
   what Ian can do (a real phone, a two-browser multiplayer pass, a final look, the
   merge).
+- Next session (Ian's plan): the layering and hover-flash fix, built on the restored
+  panels. It has not been run on any machine. Start from the overlap list in "Homemade
+  strength, touch by touch".
 - `.text-input` uses `--edge` (>=3:1 on every field surface); keep it that way.
 - The name itself: a distinct look lowers the risk of being mistaken for NYT's game but
   doesn't clear the name. See HARDENING #14 / §C10. The favicon is a bee rosette on
