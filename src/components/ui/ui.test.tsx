@@ -2,7 +2,8 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { AVATAR_KEYS } from "../../lib/avatars";
-import { avatarSvg, rosetteSvg } from "../../lib/beeArt";
+import { createHash } from "node:crypto";
+import { ART_WOBBLE, avatarSvg, rosetteSvg } from "../../lib/beeArt";
 import { AnswerField } from "./AnswerField";
 import { AvatarArt, BeeMascot, Rosette } from "./Art";
 import { Button } from "./Button";
@@ -27,6 +28,24 @@ describe("bee art", () => {
     }
     expect(new Set(AVATAR_KEYS.map(avatarSvg)).size).toBe(AVATAR_KEYS.length);
     expect(rosetteSvg()).toContain("var(--mark-2)");
+  });
+
+  it("keeps the hand-drawn wobble of the prototype's light strength", () => {
+    // Every round part is a jittered blob of 8-14 cubic segments, not a smooth
+    // ellipse. Stage 6 had swapped these for 4-segment smooth curves, which lost it.
+    expect(ART_WOBBLE).toBe(0.8);
+    for (const svg of [avatarSvg("bee"), rosetteSvg()]) {
+      expect(svg).not.toMatch(/<ellipse|<circle[^>]*r="(9\.5|27)"/);
+      const blobs = [...svg.matchAll(/<path d="(M[^"]+Z)"/g)].map((m) => (m[1].match(/C/g) ?? []).length);
+      expect(blobs.filter((n) => n >= 8).length).toBeGreaterThanOrEqual(6);
+    }
+  });
+
+  it("draws the exact same picture as when it was pinned (2026-10-06)", () => {
+    // A change here is a change to the favicon and icons too: rerun
+    // design/harness/build-brand-assets.mjs, then update this digest.
+    const all = [...AVATAR_KEYS.map(avatarSvg), rosetteSvg()].join("\n");
+    expect(createHash("sha256").update(all).digest("hex").slice(0, 16)).toBe("8da584e4c42ce967");
   });
 
   it("uses tokens only: no hex literal in any drawing", () => {

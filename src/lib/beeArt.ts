@@ -1,20 +1,23 @@
-// Bee art: the mascot, the eight contestant avatars and the rosette, as static SVG
-// drawn in the light "homemade" style: a wobbly ink outline, soft honey fills, a
-// cocoa-banded body, two big friendly eyes. Original work, drawn for this project.
+// Bee art: the mascot, the eight contestant avatars and the rosette, as SVG strings
+// drawn from theme tokens only (--bee-*, --mark*, --panel-solid), so both palettes
+// work and no colour is hardcoded here. The same drawing feeds the favicon, the app
+// icons and the share card (design/harness/build-brand-assets.mjs substitutes the
+// token colours); rerun that script after changing anything here.
 //
-// Everything here is FIXED path data. There is no runtime jitter any more (the
-// stage 3 version generated its wobble from a seeded random sequence); each curve
-// below was placed by hand so the line can be read, adjusted and redrawn, and a
-// given avatar is identical on every screen and every render by construction.
-// The same shapes feed the favicon, the app icons and the share card
-// (design/harness/build-brand-assets.mjs substitutes the token colours).
+// This is the approved prototype's drawing at the homemade "light" strength
+// (design/prototypes/homemade/art.js, ?h=light), restored on 2026-10-06: every round
+// part (wings, body, head, eyes, the rosette's petals and ring) is a hand-drawn blob,
+// points jittered around the ellipse and joined with smooth cubic curves, so the
+// line wobbles like a pen. Stage 6 had replaced it with smooth hand-placed curves,
+// which lost the wobble the light strength was picked for.
 //
-// Colours are theme tokens only (--bee-*, --mark*, --panel-solid), so both palettes
-// work and no colour is hardcoded here. Nothing animates and nothing is
+// The jitter is a fixed pseudo-random sequence SEEDED PER AVATAR KEY and the result
+// is memoized, so a given avatar is identical on every screen and every render by
+// construction (ui.test.tsx pins the output). Nothing here animates and nothing is
 // interactive; the components that use it mark it aria-hidden.
 //
-// The avatar KEYS are the eight the room_players.avatar CHECK allows; only the art
-// changes. lib/avatars.ts stays the one list of keys.
+// The avatar KEYS are the existing eight (the room_players.avatar CHECK); only the
+// art is new. lib/avatars.ts stays the one list of keys.
 //
 // Strings contain the placeholder CLIP_ID where a <clipPath> id goes; the component
 // swaps in a useId()-based value so two copies on one page never share an id.
@@ -23,76 +26,85 @@ import type { AvatarKey } from "./avatars";
 
 export const CLIP_ID = "__CLIP_ID__";
 
-// The outline every shape shares: ink colour, a slightly heavy round-joined stroke.
-const INK = 'stroke="var(--bee-line)" stroke-width="2.7" stroke-linejoin="round" stroke-linecap="round"';
+// How far each point wanders, in viewBox units: the prototype's "light" value ("more"
+// is 1.5). The one strength number that is not a CSS token (see index.css).
+export const ART_WOBBLE = 0.8;
+let seed = 1;
+const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647) - 0.5;
+const f1 = (n: number) => n.toFixed(1);
 
-// --- the parts, in drawing order -----------------------------------------------
-
-const WING_L = `<path d="M40.2 40.6C28.4 37.4 19.6 29 22.2 22.2C24.9 15.7 37.2 17.6 44.2 27.6C46.8 31.4 45 39.4 40.2 40.6Z" fill="var(--bee-wing)" ${INK}/>`;
-const WING_R = `<path d="M59.8 40.6C71.6 37.4 80.4 29 77.8 22.2C75.1 15.7 62.8 17.6 55.8 27.6C53.2 31.4 55 39.4 59.8 40.6Z" fill="var(--bee-wing)" ${INK}/>`;
-
-const ANTENNAE = `<g fill="none" ${INK}><path d="M45 25.4C43.2 18.2 38.8 14.2 33.8 15.6"/><path d="M55 25.4C56.8 18.2 61.2 14.2 66.2 15.6"/></g>
-      <circle cx="33.4" cy="15.7" r="2.5" fill="var(--bee-line)"/><circle cx="66.6" cy="15.7" r="2.5" fill="var(--bee-line)"/>`;
-const ANTENNAE_WASP = `<g fill="none" ${INK}><path d="M45 25.6L39.4 13.6"/><path d="M55 25.6L60.6 13.6"/></g>`;
-
-const BODY_PATH = "M33.4 60.8C33 51.6 40.6 45.2 50.2 45C59.8 44.8 67.2 51.8 66.8 61.4C66.4 71.2 59.4 79.2 49.9 79.1C40.4 79 33.8 70.4 33.4 60.8Z";
-const STRIPES = `<path d="M30 56.6C40 58.4 60 55.8 70 57.8L70 63.8C60 62.4 40 64.8 30 63Z"/><path d="M30 68.4C40 70.2 60 67.6 70 69.6L70 75.6C60 74.2 40 76.6 30 74.8Z"/>`;
-const STINGER = `<path d="M47.4 78.4L50.1 86L52.8 78.2Z" fill="var(--bee-line)" stroke="var(--bee-line)" stroke-width="1.4" stroke-linejoin="round"/>`;
-
-const HEAD = `<path d="M36.2 35.4C36.4 27.6 42.6 21.8 50.3 22C58 22.2 64 28.4 63.9 36.2C63.8 43.8 57.8 50.2 50 50C42.2 49.8 36 43.2 36.2 35.4Z" fill="var(--bee-body)" ${INK}/>`;
-
-const EYE_L = "M40.4 35.2C40.3 32.8 42 31.4 44.1 31.4C46.2 31.4 47.8 33 47.7 35.2C47.6 37.3 46 38.8 44 38.7C42 38.7 40.5 37.3 40.4 35.2Z";
-const EYE_R = "M52.4 35.2C52.3 32.8 54 31.4 56.1 31.4C58.2 31.4 59.8 33 59.7 35.2C59.6 37.3 58 38.8 56 38.7C54 38.7 52.5 37.3 52.4 35.2Z";
-const eyes = (scale: number) =>
-  `<g transform="translate(50 35.2) scale(${scale}) translate(-50 -35.2)">
-        <path d="${EYE_L}" fill="var(--bee-eye)" stroke="var(--bee-line)" stroke-width="${(1.7 / scale).toFixed(2)}" stroke-linejoin="round"/>
-        <path d="${EYE_R}" fill="var(--bee-eye)" stroke="var(--bee-line)" stroke-width="${(1.7 / scale).toFixed(2)}" stroke-linejoin="round"/>
-        <circle cx="44.7" cy="35.9" r="1.9" fill="var(--bee-line)"/><circle cx="56.7" cy="35.9" r="1.9" fill="var(--bee-line)"/>
-      </g>`;
-const SMILE = `<path d="M45.4 42.6C47.4 45 52.6 45.1 54.6 42.5" fill="none" stroke="var(--bee-line)" stroke-width="2" stroke-linecap="round"/>`;
-const CHEEKS = `<ellipse cx="40.4" cy="41.2" rx="2.3" ry="2" fill="var(--bee-cheek)" opacity=".7"/><ellipse cx="59.6" cy="41.2" rx="2.3" ry="2" fill="var(--bee-cheek)" opacity=".7"/>`;
-
-// The body group: outline + banding clipped to the outline. `wasp` is the same
-// drawing slimmed and stretched, so the build reads as a different insect without a
-// second set of curves to keep in step.
-function bodyGroup(wasp: boolean): string {
-  const tf = wasp ? ' transform="translate(50 64) scale(0.78 1.1) translate(-50 -62)"' : "";
-  return `<g${tf}>
-        <path d="${BODY_PATH}" fill="var(--bee-body)" ${INK}/>
-        <clipPath id="${CLIP_ID}"><path d="${BODY_PATH}"/></clipPath>
-        <g clip-path="url(#${CLIP_ID})" fill="var(--bee-stripe)">${STRIPES}</g>
-      </g>`;
+function blobPath(cx: number, cy: number, rx: number, ry: number): string {
+  const n = Math.max(8, Math.min(14, Math.round(Math.max(rx, ry) * 0.9)));
+  const a = ART_WOBBLE * Math.min(1, Math.max(rx, ry) / 12);
+  const p = Array.from({ length: n }, (_, i) => {
+    const t = (i / n) * Math.PI * 2;
+    return [cx + rx * Math.cos(t) + rnd() * a * 2, cy + ry * Math.sin(t) + rnd() * a * 2];
+  });
+  let d = `M${f1(p[0][0])} ${f1(p[0][1])}`;
+  for (let i = 0; i < n; i++) {
+    const p0 = p[(i - 1 + n) % n], p1 = p[i], p2 = p[(i + 1) % n], p3 = p[(i + 2) % n];
+    d += `C${f1(p1[0] + (p2[0] - p0[0]) / 6)} ${f1(p1[1] + (p2[1] - p0[1]) / 6)} ${f1(p2[0] - (p3[0] - p1[0]) / 6)} ${f1(p2[1] - (p3[1] - p1[1]) / 6)} ${f1(p2[0])} ${f1(p2[1])}`;
+  }
+  return d + "Z";
 }
 
-function bee(opts: { wasp?: boolean; eyeScale?: number; accessory?: string } = {}): string {
-  const wasp = Boolean(opts.wasp);
+function shape(
+  cx: number,
+  cy: number,
+  rx: number,
+  ry: number,
+  { fill = "none", stroke = "var(--bee-line)", sw = 2.4, tf = "" } = {},
+): string {
+  const t = tf ? ` transform="${tf}"` : "";
+  return `<path d="${blobPath(cx, cy, rx, ry)}" fill="${fill}" stroke="${stroke}" stroke-width="${sw + 0.3}" stroke-linejoin="round"${t}/>`;
+}
+
+// The bee: round body, two cocoa bands, big friendly eyes, two wings. `acc` adds
+// the per-avatar accessory; `slim` is the wasp's build.
+function beeInner({ acc = "", slim = false, eyes = 1, sd = 11 } = {}): string {
+  seed = sd;
+  const bodyRx = slim ? 13 : 17, bodyRy = slim ? 19 : 17;
+  const bcy = slim ? 64 : 62;
+  const wingRx = slim ? 15 : 14, wingRy = slim ? 8 : 10, wingCy = slim ? 40 : 38;
+  const wingTilt = slim ? 38 : 28;
   return `
-      ${WING_L}${WING_R}
-      ${wasp ? ANTENNAE_WASP : ANTENNAE}
-      ${bodyGroup(wasp)}
-      ${STINGER}
-      ${HEAD}
-      ${eyes(opts.eyeScale ?? 1)}
-      ${SMILE}
-      ${wasp ? "" : CHEEKS}
-      ${opts.accessory ?? ""}`;
+      ${shape(33, wingCy, wingRx, wingRy, { fill: "var(--bee-wing)", tf: `rotate(-${wingTilt} 33 38)` })}
+      ${shape(67, wingCy, wingRx, wingRy, { fill: "var(--bee-wing)", tf: `rotate(${wingTilt} 67 38)` })}
+      <g stroke="var(--bee-line)" stroke-width="2.4" stroke-linecap="round" fill="none">
+        ${slim
+          ? `<path d="M44 26 38 13M56 26 62 13"/>`
+          : `<path d="M44 27c-2-8-7-12-11-11M56 27c2-8 7-12 11-11"/><circle cx="32.5" cy="16" r="2.4" fill="var(--bee-line)"/><circle cx="67.5" cy="16" r="2.4" fill="var(--bee-line)"/>`}
+      </g>
+      ${shape(50, bcy, bodyRx, bodyRy, { fill: "var(--bee-body)", sw: 2.6 })}
+      <clipPath id="${CLIP_ID}"><path d="${blobPath(50, bcy, bodyRx, bodyRy)}"/></clipPath>
+      <g clip-path="url(#${CLIP_ID})" fill="var(--bee-stripe)">
+        <rect x="20" y="${slim ? 60 : 58}" width="60" height="${slim ? 6 : 7}"/><rect x="20" y="${slim ? 71 : 70}" width="60" height="${slim ? 6 : 7}"/>
+      </g>
+      ${shape(50, 36, slim ? 12 : 14, slim ? 12 : 14, { fill: "var(--bee-body)", sw: 2.6 })}
+      ${shape(45 - eyes, 35, 3.6 * eyes, 3.6 * eyes, { fill: "var(--bee-eye)", sw: 1.6 })}${shape(55 + eyes, 35, 3.6 * eyes, 3.6 * eyes, { fill: "var(--bee-eye)", sw: 1.6 })}
+      <g fill="var(--bee-line)"><circle cx="${45.6 - eyes}" cy="35.6" r="${1.8 * eyes}"/><circle cx="${55.6 + eyes}" cy="35.6" r="${1.8 * eyes}"/></g>
+      <path d="M45.5 42.5q4.5 3.6 9 0" fill="none" stroke="var(--bee-line)" stroke-width="2" stroke-linecap="round"/>
+      ${slim ? "" : `<circle cx="40.5" cy="41" r="2.2" fill="var(--bee-cheek)" opacity=".7"/><circle cx="59.5" cy="41" r="2.2" fill="var(--bee-cheek)" opacity=".7"/>`}
+      ${acc}`;
 }
 
-// One accessory per avatar, drawn to sit in the empty corners of the 100-wide frame.
-const ACCESSORY: Partial<Record<AvatarKey, string>> = {
-  queen: `<path d="M39.6 23.4L41.6 12.6L47.2 18.2L50.2 10.8L53.2 18.2L58.8 12.6L60.6 23.6Z" fill="var(--mark)" ${INK} stroke-width="2.2"/>`,
-  hive: `<g fill="var(--bee-eye)" ${INK} stroke-width="2.1"><path d="M69.6 92.4C69.4 78.6 73.6 70.2 79.8 70.4C86.2 70.6 90.4 79 90.2 92.2Z"/><path d="M71 84.2C76 85.4 84 85 89 83.8M72.6 77.2C77 78.2 83 77.8 87.4 76.8" fill="none"/></g>`,
-  honey: `<path d="M24 65.4C24 65.4 16.8 73.8 17.2 78.4C17.6 82.6 20.8 85.2 24.2 85.2C27.8 85.2 30.8 82.2 30.8 78C30.8 73.8 24 65.4 24 65.4Z" fill="var(--mark)" ${INK} stroke-width="2.2"/>`,
-  blossom: `<g stroke="var(--bee-line)" stroke-width="1.7" stroke-linejoin="round" fill="var(--bee-eye)">${[0, 72, 144, 216, 288]
-    .map((a) => `<circle cx="${(68 + 5.2 * Math.cos((a * Math.PI) / 180)).toFixed(1)}" cy="${(12 + 5.2 * Math.sin((a * Math.PI) / 180)).toFixed(1)}" r="3.5"/>`)
-    .join("")}<circle cx="68" cy="12" r="2.7" fill="var(--mark)"/></g>`,
-  clover: `<g stroke="var(--bee-line)" stroke-width="1.7" stroke-linejoin="round" fill="var(--bee-leaf)"><circle cx="30.4" cy="9.2" r="4.1"/><circle cx="25.2" cy="15.2" r="4.1"/><circle cx="35.6" cy="15.2" r="4.1"/></g>`,
+const ACC: Partial<Record<AvatarKey, string>> = {
+  queen: `<path d="M40 22 42 13l5 5 3-7 3 7 5-5 2 9z" fill="var(--mark)" stroke="var(--bee-line)" stroke-width="2" stroke-linejoin="round"/>`,
+  hive: `<g stroke="var(--bee-line)" stroke-width="2" fill="var(--panel-solid)"><path d="M70 92c0-14 4-22 10-22s10 8 10 22z"/><path d="M71 84h18M73 77h14" fill="none"/></g>`,
+  honey: `<path d="M24 66s-7 8-7 12a7 7 0 0 0 14 0c0-4-7-12-7-12z" fill="var(--mark)" stroke="var(--bee-line)" stroke-width="2"/>`,
+  blossom: `<g stroke="var(--bee-line)" stroke-width="1.6" fill="var(--bee-eye)">${[0, 72, 144, 216, 288]
+    .map((a) => `<circle cx="${68 + 5 * Math.cos((a * Math.PI) / 180)}" cy="${12 + 5 * Math.sin((a * Math.PI) / 180)}" r="3.4"/>`)
+    .join("")}<circle cx="68" cy="12" r="2.6" fill="var(--mark)"/></g>`,
+  clover: `<g stroke="var(--bee-line)" stroke-width="1.6" fill="var(--bee-leaf)"><circle cx="30" cy="9" r="4"/><circle cx="25" cy="15" r="4"/><circle cx="35" cy="15" r="4"/></g>`,
 };
 
-function beeFor(key: AvatarKey): string {
-  if (key === "wasp") return bee({ wasp: true });
-  if (key === "drone") return bee({ eyeScale: 1.42 });
-  return bee({ accessory: ACCESSORY[key] });
+const hash = (k: string) => [...k].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 997, 7);
+
+function beeBody(key: AvatarKey): string {
+  const sd = hash(key);
+  if (key === "wasp") return beeInner({ slim: true, sd });
+  if (key === "drone") return beeInner({ eyes: 1.45, sd });
+  return beeInner({ acc: ACC[key] ?? "", sd });
 }
 
 const wrap = (inner: string, viewBox = "12 4 76 90") =>
@@ -105,29 +117,29 @@ const memo = (k: string, build: () => string) => {
   return v;
 };
 
-/** One contestant avatar (or the mascot, for "bee"). */
+/** One contestant avatar (or the mascot, for "bee"). Deterministic per key. */
 export function avatarSvg(key: AvatarKey): string {
-  return memo(`avatar:${key}`, () => wrap(beeFor(key)));
+  return memo(`avatar:${key}`, () => wrap(beeBody(key)));
 }
 
 /** The mascot is the plain bee avatar, drawn larger by CSS. */
 export const mascotSvg = (): string => avatarSvg("bee");
 
-// The rosette's scalloped ring: fourteen lobes, each a touch different, drawn once.
-const ROSETTE_SCALLOP =
-  "M81.9 44.0C91.1 47.6 88.2 58.4 78.3 57.7C84.5 64.4 77.8 73.2 69.9 68.6C72.8 78.0 62.2 82.8 56.7 74.7C55.2 84.9 44.5 84.9 43.0 74.7C37.7 82.5 27.8 77.6 30.6 68.6C21.9 73.7 14.5 65.0 21.4 57.7C12.4 58.4 10.2 47.3 18.6 44.0C9.6 40.5 11.8 29.6 21.5 30.3C14.6 22.9 21.9 14.3 30.7 19.4C27.9 10.5 37.5 5.6 42.7 13.3C44.2 3.5 55.7 3.5 57.2 13.3C62.5 5.4 72.2 10.3 69.4 19.4C78.2 14.2 85.4 22.9 78.5 30.3C87.7 29.6 90.5 40.7 81.9 44.0Z";
-const ROSETTE_RING = "M23.4 44.3C23.2 31.2 34 21.2 50.2 21.4C65.8 21.6 76.8 31.8 76.6 44.5C76.4 57.6 65.6 67.2 49.8 66.9C34.2 66.7 23.6 57.2 23.4 44.3Z";
-
-/** The rosette: a scalloped honey ring, two ribbon tails and the bee at the centre. */
+/** The rosette: a petal ring, two ribbon tails and the bee at the centre. */
 export function rosetteSvg(): string {
-  return memo("rosette", () =>
-    wrap(
-      `<path d="M36 62.4L25.6 96.6L38.2 89.2L46.4 99L52.4 63.6Z" fill="var(--mark-2)" ${INK} stroke-width="2.2"/>
-      <path d="M64 62.4L74.4 96.6L61.8 89.2L53.6 99L47.6 63.6Z" fill="var(--mark-2)" opacity=".85" ${INK} stroke-width="2.2"/>
-      <path d="${ROSETTE_SCALLOP}" fill="var(--mark)" ${INK}/>
-      <path d="${ROSETTE_RING}" fill="var(--panel-solid)" stroke="var(--mark-ring)" stroke-width="3.2" stroke-linejoin="round"/>
-      <g transform="translate(24.2 17.2) scale(0.684) translate(-12 -4)">${bee()}</g>`,
+  return memo("rosette", () => {
+    seed = 5;
+    const petals = Array.from({ length: 14 }, (_, i) => {
+      const a = (i / 14) * Math.PI * 2;
+      return `<path d="${blobPath(+(50 + Math.cos(a) * 30).toFixed(2), +(44 + Math.sin(a) * 30).toFixed(2), 9.5, 9.5)}"/>`;
+    }).join("");
+    const ring = `<path d="${blobPath(50, 44, 27, 27)}" fill="var(--panel-solid)" stroke="var(--mark-ring)" stroke-width="3"/>`;
+    const centre = `<svg x="24" y="18" width="52" height="52" viewBox="0 0 100 100">${beeInner()}</svg>`;
+    return wrap(
+      `<path d="M36 62 26 96l12-7 8 10 6-35z" fill="var(--mark-2)"/>
+      <path d="M64 62l10 34-12-7-8 10-6-35z" fill="var(--mark-2)" opacity=".78"/>
+      <g fill="var(--mark)">${petals}</g>${ring}${centre}`,
       "0 0 100 100",
-    ),
-  );
+    );
+  });
 }
