@@ -28,12 +28,14 @@ export function HoneycombBackground() {
         <div className="bg-cells-glow" />
         <div className="bg-cells" />
       </div>
-      <div className="bg-grain" />
       <div className="bg-light">
         <div className="lit lit-glow" />
         <div className="lit" />
       </div>
       <div className="bg-depth" />
+      {/* The grain is the TOP layer, as in the prototype: under the calm header band
+          and the vignette it vanished from the top of the page and faded at the edges. */}
+      <div className="bg-grain" />
     </div>
   );
 }

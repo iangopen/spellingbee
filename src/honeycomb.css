@@ -17,10 +17,12 @@
      .bg-base         gradient: charcoal with a honey bloom (light: cream)
      .bg-cells-glow   blurred copy of the cell lines (rasterised once)
      .bg-cells        the crisp cell lines
-     .bg-grain        paper grain (page background only, never under text panels)
      .bg-light        the shimmer: a window that moves over BRIGHTER cells that
                       stay put (the child counter-moves with identical timing)
      .bg-depth        a calm band under the header, then a vignette
+     .bg-grain        paper grain, on top of all of the above as in the prototype
+                      (page background only, never under text panels; its
+                      strength is --hm-texture)
 
    Motion: only transform and opacity animate, so the blurred glow is never
    repainted. The shimmer is removed under the OS reduced-motion setting AND
