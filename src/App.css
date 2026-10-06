@@ -30,11 +30,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  border: 1px solid var(--panel-edge);
+  /* the prototype's .icon-btn at the homemade light strength: wobbly corners, a
+     1.5px control edge and a hard marker shadow instead of a soft drop shadow.
+     It stays solid (not the prototype's translucent --panel) because it floats over
+     whatever scrolls beneath it. */
+  border-radius: var(--hm-r-icon);
+  border: 1.5px solid var(--edge);
   background: var(--panel-solid);
   color: var(--accent);
-  box-shadow: var(--shadow);
+  box-shadow: 2px 3px 0 var(--ink-shadow);
   transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
