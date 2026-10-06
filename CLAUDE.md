@@ -874,6 +874,53 @@ This session worked on `main`, like the hardening pass:
 - #8 (privacy note): done 2026-09-29, see "Docs and disclosures". REPORT.md's
   "server-authoritative scoring" claim was restored the same day.
 
+## Edge function CORS preflight cache (2026-10-04)
+
+`_shared/mod.ts` sends `Access-Control-Max-Age: 7200` on every response, so
+all five functions get it. Before this, browsers used their 5 s default (MDN),
+shorter than a race round (13 s or more), so most answers paid an extra
+`OPTIONS` round trip before the real request. `callEdge` sends `apikey`,
+`Authorization` and a JSON `Content-Type`, so every call is preflighted.
+Browsers clamp the value (Chromium 76+ at 2 h, Firefox at 24 h), so 7200 is the
+most that helps. Allowed origin, headers and methods are unchanged.
+
+Deployed and checked live on 2026-10-04: an `OPTIONS` request to each of the
+five URLs returns `access-control-max-age: 7200`, and a gateway-passing POST
+(public anon key, no user) still returns 401 `{"ok":false,"error":"unauthorized"}`
+exactly as before. `edge_errors.test.mjs` pins the header, that the other three
+CORS headers are unchanged, and that the header set is exactly these four.
+
+- Preflights aren't billed (Supabase invocation docs), so this changes no quota
+  figure.
+- The functions have JWT verification on at the gateway: a POST with no
+  `Authorization` header gets the gateway's own 401 shape
+  (`UNAUTHORIZED_NO_AUTH_HEADER`) and never reaches our code. A preflight
+  carries no auth and is still answered, so keep `OPTIONS` handled before the
+  auth check in `handler`.
+- Browser check on the live site (not run by an agent, which must not create
+  guest users): DevTools Network during a race, filter by `functions/v1`. You
+  should see ONE `OPTIONS submit-answer` for the whole game, then only POSTs.
+  See `docs/history.md`, 2026-10-04.
+
+**Roll the functions back** (the pre-change `mod.ts` is commit `8b979dc`; the
+function entry points are unchanged by this work). From the repo root:
+
+```
+git checkout 8b979dc -- supabase/functions/_shared/mod.ts
+npx supabase functions deploy --use-api --project-ref wjorfdfpbgyykbhxydqj
+```
+
+Then check with `curl -s -i -X OPTIONS <url>/functions/v1/submit-answer -H
+"Origin: https://iangopen.github.io" -H "Access-Control-Request-Method: POST"`:
+the `access-control-max-age` header should be gone. If the checkout is staged
+afterwards, undo it with `git checkout HEAD -- supabase/functions/_shared/mod.ts`
+once the rollback is committed or abandoned. Supabase keeps no previous-version
+button for these, so the deploy always comes from a file in git.
+
+The multiplayer spec's stage 1 (branch `plan/multiplayer-modes`, §8, §4.5.4
+part 1) planned this header. It has shipped here on `main`; that branch still
+describes it as pending until it is rebased or its note updated.
+
 ## Docs and disclosures (2026-09-29)
 
 README.md, PRIVACY.md, LICENSE (MIT, Ian Gopen, 2026) and the GitHub About

@@ -67,3 +67,39 @@ describe("edge function error shaping", () => {
     expect(res.status).toBe(401);
   });
 });
+
+describe("CORS preflight", () => {
+  const options = () =>
+    new Request("https://x.supabase.co/functions/v1/submit-answer", {
+      method: "OPTIONS",
+      headers: { Origin: "https://iangopen.github.io", "Access-Control-Request-Method": "POST" },
+    });
+
+  it("answers OPTIONS without auth, carrying a 2 h Access-Control-Max-Age", async () => {
+    const fn = vi.fn(async () => new Response("never"));
+    const res = await handler(fn)(options());
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Access-Control-Max-Age")).toBe("7200");
+    expect(fn).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("leaves the allowed origin, headers and methods exactly as they were", async () => {
+    const res = await handler(async () => new Response("never"))(options());
+    expect(res.headers.get("Access-Control-Allow-Origin")).toBe("*");
+    expect(res.headers.get("Access-Control-Allow-Headers")).toBe(
+      "authorization, x-client-info, apikey, content-type"
+    );
+    expect(res.headers.get("Access-Control-Allow-Methods")).toBe("POST, OPTIONS");
+  });
+
+  it("the shared header set is exactly these four, so no function gains or loses one", async () => {
+    const { corsHeaders } = await import("../functions/_shared/mod.ts");
+    expect(Object.keys(corsHeaders).sort()).toEqual([
+      "Access-Control-Allow-Headers",
+      "Access-Control-Allow-Methods",
+      "Access-Control-Allow-Origin",
+      "Access-Control-Max-Age",
+    ]);
+  });
+});
