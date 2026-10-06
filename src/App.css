@@ -480,7 +480,9 @@
   rotate: calc(var(--hm-tilt) * -1.4); transform-origin: 0 80%; text-wrap: balance;
 }
 /* a hand-drawn underline, drawn as a mask so it takes the heading colour */
-.hero h1::after, .bests h2::after {
+/* (.winner h1 is the race and elimination winner's name: the prototype underlines it
+   too. Stage 4e left it out.) */
+.hero h1::after, .bests h2::after, .winner h1::after {
   content: ""; display: block; height: 10px; width: min(11ch, 78%); margin-top: 0.3em; background: var(--heading); opacity: 0.75;
   -webkit-mask: var(--squiggle) left center / 100% 100% no-repeat; mask: var(--squiggle) left center / 100% 100% no-repeat;
 }
@@ -1025,7 +1027,13 @@
 .elim-results { display: flex; flex-direction: column; align-items: center; gap: 28px; width: 100%; max-width: 720px; margin: 0 auto; padding-top: 12px; text-align: left; }
 .elim-results > .panel { width: 100%; }
 .champion.draw { grid-template-columns: 1fr; }
-.champion-name { display: flex; align-items: center; gap: 12px; }
+.champion-name { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+/* the drawn underline takes its own row under the avatar and the name; the row is
+   full width, so the stroke's own length is set by the mask */
+.winner .champion-name::after {
+  flex-basis: 100%; margin-top: 0;
+  -webkit-mask-size: min(11ch, 78%) 100%; mask-size: min(11ch, 78%) 100%;
+}
 .standings { padding: 24px 24px 18px; }
 .standings-label { margin: 0 0 8px; font: 700 0.85rem/1.2 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .standings ol { margin: 0; padding: 0; list-style: none; }
