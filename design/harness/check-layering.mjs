@@ -13,11 +13,11 @@
 // the panel and its ancestors covers the band, the topmost element must be that thing (or
 // inside it), not the panel. At phone width it also scrolls the page under the fixed
 // Settings button and probes where the button crosses an outline.
-//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://localhost:5199] node design/harness/check-layering.mjs
+//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:5199] node design/harness/check-layering.mjs
 // Exit 1 on any point where the outline paints over a decoration.
 import { pathToFileURL } from "node:url";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
-const APP = process.env.APP_URL ?? "http://localhost:5199";
+const APP = process.env.APP_URL ?? "http://127.0.0.1:5199";
 const SCREENS = ["home", "difficulty", "sp-round", "sp-correct", "sp-incorrect", "sp-results", "settings", "lobby", "waiting-room",
   "race-round", "race-locked", "race-roundend", "race-results", "race-tie", "elim-watch", "elim-myturn", "elim-knockout", "elim-results"];
 const VIEWS = { desktop: { width: 1280, height: 900 }, phone: { width: 390, height: 844 } };

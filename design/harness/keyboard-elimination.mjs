@@ -1,10 +1,10 @@
 // Keyboard-only pass over the elimination screens, using the harness's mocked state
 // (no server, no second player). Drives ONLY the keyboard and records what each press
 // lands on, so a regression in order, focus loss or a trap shows up as text.
-//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://localhost:5199] node design/harness/keyboard-elimination.mjs
+//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:5199] node design/harness/keyboard-elimination.mjs
 import { pathToFileURL } from "node:url";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
-const APP = process.env.APP_URL ?? "http://localhost:5199";
+const APP = process.env.APP_URL ?? "http://127.0.0.1:5199";
 const b = await chromium.launch();
 let fails = 0;
 const check = (ok, what) => { if (!ok) fails++; console.log(`  ${ok ? "PASS" : "FAIL"} ${what}`); };

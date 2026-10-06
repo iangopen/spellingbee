@@ -7,7 +7,7 @@
 //                               -> that folder's contrast.md / contrast.json
 //   TARGET=app                  the REAL screens rendered by design/harness
 //                               (run `npx vite --config design/harness/vite.config.ts`
-//                               first; APP_URL overrides http://localhost:5199)
+//                               first; APP_URL overrides http://127.0.0.1:5199)
 //                               -> design/baseline/contrast-app.md / .json
 //
 //   TARGET=homemade             design/prototypes/homemade, strengths ?h=off|light|more
@@ -31,7 +31,7 @@ const viewFor = (r) => (r.page === "difficulty" ? (r.w === "phone" ? { width: 39
 const THEMES = ["dark", "light"];
 
 const PROTO_DIR = resolve(TARGET === "hybrid" ? "design/prototypes/honey-hybrid" : TARGET === "homemade" ? "design/prototypes/homemade" : "design/prototypes/blue-ribbon-glow");
-const APP_URL = process.env.APP_URL || "http://localhost:5199";
+const APP_URL = process.env.APP_URL || "http://127.0.0.1:5199";
 const APP_SCREENS = ["home", "difficulty", "sp-round", "sp-correct", "sp-incorrect", "sp-results", "settings",
   "lobby", "waiting-room", "race-round", "race-locked", "race-roundend", "race-results", "race-tie",
   "elim-watch", "elim-myturn", "elim-knockout", "elim-results"];

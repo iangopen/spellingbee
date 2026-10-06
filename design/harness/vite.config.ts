@@ -35,5 +35,8 @@ function stubNetwork(): Plugin {
 export default defineConfig({
   root: here,
   plugins: [stubNetwork(), react()],
-  server: { port: 5199, strictPort: true, fs: { allow: [repo] } },
+  // 127.0.0.1, not "localhost": a server on localhost listens on [::1] only here, and a browser
+  // that tries localhost's IPv4 address first waits ~2 s per attempt on Windows (see run-checks.mjs).
+  server: { host: "127.0.0.1", port: 5199, strictPort: true, fs: { allow: [repo] } },
+  preview: { host: "127.0.0.1", port: 5199, strictPort: true },
 });

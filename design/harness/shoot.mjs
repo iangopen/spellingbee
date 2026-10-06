@@ -1,6 +1,6 @@
 // Capture harness screens (or prototype files) at desktop and phone width.
 //
-//   node shoot.mjs harness <outDir> [screen,screen...]   -> http://localhost:5199
+//   node shoot.mjs harness <outDir> [screen,screen...]   -> http://127.0.0.1:5199
 //   node shoot.mjs files <outDir> <file.html> [...]       -> file:// prototypes
 //
 // Needs Playwright importable (installed outside the repo on purpose, so
@@ -55,7 +55,7 @@ if (mode === "harness") {
     for (const w of Object.keys(WIDTHS))
       for (const t of THEMES) {
         const prep = s === "settings" ? (p) => p.click(".settings-toggle") : null;
-        await capture(`http://localhost:5199/?screen=${s}&theme=${t}`, s, t, w, prep);
+        await capture(`http://127.0.0.1:5199/?screen=${s}&theme=${t}`, s, t, w, prep);
         n++;
       }
 } else {

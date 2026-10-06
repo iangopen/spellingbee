@@ -5,12 +5,12 @@
 //      tall, and a 44px-wide run must exist at the centre row
 //   3. the focus rim against the bands just inside and outside it (tier-focus.mjs, the same
 //      check shoot-homemade.mjs runs on the prototype, proven able to fail)
-//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://localhost:5199] node design/harness/check-tier-bars.mjs
+//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:5199] node design/harness/check-tier-bars.mjs
 import { pathToFileURL } from "node:url";
 import { measureTierFocus } from "./tier-focus.mjs";
 
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
-const APP = process.env.APP_URL ?? "http://localhost:5199";
+const APP = process.env.APP_URL ?? "http://127.0.0.1:5199";
 const W = { desktop: { width: 1280, height: 800 }, phone: { width: 390, height: 844 }, narrow: { width: 320, height: 800 } };
 const view = (page, w) => (w === "phone" ? { width: 390, height: 1000 } : w === "narrow" ? { width: 320, height: 1000 } : { width: 1280, height: 960 });
 const url = (page, q) => `${APP}/?screen=${page}&theme=${q.theme}&peak=1`;

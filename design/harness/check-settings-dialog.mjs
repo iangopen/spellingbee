@@ -1,10 +1,10 @@
 // The Settings dialog behaviour in real Chrome (design/harness): focus moves in,
 // Tab cannot leave, Escape closes, focus returns to the launcher, the page behind
 // is inert. Presentation changes must never regress these (hardening #18).
-//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://localhost:5199] node design/harness/check-settings-dialog.mjs
+//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:5199] node design/harness/check-settings-dialog.mjs
 import { pathToFileURL } from "node:url";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
-const APP = process.env.APP_URL ?? "http://localhost:5199";
+const APP = process.env.APP_URL ?? "http://127.0.0.1:5199";
 const b = await chromium.launch();
 let fails = 0;
 const check = (ok, what) => { if (!ok) fails++; console.log(`${ok ? "PASS" : "FAIL"} ${what}`); };

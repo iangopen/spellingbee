@@ -33,7 +33,7 @@ const isYellow = (r, g, b) => { const [h, s, l] = hsl(r, g, b); return h >= 32 &
 // and the legacy body::before wallpaper.
 if (process.env.TARGET === "app") {
   const { mkdirSync, statSync } = await import("node:fs");
-  const APP_URL = process.env.APP_URL || "http://localhost:5199";
+  const APP_URL = process.env.APP_URL || "http://127.0.0.1:5199";
   const SCREENS = ["home", "difficulty", "sp-round", "sp-correct", "sp-incorrect", "sp-results", "settings",
     "lobby", "waiting-room", "race-round", "race-locked", "race-roundend", "race-results", "elim-watch", "elim-myturn", "elim-results"];
   const walk = (d) => readdirSync(d).flatMap((f) => { const p = resolve(d, f); return statSync(p).isDirectory() ? walk(p) : [p]; });

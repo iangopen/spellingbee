@@ -8,7 +8,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
-const HARNESS = process.env.HARNESS_URL ?? "http://localhost:5199";
+const HARNESS = process.env.HARNESS_URL ?? "http://127.0.0.1:5199";
 const OUT = resolve("docs/review");
 mkdirSync(OUT, { recursive: true });
 const PROTO = resolve("design/prototypes/homemade/screens");
