@@ -77,6 +77,11 @@
 }
 .btn svg { width: 1.15em; height: 1.15em; flex: none; }
 .btn-sm { min-height: 44px; padding: 0 16px; font-size: 15px; }
+/* The two buttons that MOVE (primary lifts on hover, both press on :active) sit on their own
+   compositing layer. A transform on a button that shares its panel's layer splits that layer,
+   and the whole panel was re-rastered on every hover (251,000 px for "Singleplayer" on the home
+   hero; found by design/harness/sweep-hover-repaint.mjs, same cause as the tier-bar flash). */
+.btn-primary, .btn-secondary { will-change: transform; }
 .btn-primary { background: var(--accent-fill); color: var(--on-accent); box-shadow: inset 0 0 0 1px var(--btn-sheen), 3px 4px 0 var(--ink-shadow); }
 .btn-primary:hover:not(:disabled) { transform: translate(-1px, -1px); box-shadow: inset 0 0 0 1px var(--btn-sheen), 4px 5px 0 var(--ink-shadow); }
 .btn-primary:active:not(:disabled) { transform: translate(2px, 3px); box-shadow: inset 0 0 0 1px var(--btn-sheen), 1px 1px 0 var(--ink-shadow); }
