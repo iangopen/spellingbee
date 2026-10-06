@@ -32,6 +32,12 @@
   content: ""; position: absolute; inset: -3px; border: 2px solid var(--sketch); border-radius: inherit;
   pointer-events: none; filter: url(#hm-wobble-s);
 }
+/* Art that hangs off a panel's edge (the home bee, the rosettes) is placed ON the card, so it
+   paints above the drawn outline, as the stickers (z-index 2) already did. Without this the
+   outline, a later positioned layer of the same stacking context (the panel isolates), cut
+   straight through them. 1 keeps them under the stickers; nothing outside the panel moves.
+   Measured by design/harness/check-layering.mjs. */
+.panel > :is(.mascot, .rosette) { z-index: 1; }
 /* No backdrop blur at any width: the homemade light strength sets it to none, so
    the honeycomb reads through a panel like paper over a pattern, not frosted glass.
    (Stage 3 copied the hybrid's desktop blur and missed that override.) */
