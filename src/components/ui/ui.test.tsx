@@ -2,7 +2,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { AVATAR_KEYS } from "../../lib/avatars";
-import { createHash } from "node:crypto";
 import { ART_WOBBLE, avatarSvg, rosetteSvg } from "../../lib/beeArt";
 import { AnswerField } from "./AnswerField";
 import { AvatarArt, BeeMascot, Rosette } from "./Art";
@@ -45,7 +44,10 @@ describe("bee art", () => {
     // A change here is a change to the favicon and icons too: rerun
     // design/harness/build-brand-assets.mjs, then update this digest.
     const all = [...AVATAR_KEYS.map(avatarSvg), rosetteSvg()].join("\n");
-    expect(createHash("sha256").update(all).digest("hex").slice(0, 16)).toBe("8da584e4c42ce967");
+    // FNV-1a, 32-bit: a fingerprint, not security, and no Node API in the app's types
+    let h = 0x811c9dc5;
+    for (let i = 0; i < all.length; i++) h = Math.imul(h ^ all.charCodeAt(i), 0x01000193) >>> 0;
+    expect({ length: all.length, fnv: h.toString(16) }).toEqual({ length: 44532, fnv: "680d39e6" });
   });
 
   it("uses tokens only: no hex literal in any drawing", () => {
