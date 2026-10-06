@@ -99,6 +99,15 @@
   width: 100%; min-width: 0; min-height: 58px; padding: 8px 30px; border: 0; text-align: left;
   background: var(--rim); color: var(--ink); clip-path: var(--hex-bar);
   transition: transform 0.15s var(--ease-out), filter 0.15s ease;
+  /* Each bar is its OWN compositing layer, permanently. Without this the eight bars share
+     one squashed layer; a hover's transform split it (the hovered bar and every bar after
+     it moved to new layers) and merged it back when the hover ended, re-rastering about
+     115,000 px twice per hover. The background showed through the gaps while that
+     happened: the "flash" on the difficulty screen. The same split happened once after
+     load, which was the strip check-reduced-motion.mjs used to tolerate. With stable layers
+     a hover repaints only the hovered bar (about 22,000 px). Measured by
+     design/harness/check-hover-flash.mjs; never remove it to "simplify". */
+  will-change: transform;
 }
 /* The rim is the element's own background showing around an inset ::before that
    carries the fill; a real border would be cut off by the angled ends. */
