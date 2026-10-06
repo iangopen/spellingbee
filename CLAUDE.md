@@ -1112,28 +1112,30 @@ Rules this adds:
 - No `backdrop-filter` on panels.
 - `unused-tokens.mjs` now also counts `getPropertyValue("--x")` as a use.
 
-**Where a restored touch changes how an outline overlaps a decoration** (for the
-layering and hover-flash session, which has not been run on any machine yet). No
-z-index or stacking was changed in Panel, Sticker, BeeMascot or Rosette; the only
-stacking change is inside `.bg`, which sits below every panel.
-1. Home hero: the bee mascot hangs over the hero panel's top edge, and the drawn
-   outline (`.panel::after`) paints OVER it. The bee's silhouette changed (wobbly
-   blobs, no stinger), so where the line crosses the lower body changed.
-2. Home best scores: the rosette (`.rosette-float`) straddles the panel's top-right
-   corner and the outline paints over it. The petals are now separate lobes, so the
-   line shows between them at different points.
-3. Every panel at desktop: without the backdrop blur, the outline's outer 3px and the
-   panel interior now sit over crisp honeycomb lines instead of blurred ones, so the
-   wobbly outline and the cell lines can read as tangled where they run parallel.
-4. Settings button: fixed, z-index 20, now with a 2px 3px marker shadow. When a page
-   scrolls under it, the button and its shadow cross panel outlines, stickers and the
-   mascot.
-5. Race and elimination winner cards: the new underline sits under the name. The
-   "Race over"/"Game over" sticker hangs off the bottom-right edge; they do not touch
-   at either width, but a long name that wraps to two lines moves the underline down
-   toward it.
-6. The grain moved above `.bg-depth` and `.bg-light`, still inside `.bg` (z-index -1
-   inside `.app-shell`), so it never covers a panel or an outline.
+**Where an outline overlaps a decoration, and what the 2026-10-07 session did about it.**
+`check-layering.mjs` now walks every panel's outline on every harness screen (both widths
+and themes, and scrolled under the Settings button at phone width) and requires whatever
+covers the line to paint above it: 22 overlaps, 3,084 probe points, 0 under the line
+(the old build: 6 overlaps and 928 points under it). Before/after crops are in
+`docs/review/layering/`.
+1. Home hero bee: the outline cut across its lower body. **Fixed**:
+   `.panel > :is(.mascot, .rosette) { z-index: 1 }` puts the art on the card, under the
+   stickers (z-index 2).
+2. Home best-scores rosette: cut across the ring and petals. **Fixed** by the same rule.
+   (The check also found a third case the list had missed: the solo results card's
+   new-best rosette, `.results-rosette`. Fixed by the same rule.)
+3. Every panel at desktop without the backdrop blur: the outline runs over crisp
+   honeycomb lines. Not a decoration and not a layering question (the honeycomb is the
+   `.bg` layer under every panel); left as designed.
+4. Settings button over panels when the page scrolls: it was always above every outline
+   (fixed, z-index 20 at `.app-shell` level). Verified by the scroll sweep, unchanged.
+5. Winner cards' underline and sticker: the stickers were always above the outline
+   (z-index 2), measured at every point; underline and sticker do not touch.
+6. The grain: inside `.bg` below every panel; never overlaps an outline.
+
+The cause, for anyone adding art: `.panel` isolates, and its outline `.panel::after` is
+the last positioned layer of that stacking context, so any positioned child at z-index
+auto paints UNDER the line. Art that hangs off a panel edge needs z-index 1 (or more).
 
 ### Status
 - Phase 1 (audit) and Phase 2 (brand plus three directions) are done, in
