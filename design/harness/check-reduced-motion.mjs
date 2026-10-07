@@ -59,8 +59,16 @@ const storedSwitch = () => {
 };
 let n = 0, bad = 0;
 
+// NOT fullPage: Playwright's full-page capture renders past the viewport, and on some captures
+// that re-rasters a composited layer for that one image (measured 2026-10-07: 5 of 30 loads
+// showed a one-shot 21px flicker on the bee, 0 of 30 with viewport captures). So the viewport
+// is grown to the page's full height once, after load, and every shot is a plain viewport shot.
 async function shot(p) {
-  return p.screenshot({ fullPage: true });
+  return p.screenshot({ fullPage: false });
+}
+async function fitPage(p, vp) {
+  const h = await p.evaluate(() => Math.ceil(document.documentElement.scrollHeight));
+  if (h > vp.height) { await p.setViewportSize({ width: vp.width, height: h }); await p.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)))); }
 }
 async function open(url, screen, vp, rm, inits) {
   const ctx = await b.newContext({ viewport: vp, reducedMotion: rm });
@@ -69,6 +77,7 @@ async function open(url, screen, vp, rm, inits) {
   await p.goto(url, { waitUntil: "networkidle" });
   await p.evaluate(() => document.fonts.ready); // a late font swap would read as motion
   if (screen === "settings") await p.click(".settings-toggle");
+  await fitPage(p, vp);
   return { ctx, p };
 }
 // ONLY=<screen> narrows the run while debugging.
