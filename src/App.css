@@ -806,10 +806,15 @@
   background: var(--panel-solid);
   border: 1px solid var(--panel-edge);
   border-radius: 12px;
-  transition: transform 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  /* The hover lift is a relative top offset, not a transform: an animated transform here put
+     the option on a compositing layer for the length of the transition and re-rastered the
+     whole avatar panel on every hover (353,000 px on the lobby; found by
+     design/harness/sweep-hover-repaint.mjs). With top it repaints only the option. */
+  position: relative; top: 0;
+  transition: top 0.12s ease, border-color 0.12s ease, color 0.12s ease;
 }
 
-.avatar-option:hover { color: var(--text); transform: translateY(-1px); }
+.avatar-option:hover { color: var(--text); top: -1px; }
 
 .avatar-option.selected {
   /* The art is multi-coloured, so selection is a thick honey edge and a halo,
