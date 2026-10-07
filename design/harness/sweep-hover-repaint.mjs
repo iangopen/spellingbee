@@ -16,27 +16,36 @@ const CONTROLS = "button, a[href], .chip-btn, .mode-chip, .tier-bar, input, sele
 const RING = 26; // the focus ring's own paint rect: Chrome repaints 26px around a control for its 3px outline (offset 3) and 13px halo (measured on the "Modes" link)
 const b = await chromium.launch();
 const cmp = await (await b.newContext()).newPage();
-const greenOutside = (frame, keep) => cmp.evaluate(async ([frame, keep]) => {
-  const im = await new Promise((o) => { const i = new Image(); i.onload = () => o(i); i.src = "data:image/png;base64," + frame; });
-  const c = document.createElement("canvas"); c.width = im.width; c.height = im.height; const t = c.getContext("2d"); t.drawImage(im, 0, 0);
-  const d = t.getImageData(0, 0, im.width, im.height).data, w = im.width; const [kx, ky, kw, kh] = keep;
+// Green that is already on screen before the interaction is ART (the clover avatar's leaves are
+// --bee-leaf green), not paint flashing, so a pixel only counts if it was not green in `base`.
+const greenOutside = (frame, keep, base) => cmp.evaluate(async ([frame, keep, base]) => {
+  const load = (s) => new Promise((o) => { const i = new Image(); i.onload = () => o(i); i.src = "data:image/png;base64," + s; });
+  const px = (im) => { const c = document.createElement("canvas"); c.width = im.width; c.height = im.height; const t = c.getContext("2d"); t.drawImage(im, 0, 0); return t.getImageData(0, 0, im.width, im.height).data; };
+  const im = await load(frame); const d = px(im), b0 = px(await load(base)), w = im.width; const [kx, ky, kw, kh] = keep;
+  const green = (a, i) => a[i + 1] > a[i] + 40 && a[i + 1] > a[i + 2] + 40;
   let n = 0, x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
   for (let i = 0; i < d.length; i += 4) {
     const X = (i / 4) % w, Y = (i / 4 / w) | 0;
     if (X >= kx && X < kx + kw && Y >= ky && Y < ky + kh) continue;
-    if (d[i + 1] > d[i] + 40 && d[i + 1] > d[i + 2] + 40) { n++; x0 = Math.min(x0, X); x1 = Math.max(x1, X); y0 = Math.min(y0, Y); y1 = Math.max(y1, Y); }
+    if (green(d, i) && !green(b0, i)) { n++; x0 = Math.min(x0, X); x1 = Math.max(x1, X); y0 = Math.min(y0, Y); y1 = Math.max(y1, Y); }
   }
   return { n, box: n ? `(${x0},${y0})-(${x1},${y1})` : "" };
-}, [frame, keep]);
+}, [frame, keep, base]);
 
 async function open(screen, vp) {
   const ctx = await b.newContext({ viewport: vp });
   const p = await ctx.newPage();
+  // NO_CARET=1 hides the text caret, whose blink repaints a focused field twice a second
+  if (process.env.NO_CARET) await p.addInitScript(() => document.addEventListener("DOMContentLoaded", () => { const st = document.createElement("style"); st.textContent = "*{caret-color:transparent!important}"; document.head.append(st); }));
   if (process.env.ADDCSS) await p.addInitScript((css) => document.addEventListener("DOMContentLoaded", () => { const st = document.createElement("style"); st.textContent = css; document.head.append(st); }), process.env.ADDCSS);
   await p.goto(`${APP}/?screen=${screen}&theme=dark`, { waitUntil: "networkidle" });
   await p.evaluate(() => document.fonts.ready);
   if (screen === "settings") await p.click(".settings-toggle");
   await p.mouse.move(vp.width - 2, vp.height - 2);
+  // Start with NOTHING focused. Screens that focus a field on arrival (the round's answer
+  // field) would otherwise charge that field's blur (its focus glow going away) to whatever
+  // control is focused next. The field's own focus is measured like any other control.
+  await p.evaluate(() => document.activeElement?.blur());
   await p.waitForTimeout(1200);
   await p.evaluate(() => { for (const a of document.getAnimations()) { if (/sweep/.test(a.animationName)) { a.pause(); a.currentTime = 4500; } else if (a.effect?.getComputedTiming().iterations !== Infinity) a.finish(); } });
   return { ctx, p };
@@ -75,7 +84,7 @@ for (const [w, vp] of Object.entries(VIEWS)) for (const screen of SCREENS) {
     await p.waitForTimeout(400);
     await cdp.send("Page.stopScreencast");
     let worst = { n: 0, box: "" };
-    for (const f of frames) { const g = await greenOutside(f, keep); if (g.n > worst.n) worst = g; }
+    for (const f of frames) { const g = await greenOutside(f, keep, frames[0]); if (g.n > worst.n) worst = g; }
     tested++;
     if (worst.n) { findings.push(`${w} ${screen} ${how} ${c.name}: ${worst.n} px repainted outside it in ${worst.box}`); console.log("FOUND " + findings.at(-1)); }
     await ctx.close();
