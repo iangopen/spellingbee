@@ -990,8 +990,9 @@ edge-function CORS preflight cache, 64f65f3 / 21c2601). Stage numbers follow `de
 3 shared components, 4a-4h the screens, 5 rename, 6 assets, 7 polish. All are built.
 
 **Verified, with the command that shows it** (`PW_MODULE=... node design/harness/run-checks.mjs`
-runs the browser ones in one go; 9 of 10 browser scripts run (plus the two unused-* checks), the 10th is
-`check-glow.mjs`, the Blue Ribbon prototype's check, which fails honey by design):
+runs the browser ones in one go; 11 of 12 browser scripts run (plus the two unused-* checks), the 12th is
+`check-glow.mjs`, the Blue Ribbon prototype's check, which fails honey by design). The suite
+has NOT been re-run in full since the hover-flash commits (fef91ca); see "Hover flash" below:
 - [x] `npm run build`, `npm run lint` (0 errors, 11 warnings, all in old scripts or the harness except the old `TurnScreen` hook one),
   `npm test` (119 tests in 16 files: logic, screens, standings, sounds, brand assets,
   licences, the pinned bee art), `npm run test:db` (97, with main's CORS tests). There is no Playwright SPEC suite in the repo (it
@@ -1005,8 +1006,10 @@ runs the browser ones in one go; 9 of 10 browser scripts run (plus the two unuse
 - [x] `unused-selectors.mjs` 0, `unused-tokens.mjs` 0 (the old aliases, Inter and
   Space Grotesk are gone).
 - [x] Reduced motion: 68/68 screen configurations are still and match the in-app
-  switch (2026-10-06: 60 pixel-identical, 8 within a 0.2% anti-aliasing tolerance that is printed; the split varies by a case or two run to run).
-  Proven able to fail (remove the global block and it fails).
+  switch, at ZERO tolerance (2026-10-06, 03c9fcd: three runs of that check in a row, 68/68
+  pixel-identical each time). The 0.2% tolerance is gone; each of the 8 cases it used to
+  hide was explained and fixed (c7b40e1). Proven able to fail (remove the global block and
+  it fails).
 - [x] A full 30-word game in the production build: each outcome sounds exactly once
   (miss = tick + one bell, 4 oscillators; correct = tick + chime, 3), no utterance is
   interrupted (60 of 60 ended normally), and every request goes to the site's own
@@ -1136,6 +1139,57 @@ covers the line to paint above it: 22 overlaps, 3,084 probe points, 0 under the 
 The cause, for anyone adding art: `.panel` isolates, and its outline `.panel::after` is
 the last positioned layer of that stacking context, so any positioned child at z-index
 auto paints UNDER the line. Art that hangs off a panel edge needs z-index 1 (or more).
+
+### Hover flash and harness stability (2026-10-06)
+**The criterion for visible flicker** is that compositor frames visibly CHANGE outside the
+element being hovered or focused, sampled frame by frame with the shimmer frozen. Paint
+area is NOT the criterion: paint flashing reports every re-raster, and a re-raster that
+puts back the same pixels (a focus ring, a drawer, a caret blink) is invisible. Paint
+area is how to FIND a candidate (`design/harness/sweep-hover-repaint.mjs`); a fix is
+justified only when frames change. `check-hover-flash.mjs` applies the frame criterion
+to the tier bars (old build 30/32 fail, fixed 32/32).
+
+What was fixed, and the causes found:
+- **The shared compositing layer.** The eight tier bars were squashed into one layer. A
+  hover's `transform` split it (the hovered bar and every bar after it moved to new
+  layers) and merged it back when the hover ended, re-rastering ~115,000 px twice per
+  hover with the honeycomb showing through the gaps: the "flash". `will-change: transform`
+  on `.tier-bar` (18289a0) gives each bar a stable layer; a hover now repaints the bar
+  alone (~22,000 px, 0 outside it). The same split once after load was the strip the old
+  reduced-motion tolerance hid.
+  - Buttons had the same cause (hovering "Singleplayer" re-rastered the home hero panel,
+    251,258 px). Their own layer fixed the hover but made Chrome re-layer the lobby
+    once after load (5580ca7), so `.btn` and the avatar options (329f4ee) now lift and
+    press with a relative `top`/`left`, which needs no layer at all: 0 px outside the
+    control. **Rule:** a hover or press inside a panel moves with `top`/`left`, never
+    `transform` and never `will-change`. `.tier-bar` and `.sticker` are the deliberate
+    exceptions, each with its reason in a comment; don't "simplify" either away.
+- **The IPv6-only dev server** (8d0a84f). The harness's Vite dev server listened on
+  `[::1]` only, and Chromium sometimes tried localhost's IPv4 address first; on Windows an
+  IPv4 connect to a closed loopback port retries for ~2 s, so loads stalled 2-8 s and
+  sometimes passed Playwright's 30 s timeout. That was the batch run where two scripts
+  "crashed" with only a Node version line. `run-checks.mjs` now serves static builds with
+  `vite preview` on `127.0.0.1`, health-checks both servers before every script and keeps
+  every log. Every script's default URL is `127.0.0.1`. Never go back to `localhost`.
+- **The full-page screenshot redraw** (03c9fcd). Playwright's `fullPage` capture renders
+  past the viewport and sometimes re-rasters a composited layer for that one image
+  (pixels changed and changed back in 5 of 30 loads, 0 of 30 with viewport captures); the
+  page itself never changed. `check-reduced-motion.mjs` grows the viewport to the page
+  height once and takes plain viewport shots. Use viewport captures for any pixel diff.
+- The rotated sticker under the Settings scrim rasterised differently load to load
+  (up to 118 px); `will-change` on `.sticker` (already a stacking context) makes it
+  identical (c7b40e1).
+
+Still unverified (deliberately not run on 2026-10-09, because the laptop had under
+3000 MB available; nothing changed since fef91ca):
+- The frame-sampling check on the Settings drawer ("Close settings" focus) and on the
+  lobby text fields. The paint sweep reports repaints there; whether frames visibly
+  change outside the element is not known. Don't add `will-change` to the fields.
+- Three consecutive full `run-checks.mjs` runs, then build, lint, unit, database and
+  contrast gates, on the current HEAD.
+- Whether the answer field's `scrollIntoView` (`RoundScreen.tsx`, on focus) moves the
+  page on desktop at each word. If it does, limit it to touch / an on-screen keyboard and
+  re-check phone width with touch emulation.
 
 ### Status
 - Phase 1 (audit) and Phase 2 (brand plus three directions) are done, in
@@ -1368,16 +1422,16 @@ auto paints UNDER the line. Art that hangs off a panel edge needs z-index 1 (or 
 - Merge-readiness: see the checklist at the top of this section. What is left is only
   what Ian can do (a real phone, a two-browser multiplayer pass, a final look, the
   merge).
-- Next session (Ian's plan): the layering and hover-flash fix, built on the restored
-  panels. It has not been run on any machine. Start from the overlap list in "Homemade
-  strength, touch by touch".
+- The layering and hover-flash fixes are built (see "Where an outline overlaps" and
+  "Hover flash and harness stability"). Their three unverified checks are listed at the
+  end of the latter; run them first, checking available memory (`(Get-Counter
+  '\Memory\Available MBytes').CounterSamples.CookedValue`, floor 3000) before each.
 - `.text-input` uses `--edge` (>=3:1 on every field surface); keep it that way.
 - The name itself: a distinct look lowers the risk of being mistaken for NYT's game but
   doesn't clear the name. See HARDENING #14 / §C10. The favicon is a bee rosette on
   purpose (a plain hexagon was the closest overlap in the audit).
 - Known limits, recorded rather than hidden: `check-settings-dialog.mjs` cannot see
-  two focus mutations (Chrome restores focus itself on close); the reduced-motion check
-  tolerates up to 0.2% of a page in anti-aliasing noise and prints each case; the
+  two focus mutations (Chrome restores focus itself on close); the
   elimination keyboard pass ran on mocked state; the lane subtitles from the prototype
   ("8 of 10 spelled") are not shown because the client has no per-player correct count.
 - Not in the redesign and untouched on purpose: game logic, `supabase/`, edge functions.

@@ -331,3 +331,46 @@ single lost touch hides, so this session compared one touch at a time.
 ### Open
 - The layering and hover-flash session, built on these panels: start from the overlap
   list in CLAUDE.md.
+
+## 2026-10-06 to 2026-10-09: layering, hover flash, and a stable check harness (redesign branch)
+
+Commits 337703f to fef91ca, all pushed. Full detail is in each commit message and in
+CLAUDE.md "Where an outline overlaps a decoration" and "Hover flash and harness stability".
+
+- **Layering (337703f):** the home bee, home rosette and the solo new-best rosette sat
+  under the panel's drawn outline. `.panel > :is(.mascot, .rosette) { z-index: 1 }`.
+  `check-layering.mjs`: old build 6 of 22 overlaps fail, fixed 22/22 (0 of 3,084 points).
+- **Hover flash, the shared compositing layer (18289a0, 55d99be, 5580ca7, 329f4ee):** a
+  `transform` on hover split a squashed layer and re-rastered everything sharing it. The
+  tier bars got stable layers (`will-change`); buttons and avatar options now move with
+  `top`/`left`, which needs no layer (a `will-change` on buttons had re-layered the lobby
+  once after load). Evidence in `docs/review/flash/`.
+- **The IPv6-only dev server (8d0a84f):** the harness dev server listened on `[::1]` only;
+  Chromium's IPv4 attempts stalled 2 s each on Windows, which explains the unexplained
+  batch "crashes" from the 2026-10-06 entry. Checks now run against static builds on
+  `127.0.0.1`, health-checked, with logs kept.
+- **The full-page screenshot redraw (03c9fcd):** Playwright's `fullPage` capture
+  occasionally re-rastered a layer just for that image (5 of 30 loads; 0 of 30 with
+  viewport captures). The reduced-motion check now uses viewport captures and runs at
+  zero tolerance (c7b40e1): three runs in a row of that check, 68/68 identical.
+- **The criterion for visible flicker,** settled here: frames visibly change outside the
+  element (sampled compositor frames, shimmer frozen). Paint area only finds candidates;
+  a re-raster that restores the same pixels is not flicker. `sweep-hover-repaint.mjs`
+  (fef91ca) is the candidate finder: it starts unfocused, ignores pixels that were
+  already green (the clover avatar's art) and can hide the caret (`NO_CARET=1`).
+
+### 2026-10-09: write-up only, nothing run
+Ian asked for a memory check before each heavy step. Measured on 2026-10-09:
+- First check: 3.57 GB free of 15.8 GB (Free, under the then 4 GB floor). Stopped.
+- Second check, as Available (`\Memory\Available MBytes`): **2315 MB**, under the 3000 MB
+  floor. Stopped again. No node or chrome process from this session was running either time.
+- Ian then said to skip the heavy steps and do only this write-up. No build, server or
+  browser was started, so there are no before/after numbers to log for heavy steps.
+
+### Open (unverified on the current HEAD)
+- The frame-sampling check on the Settings drawer ("Close settings" focus) and on the
+  lobby text fields; fix only if frames visibly change outside the element.
+- Three consecutive full `run-checks.mjs` runs, then the build, lint, unit, database and
+  contrast gates.
+- Whether the answer field's `scrollIntoView` on focus moves the page on desktop at each
+  word; limit it to touch only if it does, and re-check phone width with touch emulation.
