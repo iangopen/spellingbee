@@ -1316,23 +1316,23 @@
  {
   "page": "difficulty",
   "theme": "dark",
-  "w": "desktop",
+  "w": "phone",
   "kind": "text",
   "label": "Novice",
   "color": "rgb(245, 239, 227)",
   "need": 4.5,
   "rects": [
    [
-    489.796875,
-    417.109375,
-    546.21875,
-    438.109375
+    54,
+    479.46875,
+    110.421875,
+    500.46875
    ]
   ],
   "fg": "#f5efe3",
-  "worst": 9.65,
-  "wp": "#383e30",
-  "where": "desktop"
+  "worst": 9.62,
+  "wp": "#393e30",
+  "where": "phone"
  },
  {
   "page": "difficulty",
@@ -1358,23 +1358,23 @@
  {
   "page": "difficulty",
   "theme": "dark",
-  "w": "phone",
+  "w": "desktop",
   "kind": "text",
   "label": "Best",
   "color": "rgb(179, 166, 143)",
   "need": 4.5,
   "rects": [
    [
-    274.6875,
-    620.703125,
-    311.40625,
-    634.703125
+    728.875,
+    558.34375,
+    765.59375,
+    572.34375
    ]
   ],
   "fg": "#b3a68f",
-  "worst": 5.21,
-  "wp": "#383421",
-  "where": "phone"
+  "worst": 5.23,
+  "wp": "#373421",
+  "where": "desktop"
  },
  {
   "page": "difficulty",
@@ -1715,23 +1715,23 @@
  {
   "page": "difficulty",
   "theme": "dark",
-  "w": "phone",
+  "w": "desktop",
   "kind": "text",
   "label": "Expert",
   "color": "rgb(36, 26, 9)",
   "need": 4.5,
   "rects": [
    [
-    54,
-    863.46875,
-    108.609375,
-    884.46875
+    489.796875,
+    801.109375,
+    544.40625,
+    822.109375
    ]
   ],
   "fg": "#241a09",
-  "worst": 7.33,
-  "wp": "#dc9e3a",
-  "where": "phone"
+  "worst": 7.36,
+  "wp": "#dd9e3a",
+  "where": "desktop"
  },
  {
   "page": "difficulty",
@@ -1751,7 +1751,7 @@
   ],
   "fg": "#241a09",
   "worst": 6.62,
-  "wp": "#d39533",
+  "wp": "#d39532",
   "where": "phone"
  },
  {
@@ -2248,8 +2248,8 @@
    ]
   ],
   "fg": "#000000",
-  "worst": 15.25,
-  "wp": "#d5dfce",
+  "worst": 15.11,
+  "wp": "#d4dece",
   "where": "phone"
  },
  {
@@ -2269,8 +2269,8 @@
    ]
   ],
   "fg": "#2b2115",
-  "worst": 5.73,
-  "wp": "#d88b20",
+  "worst": 5.69,
+  "wp": "#d88a20",
   "where": "desktop"
  },
  {
@@ -2423,23 +2423,23 @@
  {
   "page": "difficulty",
   "theme": "light",
-  "w": "phone",
+  "w": "desktop",
   "kind": "text",
   "label": "Medium",
   "color": "rgb(44, 36, 25)",
   "need": 4.5,
   "rects": [
    [
-    54,
-    671.46875,
-    121.078125,
-    692.46875
+    489.796875,
+    609.109375,
+    556.875,
+    630.109375
    ]
   ],
   "fg": "#2c2419",
-  "worst": 11.85,
-  "wp": "#efe1c8",
-  "where": "phone"
+  "worst": 11.93,
+  "wp": "#efe2c8",
+  "where": "desktop"
  },
  {
   "page": "difficulty",
@@ -2458,8 +2458,8 @@
    ]
   ],
   "fg": "#000000",
-  "worst": 15.92,
-  "wp": "#eddfc4",
+  "worst": 16.04,
+  "wp": "#ede0c5",
   "where": "phone"
  },
  {
@@ -2549,23 +2549,23 @@
  {
   "page": "difficulty",
   "theme": "light",
-  "w": "phone",
+  "w": "desktop",
   "kind": "text",
   "label": "Hard",
   "color": "rgb(44, 36, 25)",
   "need": 4.5,
   "rects": [
    [
-    54,
-    799.46875,
-    93.765625,
-    820.46875
+    489.796875,
+    737.109375,
+    529.5625,
+    758.109375
    ]
   ],
   "fg": "#2c2419",
-  "worst": 11.25,
-  "wp": "#f0d9c7",
-  "where": "phone"
+  "worst": 11.26,
+  "wp": "#f0d9c8",
+  "where": "desktop"
  },
  {
   "page": "difficulty",
@@ -2606,7 +2606,7 @@
   ],
   "fg": "#2b2115",
   "worst": 5.69,
-  "wp": "#d88a1f",
+  "wp": "#d88a20",
   "where": "desktop"
  },
  {
@@ -2633,23 +2633,23 @@
  {
   "page": "difficulty",
   "theme": "light",
-  "w": "desktop",
+  "w": "phone",
   "kind": "text",
   "label": "Competition-level",
   "color": "rgb(43, 33, 21)",
   "need": 4.5,
   "rects": [
    [
-    489.796875,
-    823.578125,
-    589.90625,
-    839.578125
+    54,
+    885.9375,
+    154.109375,
+    901.9375
    ]
   ],
   "fg": "#2b2115",
-  "worst": 6.63,
-  "wp": "#e2992f",
-  "where": "desktop"
+  "worst": 6.58,
+  "wp": "#e2982e",
+  "where": "phone"
  },
  {
   "page": "difficulty",
@@ -3196,20 +3196,20 @@
   "theme": "dark",
   "w": "desktop",
   "kind": "text",
-  "label": "Next word:",
+  "label": "Here's your word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    603.078125,
+    571.125,
     313.515625,
-    708.921875,
+    740.859375,
     347.515625
    ]
   ],
   "fg": "#a3b5ff",
-  "worst": 7.35,
-  "wp": "#30281a",
+  "worst": 7.34,
+  "wp": "#30281b",
   "where": "desktop"
  },
  {
@@ -3436,27 +3436,6 @@
   "worst": 10.82,
   "wp": "#1e1910",
   "focused": true,
-  "where": "phone"
- },
- {
-  "page": "sp-round",
-  "theme": "dark",
-  "w": "phone",
-  "kind": "text",
-  "label": "Try spelling this:",
-  "color": "rgb(163, 181, 255)",
-  "need": 3,
-  "rects": [
-   [
-    128.5625,
-    254.796875,
-    293.421875,
-    288.796875
-   ]
-  ],
-  "fg": "#a3b5ff",
-  "worst": 7.34,
-  "wp": "#30281b",
   "where": "phone"
  },
  {
@@ -3722,14 +3701,14 @@
   "theme": "light",
   "w": "desktop",
   "kind": "text",
-  "label": "Next word:",
+  "label": "Spell this word:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    603.078125,
+    580.171875,
     313.515625,
-    708.921875,
+    731.8125,
     347.515625
    ]
   ],
@@ -3969,14 +3948,14 @@
   "theme": "light",
   "w": "phone",
   "kind": "text",
-  "label": "Try spelling this:",
+  "label": "Get ready:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    128.5625,
+    159.5625,
     254.796875,
-    293.421875,
+    262.4375,
     288.796875
    ]
   ],
@@ -4248,14 +4227,14 @@
   "theme": "dark",
   "w": "desktop",
   "kind": "text",
-  "label": "Your word is:",
+  "label": "Next word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    592.828125,
+    603.078125,
     319.515625,
-    719.171875,
+    708.921875,
     353.515625
    ]
   ],
@@ -4513,14 +4492,14 @@
   "theme": "dark",
   "w": "phone",
   "kind": "text",
-  "label": "Next word:",
+  "label": "Spell this word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    158.078125,
+    135.171875,
     254.796875,
-    263.921875,
+    286.8125,
     288.796875
    ]
   ],
@@ -5057,14 +5036,14 @@
   "theme": "light",
   "w": "phone",
   "kind": "text",
-  "label": "Spell this word:",
+  "label": "Try spelling this:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    135.171875,
+    128.5625,
     254.796875,
-    286.8125,
+    293.421875,
     288.796875
    ]
   ],
@@ -5601,14 +5580,14 @@
   "theme": "dark",
   "w": "phone",
   "kind": "text",
-  "label": "Your word is:",
+  "label": "Here's your word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    147.828125,
+    126.125,
     254.796875,
-    274.171875,
+    295.859375,
     288.796875
    ]
   ],
@@ -5859,14 +5838,14 @@
   "theme": "light",
   "w": "desktop",
   "kind": "text",
-  "label": "Your word is:",
+  "label": "Next word:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    592.828125,
+    603.078125,
     319.515625,
-    719.171875,
+    708.921875,
     353.515625
    ]
   ],
@@ -6124,14 +6103,14 @@
   "theme": "light",
   "w": "phone",
   "kind": "text",
-  "label": "Get ready:",
+  "label": "Your word is:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    159.5625,
+    147.828125,
     254.796875,
-    262.4375,
+    274.171875,
     288.796875
    ]
   ],
@@ -11631,23 +11610,23 @@
  {
   "page": "race-round",
   "theme": "dark",
-  "w": "phone",
+  "w": "desktop",
   "kind": "text",
-  "label": "Here's your word:",
+  "label": "Get ready:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    126.125,
-    190.796875,
-    295.859375,
-    224.796875
+    604.5625,
+    307.515625,
+    707.4375,
+    341.515625
    ]
   ],
   "fg": "#a3b5ff",
-  "worst": 7.32,
-  "wp": "#31281a",
-  "where": "phone"
+  "worst": 7.35,
+  "wp": "#30281a",
+  "where": "desktop"
  },
  {
   "page": "race-round",
@@ -11805,6 +11784,27 @@
   "wp": "#16130f",
   "focused": true,
   "where": "desktop"
+ },
+ {
+  "page": "race-round",
+  "theme": "dark",
+  "w": "phone",
+  "kind": "text",
+  "label": "Your word is:",
+  "color": "rgb(163, 181, 255)",
+  "need": 3,
+  "rects": [
+   [
+    147.828125,
+    190.796875,
+    274.171875,
+    224.796875
+   ]
+  ],
+  "fg": "#a3b5ff",
+  "worst": 7.32,
+  "wp": "#31281a",
+  "where": "phone"
  },
  {
   "page": "race-round",
@@ -12048,14 +12048,14 @@
   "theme": "light",
   "w": "desktop",
   "kind": "text",
-  "label": "Next word:",
+  "label": "Get ready:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    603.078125,
+    604.5625,
     307.515625,
-    708.921875,
+    707.4375,
     341.515625
    ]
   ],
@@ -12220,27 +12220,6 @@
   "wp": "#fffdf8",
   "focused": true,
   "where": "desktop"
- },
- {
-  "page": "race-round",
-  "theme": "light",
-  "w": "phone",
-  "kind": "text",
-  "label": "Spell this word:",
-  "color": "rgb(35, 70, 216)",
-  "need": 3,
-  "rects": [
-   [
-    135.171875,
-    190.796875,
-    286.8125,
-    224.796875
-   ]
-  ],
-  "fg": "#2346d8",
-  "worst": 6.64,
-  "wp": "#fcf6ea",
-  "where": "phone"
  },
  {
   "page": "race-round",
@@ -12484,14 +12463,14 @@
   "theme": "dark",
   "w": "desktop",
   "kind": "text",
-  "label": "Get ready:",
+  "label": "Try spelling this:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    604.5625,
+    573.5625,
     287.515625,
-    707.4375,
+    738.421875,
     321.515625
    ]
   ],
@@ -12689,14 +12668,14 @@
   "theme": "dark",
   "w": "phone",
   "kind": "text",
-  "label": "Try spelling this:",
+  "label": "Spell this word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    128.5625,
+    135.171875,
     190.796875,
-    293.421875,
+    286.8125,
     224.796875
    ]
   ],
@@ -13152,27 +13131,6 @@
   "theme": "light",
   "w": "phone",
   "kind": "text",
-  "label": "Here's your word:",
-  "color": "rgb(35, 70, 216)",
-  "need": 3,
-  "rects": [
-   [
-    126.125,
-    190.796875,
-    295.859375,
-    224.796875
-   ]
-  ],
-  "fg": "#2346d8",
-  "worst": 6.64,
-  "wp": "#fcf6ea",
-  "where": "phone"
- },
- {
-  "page": "race-locked",
-  "theme": "light",
-  "w": "phone",
-  "kind": "text",
   "label": "\"",
   "color": "rgb(44, 36, 25)",
   "need": 4.5,
@@ -13410,14 +13368,14 @@
   "theme": "dark",
   "w": "phone",
   "kind": "text",
-  "label": "Your word is:",
+  "label": "Spell this word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    147.828125,
+    135.171875,
     190.796875,
-    274.171875,
+    286.8125,
     224.796875
    ]
   ],
@@ -13888,14 +13846,14 @@
   "theme": "light",
   "w": "desktop",
   "kind": "text",
-  "label": "Here's your word:",
+  "label": "Spell this word:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    571.125,
+    580.171875,
     276.515625,
-    740.859375,
+    731.8125,
     310.515625
    ]
   ],
@@ -14150,14 +14108,14 @@
   "theme": "light",
   "w": "phone",
   "kind": "text",
-  "label": "Spell this word:",
+  "label": "Get ready:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    135.171875,
+    159.5625,
     190.796875,
-    286.8125,
+    262.4375,
     224.796875
    ]
   ],
@@ -14956,8 +14914,8 @@
    18
   ],
   "fg": "#7a4a08",
-  "worst": 7.16,
-  "wp": "#fcfaf4",
+  "worst": 7.35,
+  "wp": "#fffdf8",
   "focused": true,
   "where": "desktop"
  },
@@ -15640,8 +15598,8 @@
    18
   ],
   "fg": "#7a4a08",
-  "worst": 7.16,
-  "wp": "#fcfaf4",
+  "worst": 7.35,
+  "wp": "#fffdf8",
   "focused": true,
   "where": "desktop"
  },
@@ -15887,14 +15845,14 @@
   "theme": "dark",
   "w": "desktop",
   "kind": "text",
-  "label": "Get ready:",
+  "label": "Your word is:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    604.5625,
+    592.828125,
     316.390625,
-    707.4375,
+    719.171875,
     350.390625
    ]
   ],
@@ -16211,20 +16169,20 @@
   "theme": "dark",
   "w": "phone",
   "kind": "text",
-  "label": "Your word is:",
+  "label": "Spell this word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    147.828125,
+    135.171875,
     354,
-    274.171875,
+    286.8125,
     388
    ]
   ],
   "fg": "#a3b5ff",
-  "worst": 7.35,
-  "wp": "#30281a",
+  "worst": 7.34,
+  "wp": "#30281b",
   "where": "phone"
  },
  {
@@ -16517,14 +16475,14 @@
   "theme": "light",
   "w": "desktop",
   "kind": "text",
-  "label": "Here's your word:",
+  "label": "Spell this word:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    571.125,
+    580.171875,
     316.390625,
-    740.859375,
+    731.8125,
     350.390625
    ]
   ],
@@ -16841,14 +16799,14 @@
   "theme": "light",
   "w": "phone",
   "kind": "text",
-  "label": "Spell this word:",
+  "label": "Your word is:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    135.171875,
+    147.828125,
     354,
-    286.8125,
+    274.171875,
     388
    ]
   ],
@@ -17147,14 +17105,14 @@
   "theme": "dark",
   "w": "desktop",
   "kind": "text",
-  "label": "Your word is:",
+  "label": "Spell this word:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    592.828125,
+    580.171875,
     316.390625,
-    719.171875,
+    731.8125,
     350.390625
    ]
   ],
@@ -17496,20 +17454,20 @@
   "theme": "dark",
   "w": "phone",
   "kind": "text",
-  "label": "Here's your word:",
+  "label": "Your word is:",
   "color": "rgb(163, 181, 255)",
   "need": 3,
   "rects": [
    [
-    126.125,
+    147.828125,
     354,
-    295.859375,
+    274.171875,
     388
    ]
   ],
   "fg": "#a3b5ff",
-  "worst": 7.34,
-  "wp": "#30281b",
+  "worst": 7.35,
+  "wp": "#30281a",
   "where": "phone"
  },
  {
@@ -18151,14 +18109,14 @@
   "theme": "light",
   "w": "phone",
   "kind": "text",
-  "label": "Spell this word:",
+  "label": "Here's your word:",
   "color": "rgb(35, 70, 216)",
   "need": 3,
   "rects": [
    [
-    135.171875,
+    126.125,
     354,
-    286.8125,
+    295.859375,
     388
    ]
   ],
@@ -19494,8 +19452,8 @@
    18
   ],
   "fg": "#7a4a08",
-  "worst": 7.29,
-  "wp": "#fefcf7",
+  "worst": 7.35,
+  "wp": "#fffdf8",
   "focused": true,
   "where": "desktop"
  }
