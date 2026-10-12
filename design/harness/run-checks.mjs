@@ -22,6 +22,7 @@
 // printed, so a crash can always be traced afterwards.
 import { spawn, spawnSync } from "node:child_process";
 import { createWriteStream, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
+import http from "node:http";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -36,9 +37,23 @@ const firstError = (s) => s.split("\n").find((l) => /(^|\s)(FAIL|Error|error:|Ti
 
 const APP = "http://127.0.0.1:4173/spellingbee/";
 const HARNESS = "http://127.0.0.1:5199/";
-const HARNESS_DIST = resolve("design/harness/dist");
+// Relative to the harness config's `root` (design/harness). Not an absolute path: with
+// `shell: true` on Windows an argument is split at spaces, and this repo lives under
+// "github projects", so an absolute --outDir became two arguments and the build failed.
+const HARNESS_DIST = "dist";
 
-async function answers(url) { try { return (await fetch(url, { signal: AbortSignal.timeout(3000) })).ok; } catch { return false; } }
+// A fresh connection per probe (agent: false), never fetch's keep-alive pool. Each script runs
+// under spawnSync, which blocks this event loop for minutes; vite preview closes the idle pooled
+// socket after 5 s, this process never sees the close, and the next probe is written onto a dead
+// socket and gets ECONNRESET. That failed the app probe before every other script while the
+// server was fine (2026-10-12; reproduced with two servers and blocking spawns).
+function answers(url) {
+  return new Promise((done) => {
+    const req = http.get(url, { agent: false, timeout: 3000 }, (res) => { res.resume(); done(res.statusCode >= 200 && res.statusCode < 300); });
+    req.on("timeout", () => req.destroy(new Error("timeout")));
+    req.on("error", () => done(false));
+  });
+}
 for (const url of [APP, HARNESS]) if (await answers(url)) { console.error(`${url} is already being served by something else; stop it first (this script starts its own servers).`); process.exit(2); }
 
 console.log("building the app and the harness...");
