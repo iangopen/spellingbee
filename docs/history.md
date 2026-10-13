@@ -480,6 +480,62 @@ disabled, with the tags fetched:
 - The fresh-clone build used `npm ci` as asked, while the workflow still runs
   `npm install`; both install from the same lockfile here.
 
+## 2026-10-12: deploy workflow on a pinned runner, Node 22, npm ci
+
+Why: run 38333072617 warned that `checkout@v4`, `setup-node@v4`,
+`upload-artifact@v4` (inside `upload-pages-artifact@v3`) and `deploy-pages@v4`
+target Node 20 and were being forced onto Node 24, and noticed that
+`ubuntu-latest` moves to Ubuntu 26. It also built with `npm install` on Node 20,
+which warned EBADENGINE for `@supabase/*` 2.110.8 (they require Node >= 22).
+
+### What GitHub's own notices say (read 2026-10-12)
+- Changelog 2025-09-19, "Deprecation of Node 20 on GitHub Actions runners":
+  Node 24 default for JavaScript actions from 2026-06-16; Node 20 removed from
+  runners on 2026-09-23 (the `ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION` opt-out
+  works only until then). Changelog 2026-09-23, "Node 20 is no longer available
+  in GitHub Actions", confirms the removal; Node 20 actions run on Node 24.
+- actions/runner-images issue #14748 (opened 2026-09-17): `ubuntu-latest`
+  becomes Ubuntu 26.04 in a rollout beginning 2026-10-19, to be complete by
+  2026-11-19 (kernel 7.0, systemd 259; Java 17 default unchanged).
+
+### Release notes read before each major bump
+- `checkout` v4 -> v7: v5 Node 24 (runner >= 2.327.1); v6 persists credentials
+  to a separate file; v7 ESM and blocks checking out fork PRs under
+  `pull_request_target`/`workflow_run`. None apply (push to main only).
+- `setup-node` v4 -> v7 (7.1.0): v5 auto-caches when `package.json` has a
+  `packageManager` field (it has none, so no cache); v6 limits that to npm; v7
+  ESM and drops the dummy `NODE_AUTH_TOKEN` export (we don't publish).
+- `upload-pages-artifact` v3 -> v5: v4 excludes dotfiles from the artifact
+  (`dist` has none); v5 uses `upload-artifact` v7 and adds
+  `include-hidden-files`.
+- `deploy-pages` v4 -> v5 (5.0.1): Node 24; 5.0.1 adds polling backoff.
+- `configure-pages`: this workflow never used it, so it was not added.
+
+### Change (commit a21e46a)
+`runs-on: ubuntu-24.04` on both jobs, `node-version: 22`, `npm ci`, and the four
+action bumps. Permissions, the three `VITE_*` secrets and the comments are
+unchanged; there was no `concurrency` block before and none was added. The repo
+has no `.nvmrc` or `engines` field, so nothing else names a Node version.
+
+### Verification
+- Local: fresh clone, Node 22.23.3 + npm 10.9.9 (the pair setup-node gives),
+  `npm ci` with no EBADENGINE, the three `VITE_*` values from `.env.local`,
+  `npm run build`: `index-BFZyqfqC.js`, `index-y9rZHhoN.css`.
+- Deploy run 38350187205: success. Image `ubuntu-24.04`, node v22.23.3,
+  `npm ci` added 114 packages (111 on Windows; platform-specific optional
+  bindings). No annotations on either job; the log has no Node 20, runner-image
+  or EBADENGINE lines. The one deprecation line left is Node's own `punycode`
+  DEP0040, printed from inside `deploy-pages@v5`.
+- Live vs the local build: all 19 files fetched; 15 byte-identical, 4 text files
+  (`index.html`, `favicon.svg`, `manifest.webmanifest`,
+  `third-party-licenses.txt`) differ only by CR characters (the Windows clone
+  checks out CRLF under `core.autocrlf=true`) and are identical with CR removed.
+- Live site: title "Spelling Bee | Hear the word. Spell it right."; manifest,
+  favicon.svg, favicon-32, apple-touch-icon, icon-192, icon-512,
+  icon-maskable-512 and og-card all 200 with the right types. One easy word
+  played in Playwright ("zebra", Correct): 7 requests, all to
+  `https://iangopen.github.io`.
+
 ## Archived CLAUDE.md (2026-10-12, before the trim)
 
 CLAUDE.md had grown to 1,437 lines (95 kB), re-read at every session. On 2026-10-12, before

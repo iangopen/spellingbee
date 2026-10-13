@@ -26,6 +26,29 @@ Deploys via `.github/workflows/deploy.yml` on every push to `main`
 (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_TURNSTILE_SITE_KEY`);
 locally they are in `.env.local` (ignored).
 
+The build job (checked 2026-10-12, run 38350187205): runner pinned to
+`ubuntu-24.04`, Node 22 via `actions/setup-node@v7`, `npm ci` (exactly
+`package-lock.json`), then `npm run build`; actions `checkout@v7`,
+`upload-pages-artifact@v5`, `deploy-pages@v5`, all on the Node 24 runtime. The
+log shows no Node 20 or runner-image warnings. Permissions stay minimal
+(`contents: read`, `pages: write`, `id-token: write`); there is no
+`concurrency` block. There is no `.nvmrc` or `engines` field; the `22` lives
+only in the workflow.
+- **Bumping the runner image is a deliberate step**, never a side effect: change
+  both `runs-on` lines together, push, and check the run and the live site.
+  `ubuntu-latest` moves to Ubuntu 26.04 in a rollout from 2026-10-19 to
+  2026-11-19 (runner-images issue #14748); the pin keeps us off it until 26.04
+  is tested.
+- `upload-pages-artifact` v4+ leaves dotfiles out of the artifact. `dist` has
+  none; anything in `public/` starting with a dot would silently not deploy.
+- **Restoring the previous workflow** (ubuntu-latest, Node 20, `npm install`,
+  the v3/v4 actions; it last deployed in run 38333072617). Its Node 20 actions
+  now only run because GitHub forces them onto Node 24:
+  ```
+  git checkout aa8e70f -- .github/workflows/deploy.yml
+  git commit -m "Restore the previous deploy workflow" && git push origin main
+  ```
+
 **Rolling back the redesign:** see "Redesign merge and rollback" under Current state.
 
 ## Architecture rules — never violate
@@ -341,12 +364,11 @@ Everything below is live unless marked open.
 - Known limits: `check-settings-dialog.mjs` cannot see two focus mutations; the
   elimination keyboard pass in the harness runs on mocked state; race lanes show
   no per-player correct count (the client doesn't have it).
-- Follow-ups not started: move the deploy workflow to `npm ci` and Node 22
-  (it uses `npm install` and Node 20; the 2026-10-12 run also warned that
-  `actions/deploy-pages@v4` targets the deprecated Node 20 runtime, and that
-  `ubuntu-latest` moves to Ubuntu 26 from 2026-10-19); the multiplayer modes
-  spec on branch `plan/multiplayer-modes` (its CORS note predates the change
-  shipping on main).
+- Follow-up not started: the multiplayer modes spec on branch
+  `plan/multiplayer-modes` (its CORS note predates the change shipping on
+  main). (Done 2026-10-12: the deploy workflow now uses `npm ci`, Node 22, a
+  pinned runner and Node 24 actions; see Deploy.)
+- `npm ci` reports 1 high-severity advisory (`npm audit`); not looked into.
 - `design/stage-results/*.json` (5.2 MB of contrast measurements) went to main
   with the squash because only images were excluded; they could be dropped from
   main later if the repo size matters.
