@@ -11,13 +11,16 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest, so a new default image can't change the deploy
+    # by surprise. Bumping it is a deliberate step (see CLAUDE.md, Deploy).
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
-      - run: npm install
+          node-version: 22
+      # npm ci installs exactly package-lock.json, so CI builds what is tested.
+      - run: npm ci
       # Vite inlines VITE_* at build time, so these must be present HERE, not at
       # runtime. Without them the app builds fine but multiplayer is disabled in
       # the deployed bundle. The anon key is a publishable client key (it ships
@@ -30,15 +33,15 @@ jobs:
           # Optional Cloudflare Turnstile site key (public by design). While the
           # secret is unset the build has no CAPTCHA widget, exactly as before.
           VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/deploy-pages@v4
+      - uses: actions/deploy-pages@v5
         id: deployment
