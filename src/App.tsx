@@ -18,6 +18,7 @@ import { useGameEngine } from "./hooks/useGameEngine";
 import { useMultiplayerGame } from "./hooks/useMultiplayerGame";
 import type { DifficultyTier } from "./types";
 import { getAllBests, setBest } from "./lib/storage";
+import { unlockSpeech } from "./lib/tts";
 import { leaveRoom, type RoomInfo } from "./lib/rooms";
 
 // Top-level mode: null = pick a mode; "single" = the existing singleplayer flow
@@ -183,7 +184,16 @@ function App() {
             <ArrowLeft size={15} aria-hidden />
             Modes
           </button>
-          <DifficultySelect bests={bests} onSelect={(tier, options) => withViewTransition(() => startGame(tier, options))} />
+          {/* unlockSpeech runs synchronously in the tap, before the view
+              transition: iOS speaks only if the first speak() is inside a gesture,
+              and the first word is announced later from a timer (lib/tts.ts). */}
+          <DifficultySelect
+            bests={bests}
+            onSelect={(tier, options) => {
+              unlockSpeech();
+              withViewTransition(() => startGame(tier, options));
+            }}
+          />
         </div>
       )}
 
@@ -212,15 +222,16 @@ function App() {
           // Replay keeps the modifiers the finished game was played with, so
           // "Play again" repeats the same game rather than silently dropping
           // back to timed-with-definition.
-          onReplay={() =>
-            state.tier &&
+          onReplay={() => {
+            if (!state.tier) return;
+            unlockSpeech();
             withViewTransition(() =>
               startGame(state.tier!, {
                 untimed: state.untimed,
                 hideDefinition: state.hideDefinition,
               })
-            )
-          }
+            );
+          }}
           onMenu={() => withViewTransition(resetToMenu)}
         />
       )}

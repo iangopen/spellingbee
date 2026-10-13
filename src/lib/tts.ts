@@ -55,12 +55,24 @@ export function isSpeechSupported(): boolean {
 // ---------------------------------------------------------------------------
 let voices: SpeechSynthesisVoice[] = [];
 let voicesPromise: Promise<SpeechSynthesisVoice[]> | null = null;
+// The wait timed out with no voices. Later calls don't wait again (a browser with
+// genuinely no voices would otherwise stall every word by VOICE_WAIT_MS); they
+// read the list afresh instead.
+let voiceWaitTimedOut = false;
 
 const VOICE_WAIT_MS = 3000;
 
 export function loadVoices(): Promise<SpeechSynthesisVoice[]> {
   if (!supported()) return Promise.resolve([]);
   if (voices.length > 0) return Promise.resolve(voices);
+  // 2026-10-12: this used to return the settled promise, i.e. the EMPTY list,
+  // forever. Android Chrome can expose its voices after the 3 s wait; the old
+  // code never looked again, so every later word was spoken with no voice set.
+  if (voiceWaitTimedOut) {
+    const now = window.speechSynthesis.getVoices();
+    if (now.length > 0) voices = now;
+    return Promise.resolve(now);
+  }
   if (voicesPromise) return voicesPromise;
 
   voicesPromise = new Promise<SpeechSynthesisVoice[]>((resolve) => {
@@ -84,10 +96,11 @@ export function loadVoices(): Promise<SpeechSynthesisVoice[]> {
     const onChanged = () => attempt();
     window.speechSynthesis.addEventListener("voiceschanged", onChanged);
     const poll = window.setInterval(attempt, 100);
-    const timeout = window.setTimeout(
-      () => finish(window.speechSynthesis.getVoices()),
-      VOICE_WAIT_MS
-    );
+    const timeout = window.setTimeout(() => {
+      const list = window.speechSynthesis.getVoices();
+      if (list.length === 0) voiceWaitTimedOut = true;
+      finish(list);
+    }, VOICE_WAIT_MS);
 
     attempt(); // in case they're already there
   });
@@ -228,6 +241,27 @@ export function getLastUsedVoiceName(): string | null {
 }
 
 // ---------------------------------------------------------------------------
+// Debug trace (?debug=speech)
+//
+// Null unless the lazily loaded SpeechDebug panel installs a listener, so normal
+// play pays one null check per event. Nothing is stored or sent from here.
+// ---------------------------------------------------------------------------
+export type SpeechTraceEvent = "speak" | "start" | "end" | "error" | "retry" | "unlock" | "cancel";
+type SpeechTrace = (event: SpeechTraceEvent, text: string, detail?: string) => void;
+let trace: SpeechTrace | null = null;
+
+export function setSpeechTrace(fn: SpeechTrace | null): void {
+  trace = fn;
+}
+
+/** The engine's state, for the debug panel only. */
+export function speechStatus() {
+  if (!supported()) return null;
+  const ss = window.speechSynthesis;
+  return { speaking: ss.speaking, pending: ss.pending, paused: ss.paused, voices: ss.getVoices().length };
+}
+
+// ---------------------------------------------------------------------------
 // Speaking
 // ---------------------------------------------------------------------------
 
@@ -255,6 +289,66 @@ function makeUtterance(text: string, rate: number, voice: SpeechSynthesisVoice |
 // How long a real cancel() is given to settle before the next speak().
 export const CANCEL_SETTLE_MS = 60;
 
+// The silent unlock utterance is waited for, not cancelled, for at most this long.
+// Measured 2026-10-12 in headless Chrome: a cold engine ends it after ~1.1 s, a
+// warm one after ~0.2 s.
+export const UNLOCK_WAIT_MS = 1500;
+const UNLOCK_POLL_MS = 50;
+// Set by unlockSpeech() until its utterance ends or errors (declared here because
+// afterClearing reads it).
+let unlockInFlight = false;
+
+// An utterance that hasn't started this long after speak() is retried, once.
+export const START_TIMEOUT_MS = 1000;
+
+/**
+ * speak() one utterance, retrying ONCE if it never starts.
+ *
+ * Phones can drop an utterance silently: no start, no error. If neither this
+ * utterance's start event has fired nor anything is speaking after
+ * START_TIMEOUT_MS, the queue is cleared and it is spoken again after the usual
+ * settle beat. The dropped original is marked superseded so a late end event
+ * from it can't chain anything. `speaking` is checked so an engine that plays
+ * without firing start events is never cut off and doubled.
+ */
+function speakTracked(
+  text: string,
+  rate: number,
+  voice: SpeechSynthesisVoice | null,
+  mine: number,
+  hooks: { onEnd?: () => void; onRetry?: () => void } = {},
+  isRetry = false
+): void {
+  const ss = window.speechSynthesis;
+  const u = makeUtterance(text, rate, voice);
+  let started = false;
+  let superseded = false;
+  u.onstart = () => {
+    started = true;
+    trace?.("start", text);
+  };
+  u.onend = () => {
+    trace?.("end", text);
+    if (!superseded) hooks.onEnd?.();
+  };
+  u.onerror = (e: SpeechSynthesisErrorEvent) => trace?.("error", text, e?.error);
+  trace?.("speak", text, isRetry ? "retry" : undefined);
+  ss.speak(u);
+  if (isRetry) return;
+  window.setTimeout(() => {
+    if (started || mine !== generation || ss.speaking) return;
+    superseded = true;
+    trace?.("retry", text);
+    if (ss.paused) ss.resume();
+    ss.cancel();
+    window.setTimeout(() => {
+      if (mine !== generation) return;
+      hooks.onRetry?.();
+      speakTracked(text, rate, voice, mine, hooks, true);
+    }, CANCEL_SETTLE_MS);
+  }, START_TIMEOUT_MS);
+}
+
 /**
  * Run `speak` on a clear queue, without clipping it.
  *
@@ -269,12 +363,25 @@ export const CANCEL_SETTLE_MS = 60;
  * Callers pass their generation so a newer announcement arriving during that
  * beat supersedes this one instead of both speaking.
  */
-function afterClearing(mine: number, speak: () => void): void {
+function afterClearing(mine: number, speak: () => void, waitedMs = 0): void {
   const ss = window.speechSynthesis;
   const run = () => {
     if (mine === generation) speak();
   };
+  // The silent unlock (unlockSpeech) is still going: wait for it to end rather
+  // than cancel it, so the first word needs no cancel at all. Capped: an engine
+  // that never ends it falls through to the usual path below after UNLOCK_WAIT_MS.
+  if (unlockInFlight) {
+    if (waitedMs < UNLOCK_WAIT_MS) {
+      window.setTimeout(() => {
+        if (mine === generation) afterClearing(mine, speak, waitedMs + UNLOCK_POLL_MS);
+      }, UNLOCK_POLL_MS);
+      return;
+    }
+    unlockInFlight = false;
+  }
   if (ss.speaking || ss.pending) {
+    trace?.("cancel", "");
     ss.cancel();
     window.setTimeout(run, CANCEL_SETTLE_MS);
   } else {
@@ -287,9 +394,7 @@ async function speakAlone(text: string, rate: number): Promise<void> {
   if (!supported()) return;
   const list = await loadVoices();
   const mine = ++generation;
-  afterClearing(mine, () => {
-    window.speechSynthesis.speak(makeUtterance(text, rate, resolveVoice(list)));
-  });
+  afterClearing(mine, () => speakTracked(text, rate, resolveVoice(list), mine));
 }
 
 /**
@@ -316,16 +421,19 @@ async function speakSequence(leadIn: string, word: string): Promise<void> {
     if (wordSpoken || mine !== generation) return;
     wordSpoken = true;
     window.clearTimeout(guard);
-    window.speechSynthesis.speak(makeUtterance(word, rate, voice));
+    speakTracked(word, rate, voice, mine);
   };
 
-  afterClearing(mine, () => {
-    const intro = makeUtterance(leadIn, leadRate, voice);
-    intro.onend = sayWord;
-    // Fallback: rough spoken duration of the lead-in plus slack. Started with
-    // the intro, not before any settle delay, so it measures the right thing.
+  // Fallback: rough spoken duration of the lead-in plus slack. Started with the
+  // intro, not before any settle delay, so it measures the right thing; restarted
+  // if the intro is retried, so it measures the retry.
+  const startGuard = () => {
+    window.clearTimeout(guard);
     guard = window.setTimeout(sayWord, (leadIn.length / 10) * 1000 + 2500);
-    window.speechSynthesis.speak(intro);
+  };
+  afterClearing(mine, () => {
+    startGuard();
+    speakTracked(leadIn, leadRate, voice, mine, { onEnd: sayWord, onRetry: startGuard });
   });
 }
 
@@ -370,6 +478,7 @@ export function getLeadInFor(word: string): string | null {
 export function stopSpeaking(): void {
   if (!supported()) return;
   generation++;
+  trace?.("cancel", "");
   window.speechSynthesis.cancel();
 }
 
@@ -396,4 +505,41 @@ export function speakDefinition(definition: string): void {
 /** Sample used by the voice settings "test" button. */
 export function speakSample(text = "Here's your word: rhythm"): void {
   void speakAlone(text, getRate());
+}
+
+// ---------------------------------------------------------------------------
+// Unlock (2026-10-12)
+//
+// iOS Safari (and so every iOS browser, which all use WebKit) speaks only if
+// the page's FIRST speak() runs inside a user gesture. The first word of a game
+// is announced from a timer after an await (useAnnouncedWord + speakSequence),
+// never inside the tap, so on an iPhone it can be dropped silently while "Hear
+// it again", a tap, works. One silent utterance spoken synchronously inside the
+// tap that starts the game unlocks the engine for the rest of the page.
+//
+// Called from singleplayer's start handlers. Once per page load: after that the
+// engine is unlocked, and another silent utterance would only be one more thing
+// for the first announcement to cancel. It also starts loading voices, so they
+// are usually ready before the first word instead of being requested by it.
+// ---------------------------------------------------------------------------
+let unlocked = false;
+
+export function unlockSpeech(): void {
+  if (!supported() || unlocked) return;
+  unlocked = true;
+  unlockInFlight = true;
+  const u = new SpeechSynthesisUtterance("");
+  u.volume = 0;
+  u.onstart = () => trace?.("start", "(unlock)");
+  u.onend = () => {
+    unlockInFlight = false;
+    trace?.("end", "(unlock)");
+  };
+  u.onerror = (e: SpeechSynthesisErrorEvent) => {
+    unlockInFlight = false;
+    trace?.("error", "(unlock)", e?.error);
+  };
+  trace?.("unlock", "");
+  window.speechSynthesis.speak(u);
+  void loadVoices();
 }
