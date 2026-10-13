@@ -536,6 +536,29 @@ has no `.nvmrc` or `engines` field, so nothing else names a Node version.
   played in Playwright ("zebra", Correct): 7 requests, all to
   `https://iangopen.github.io`.
 
+## 2026-10-12: Node declared, deploy concurrency, npm audit triage
+
+- Added `.nvmrc` (`22`) and `engines.node >=22.12.0` in `package.json` (also in
+  the lockfile's root entry). No engine-strict. `npm ci` on Node 24.14.1: no
+  EBADENGINE, 111 packages.
+- Added `concurrency: { group: pages, cancel-in-progress: false }` to the deploy
+  workflow. Nothing else in the workflow changed.
+- Audit before: 1 high, `source-map-js` 1.2.1, GHSA-68fv-2mgg-jv7q (CWE-1284,
+  CVSS 7.5 AV:N/AC:L/PR:N, availability only), range 1.0.0-1.2.1, fix available.
+  Reach: dev-only. `npm ls` shows it under `vite > postcss` and
+  `jsdom > css-tree`; `npm ls --omit=dev --all` finds no `source-map-js`, and the
+  lockfile marks it `"dev": true`. The bug is in parsing indexed source maps
+  (`sections`), which neither the app nor our build feeds it. Decision: apply the
+  fix anyway because it is a patch release inside the existing `^1.2.1` range
+  (`npm audit fix`, not `--force`; the only lockfile change is 1.2.1 -> 1.2.2).
+  Audit after: 0 vulnerabilities.
+- After the change: `npm test` 119/119, `npm run test:db` 97/97, build gives the
+  same `index-BFZyqfqC.js` and `index-y9rZHhoN.css` as the live site. Memory read
+  before each step: 2790, 2697, 3423, 5375 MB.
+- Dependabot: `gh api .../dependabot/alerts` returns 403 "Dependabot alerts are
+  disabled for this repository", so there are no alerts to compare; the
+  advisory above came from `npm audit` alone.
+
 ## Archived CLAUDE.md (2026-10-12, before the trim)
 
 CLAUDE.md had grown to 1,437 lines (95 kB), re-read at every session. On 2026-10-12, before

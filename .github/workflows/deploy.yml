@@ -9,6 +9,13 @@ permissions:
   pages: write
   id-token: write
 
+# One Pages deploy at a time. A deploy that has started is allowed to finish,
+# never cancelled halfway; a newer push waits (GitHub keeps only the newest
+# waiting run), so an older commit can't deploy after a newer one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
   build:
     # Pinned, not ubuntu-latest, so a new default image can't change the deploy

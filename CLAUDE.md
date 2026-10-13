@@ -31,9 +31,12 @@ The build job (checked 2026-10-12, run 38350187205): runner pinned to
 `package-lock.json`), then `npm run build`; actions `checkout@v7`,
 `upload-pages-artifact@v5`, `deploy-pages@v5`, all on the Node 24 runtime. The
 log shows no Node 20 or runner-image warnings. Permissions stay minimal
-(`contents: read`, `pages: write`, `id-token: write`); there is no
-`concurrency` block. There is no `.nvmrc` or `engines` field; the `22` lives
-only in the workflow.
+(`contents: read`, `pages: write`, `id-token: write`) and a `concurrency` group
+`pages` with `cancel-in-progress: false`: a started deploy finishes, a newer push
+waits (GitHub keeps only the newest waiting run). Node is declared in three places
+that must agree: `.nvmrc` (`22`), `engines.node` in `package.json` (`>=22.12.0`,
+Vite's minimum; not engine-strict) and `node-version: 22` in the workflow.
+`npm ci` also works on the laptop's Node 24.
 - **Bumping the runner image is a deliberate step**, never a side effect: change
   both `runs-on` lines together, push, and check the run and the live site.
   `ubuntu-latest` moves to Ubuntu 26.04 in a rollout from 2026-10-19 to
@@ -368,7 +371,12 @@ Everything below is live unless marked open.
   `plan/multiplayer-modes` (its CORS note predates the change shipping on
   main). (Done 2026-10-12: the deploy workflow now uses `npm ci`, Node 22, a
   pinned runner and Node 24 actions; see Deploy.)
-- `npm ci` reports 1 high-severity advisory (`npm audit`); not looked into.
+- Audit (2026-10-12): `npm audit` now reports 0. The one advisory was
+  GHSA-68fv-2mgg-jv7q (`source-map-js` 1.0.0-1.2.1, high, CVSS 7.5, event-loop DoS
+  from indexed source-map section offsets), dev-only via `vite > postcss` and
+  `jsdom > css-tree`; fixed by the lockfile-only patch bump to 1.2.2. GitHub
+  Dependabot alerts are DISABLED for this repo (the API says so), so `npm audit`
+  is the only check; enabling them is a repo setting for Ian.
 - `design/stage-results/*.json` (5.2 MB of contrast measurements) went to main
   with the squash because only images were excluded; they could be dropped from
   main later if the repo size matters.
