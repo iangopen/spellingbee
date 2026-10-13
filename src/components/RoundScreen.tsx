@@ -5,6 +5,8 @@ import { repeatWord, stopSpeaking } from "../lib/tts";
 import { playSubmit } from "../lib/sfx";
 import { formatResponseDetail } from "../lib/wpm";
 import { roundAnnouncement } from "../lib/announce";
+import { guessMatches } from "../lib/answer";
+import { isAutoSubmitOn } from "../lib/touch";
 import { useAnnouncedWord } from "../hooks/useAnnouncedWord";
 import { useSfxForOutcome } from "../hooks/useSfxForOutcome";
 import { ScoreBar } from "./ScoreBar";
@@ -24,6 +26,7 @@ export function RoundScreen({
   awaitingOthers = false,
   resultNote = null,
   canSkip = true,
+  autoSubmit = false,
 }: {
   state: GameState;
   onSubmit: (guess: string) => void;
@@ -41,6 +44,10 @@ export function RoundScreen({
   /** Multiplayer has no skip (see useMultiplayerGame.skipWord) — hide it
    *  rather than render a button that does nothing. */
   canSkip?: boolean;
+  /** Singleplayer only: on a touch device (and unless switched off in Settings),
+   *  submit the moment the typed text spells the word. Multiplayer never passes
+   *  it, so a race still needs Enter. */
+  autoSubmit?: boolean;
 }) {
   const [guess, setGuess] = useState("");
   // Two-step, matching the settings panel's reset: quitting throws away a run in
@@ -48,6 +55,9 @@ export function RoundScreen({
   // easy. Same reason it isn't a window.confirm — that blocks the page.
   const [confirmingExit, setConfirmingExit] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  // An IME or predictive keyboard is mid-composition: the text isn't final yet,
+  // so auto-submit waits for compositionend.
+  const composing = useRef(false);
 
   // The Leave/Quit link is REPLACED by the confirm, taking focus with it to <body>
   // (hardening #19 again). Opening the confirm focuses "Keep playing", the safe
@@ -113,6 +123,28 @@ export function RoundScreen({
   const liveScore = useRef(state.score);
   if (state.status === "playing") liveScore.current = state.score;
   const gained = state.status === "correct" ? state.score - liveScore.current : 0;
+
+  // Enter and auto-submit both come through here, so the answer record (response
+  // time, the submit tick, the verdict) and the screen-reader announcement are
+  // the same whichever way the word was sent.
+  function submit(text: string) {
+    // One answer per word: a second Enter while the first is in flight used to
+    // send a second request, whose already_submitted reply could overwrite the
+    // first one's verdict.
+    if (state.status !== "playing" || pending) return;
+    setSubmittedFor(wordId ?? null);
+    playSubmit();
+    onSubmit(text);
+  }
+
+  // Touch auto-submit: only a COMPLETE correct word sends, judged by the same
+  // comparison the engine uses (lib/answer.ts), so a wrong or partial word never
+  // does, and a trailing space from predictive text still counts.
+  function maybeAutoSubmit(text: string) {
+    if (!autoSubmit || composing.current || !wordText) return;
+    if (!isAutoSubmitOn() || !guessMatches(wordText, text)) return;
+    submit(text);
+  }
 
   const scrollInputIntoView = () => {
     inputRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
@@ -215,13 +247,7 @@ export function RoundScreen({
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            // One answer per word: a second Enter while the first is in flight
-            // used to send a second request, whose already_submitted reply could
-            // overwrite the first one's verdict.
-            if (state.status !== "playing" || pending) return;
-            setSubmittedFor(wordId ?? null);
-            playSubmit();
-            onSubmit(guess);
+            submit(guess);
           }}
         >
           <AnswerField
@@ -229,7 +255,17 @@ export function RoundScreen({
             state={feedback}
             aria-label="Your spelling"
             value={guess}
-            onChange={(e) => setGuess(e.target.value)}
+            onChange={(e) => {
+              setGuess(e.target.value);
+              maybeAutoSubmit(e.target.value);
+            }}
+            onCompositionStart={() => {
+              composing.current = true;
+            }}
+            onCompositionEnd={(e) => {
+              composing.current = false;
+              maybeAutoSubmit(e.currentTarget.value);
+            }}
             onFocus={scrollInputIntoView}
             // readOnly, NOT disabled, during the feedback beat: disabling the
             // focused input drops focus to <body>, so the next word arrived with

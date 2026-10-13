@@ -149,3 +149,17 @@ export function setReduceMotion(on: boolean): void {
   if (on) localStorage.setItem(REDUCE_MOTION_KEY, "true");
   else localStorage.removeItem(REDUCE_MOTION_KEY);
 }
+
+// --- touch auto-submit (2026-10-12) ----------------------------------------
+// null when unset, so touch.ts applies the default (on, for touch devices).
+const AUTO_SUBMIT_KEY = "spellingbee:autoSubmit";
+
+export function getAutoSubmit(): boolean | null {
+  const raw = localStorage.getItem(AUTO_SUBMIT_KEY);
+  if (raw === null) return null;
+  return raw === "true";
+}
+
+export function setAutoSubmit(on: boolean): void {
+  localStorage.setItem(AUTO_SUBMIT_KEY, String(on));
+}

@@ -7,6 +7,7 @@ import type {
   WordEntry,
 } from "../types";
 import { wordsForTier } from "../data/words";
+import { guessMatches } from "../lib/answer";
 
 // Seconds per word. MUST stay in sync with public.round_seconds() in
 // supabase/migrations/0010 — the client renders the countdown, the server
@@ -45,8 +46,10 @@ const FEEDBACK_DELAY_MS = 1100;
 // lengths by design, and the server owns its own value.
 const WORDS_PER_GAME = 30;
 
+// The verdict boundary (CLAUDE.md). The comparison itself is lib/answer.ts, so
+// touch auto-submit can tell when a word is complete without a second copy of it.
 function checkAnswer(word: WordEntry, guess: string): boolean {
-  return guess.trim().toLowerCase() === word.word.toLowerCase();
+  return guessMatches(word.word, guess);
 }
 
 function shuffle<T>(arr: T[]): T[] {

@@ -30,9 +30,11 @@ import {
   type Theme,
 } from "../lib/theme";
 import { isReduceMotionOn, setReduceMotionPreference } from "../lib/motion";
+import { isAutoSubmitOn, isTouchDevice } from "../lib/touch";
 import {
   getDisplayName,
   resetBests,
+  setAutoSubmit,
   setDisplayName,
   setSfxEnabled as persistSfxEnabled,
   setSfxVolume as persistSfxVolume,
@@ -65,6 +67,10 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
   const [theme, setTheme] = useState<Theme>(() => resolveTheme());
   const [reduceMotion, setReduceMotionState] = useState(() => isReduceMotionOn());
   const [name, setName] = useState(() => getDisplayName());
+  // Touch devices only: the switch isn't rendered anywhere else, because
+  // auto-submit never runs there.
+  const [touch] = useState(() => isTouchDevice());
+  const [autoSubmit, setAutoSubmitState] = useState(() => isAutoSubmitOn());
 
   // Two-step confirm instead of window.confirm: a native dialog blocks the page
   // and reads as a browser artefact rather than part of the app.
@@ -177,6 +183,12 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
     setDisplayName(next); // the lobby reads this same key when creating/joining
   }
 
+  function toggleAutoSubmit() {
+    const next = !autoSubmit;
+    setAutoSubmitState(next);
+    setAutoSubmit(next);
+  }
+
   function toggleReduceMotion() {
     const next = !reduceMotion;
     setReduceMotionState(next);
@@ -240,6 +252,32 @@ export function SettingsPanel({ onBestsReset }: { onBestsReset?: () => void }) {
               </label>
               <p className="settings-note">Used when you create or join a multiplayer room.</p>
             </section>
+
+            {/* Automatic submission surprises some people, so it is a switch, on by
+                default on touch devices (where there is no Enter key to reach for)
+                and absent everywhere else. Singleplayer only; a race still needs
+                Enter. */}
+            {touch && (
+              <section className="settings-section">
+                <h3 className="settings-section-title">Typing</h3>
+                <button
+                  className="switch-row"
+                  role="switch"
+                  aria-checked={autoSubmit}
+                  onClick={toggleAutoSubmit}
+                >
+                  <span className="switch-text">
+                    <span className="switch-label">Submit automatically when correct</span>
+                    <span className="switch-hint">
+                      Singleplayer: a correct word is sent as soon as it's typed, no Enter needed.
+                    </span>
+                  </span>
+                  <span className={`switch-track${autoSubmit ? " on" : ""}`} aria-hidden>
+                    <span className="switch-thumb" />
+                  </span>
+                </button>
+              </section>
+            )}
 
             <section className="settings-section">
               <h3 className="settings-section-title">Voice</h3>

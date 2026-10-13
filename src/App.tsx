@@ -192,6 +192,9 @@ function App() {
           state={state}
           onSubmit={submitGuess}
           onSkip={skipWord}
+          // Touch auto-submit is singleplayer only; the race RoundScreen above
+          // doesn't pass it.
+          autoSubmit
           // Singleplayer only. resetToMenu drops straight back to idle, so the
           // run is discarded rather than finished — no best score is recorded,
           // which is the point of quitting.
