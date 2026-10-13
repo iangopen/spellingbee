@@ -117,6 +117,7 @@ const scripts = [
   ["check-hover-flash.mjs", env],
   ["check-real-app.mjs", appEnv],
   ["keyboard-real-app.mjs", appEnv],
+  ["check-touch-autosubmit.mjs", appEnv],
   ["unused-selectors.mjs", {}, ["--fail"]],
   ["unused-tokens.mjs", {}, ["--fail"]],
 ];

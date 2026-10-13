@@ -5,7 +5,7 @@
 // measured on the live project), and before this the screen showed nothing
 // until it came back, so Enter felt dead.
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { GameState } from "../types";
 import { RoundScreen } from "./RoundScreen";
 
@@ -122,5 +122,97 @@ describe("RoundScreen — Enter latency", () => {
     );
     expect(input.readOnly).toBe(false);
     expect(screen.queryByText("Checking…")).toBeNull();
+  });
+});
+
+// Touch auto-submit (2026-10-12). Singleplayer passes `autoSubmit`; on a device
+// matching "(pointer: coarse) and (hover: none)" a COMPLETE correct word is sent
+// with no Enter. Everything else must still need Enter.
+describe("RoundScreen — touch auto-submit", () => {
+  let touch = true;
+  beforeEach(() => {
+    touch = true;
+    localStorage.clear();
+    vi.stubGlobal("matchMedia", (q: string) => ({ matches: touch && q === "(pointer: coarse) and (hover: none)", addEventListener() {}, removeEventListener() {} }));
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  function setupAuto({ autoSubmit = true } = {}) {
+    const onSubmit = vi.fn();
+    render(<RoundScreen state={base} onSubmit={onSubmit} onSkip={() => {}} canSkip={false} autoSubmit={autoSubmit} />);
+    const input = screen.getByPlaceholderText("Type the word you hear") as HTMLInputElement;
+    // One change event per keystroke, the way a phone keyboard types.
+    const typeKeys = (text: string) => {
+      for (let i = 1; i <= text.length; i++) fireEvent.change(input, { target: { value: text.slice(0, i) } });
+    };
+    return { onSubmit, input, typeKeys };
+  }
+
+  it("submits the moment the last letter makes the word correct, once, without Enter", () => {
+    const { onSubmit, input, typeKeys } = setupAuto();
+    typeKeys("rhythm");
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(onSubmit).toHaveBeenCalledWith("rhythm");
+    // Same acknowledgement as an Enter: locked, aria-disabled, "Checking…".
+    expect(input.readOnly).toBe(true);
+    expect(input.getAttribute("aria-disabled")).toBe("true");
+    expect(screen.getByText("Checking…")).toBeTruthy();
+  });
+
+  it("never submits a partial word", () => {
+    const { onSubmit, typeKeys } = setupAuto();
+    typeKeys("rhyth");
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("never submits a wrong word, and Enter still sends it", () => {
+    const { onSubmit, input, typeKeys } = setupAuto();
+    typeKeys("rythm");
+    expect(onSubmit).not.toHaveBeenCalled();
+    fireEvent.submit(input.form!);
+    expect(onSubmit).toHaveBeenCalledWith("rythm");
+  });
+
+  it("a trailing space from predictive text still submits (whole word inserted at once)", () => {
+    const { onSubmit, input } = setupAuto();
+    fireEvent.change(input, { target: { value: "rhythm " } });
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(onSubmit).toHaveBeenCalledWith("rhythm ");
+  });
+
+  it("matches case-insensitively, like the engine's verdict", () => {
+    const { onSubmit, input } = setupAuto();
+    fireEvent.change(input, { target: { value: "Rhythm" } });
+    expect(onSubmit).toHaveBeenCalledWith("Rhythm");
+  });
+
+  it("waits while a composition is in progress, then submits when it ends", () => {
+    const { onSubmit, input } = setupAuto();
+    fireEvent.compositionStart(input);
+    fireEvent.change(input, { target: { value: "rhythm" } });
+    expect(onSubmit).not.toHaveBeenCalled();
+    fireEvent.compositionEnd(input);
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(onSubmit).toHaveBeenCalledWith("rhythm");
+  });
+
+  it("is off on a desktop (fine pointer that hovers)", () => {
+    touch = false;
+    const { onSubmit, typeKeys } = setupAuto();
+    typeKeys("rhythm");
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("is off when Settings switched it off", () => {
+    localStorage.setItem("spellingbee:autoSubmit", "false");
+    const { onSubmit, typeKeys } = setupAuto();
+    typeKeys("rhythm");
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("is off without the prop (multiplayer's race screen), even on touch", () => {
+    const { onSubmit, typeKeys } = setupAuto({ autoSubmit: false });
+    typeKeys("rhythm");
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 });

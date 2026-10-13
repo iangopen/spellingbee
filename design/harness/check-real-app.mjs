@@ -12,6 +12,9 @@
 //      the results screen, goes to the site's own origin. Nothing is sent anywhere else.
 //      Multiplayer is NOT clicked: it would sign a guest in on the live Supabase project.
 //   4. no page errors or console errors.
+//   The tap that starts the game speaks ONE silent unlock utterance (empty text, volume 0;
+//   lib/tts.ts unlockSpeech, for iOS). It is checked on its own and left out of the
+//   word counts below, which are about the announcements.
 //
 //   npm run build && npx vite preview --port 4173      (in another terminal)
 //   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:4173/spellingbee/] node design/harness/check-real-app.mjs
@@ -62,7 +65,7 @@ await p.addInitScript(() => {
       u.__rec = { text: u.text, t: now() };
       window.__speech.push(u.__rec);
       queue.push(u);
-      if (window.__control === "cancel" && window.__speech.length === 1) setTimeout(() => fake.cancel(), 200);
+      if (window.__control === "cancel" && u.text !== "" && window.__speech.filter((s) => s.text !== "").length === 1) setTimeout(() => fake.cancel(), 200);
       fake.pending = queue.length > 0; next(); fake.speaking = !!current;
     },
     cancel() {
@@ -84,7 +87,8 @@ await p.addInitScript(() => {
 let fails = 0;
 const check = (ok, what) => { if (!ok) fails++; console.log(`  ${ok ? "PASS" : "FAIL"} ${what}`); };
 const oscCount = () => p.evaluate(() => window.__osc.length);
-const speech = () => p.evaluate(() => window.__speech);
+const speech = () => p.evaluate(() => window.__speech.filter((s) => s.text !== ""));
+const unlocks = () => p.evaluate(() => window.__speech.filter((s) => s.text === "").length);
 
 console.log("\n## home, difficulty, settings");
 await p.goto(APP, { waitUntil: "networkidle" });
@@ -115,9 +119,11 @@ for (let i = 0; i < WORDS; i++) {
   await p.waitForTimeout(900); // let every sound finish being scheduled; nothing else may start
   const made = (await oscCount()) - before;
   outcomes.push({ i, wrong, made });
-  if (i < WORDS - 1) await p.waitForFunction((n) => window.__speech.length > n, spoken.length, { timeout: 8000 });
+  if (i < WORDS - 1) await p.waitForFunction((n) => window.__speech.filter((s) => s.text !== "").length > n, spoken.length, { timeout: 8000 });
 }
 await p.waitForSelector(".results-screen", { timeout: 8000 });
+const allSpoken = await p.evaluate(() => window.__speech.map((s) => s.text));
+check((await unlocks()) === 1 && allSpoken[0] === "", `exactly one silent unlock utterance, spoken first, inside the start tap (${await unlocks()} found)`);
 console.log(`  oscillators per word (submit tick + outcome): ${outcomes.map((o) => o.made).join(" ")}`);
 const miss = outcomes.filter((o) => o.wrong);
 const hits = outcomes.filter((o) => !o.wrong);
