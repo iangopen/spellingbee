@@ -375,6 +375,111 @@ Ian asked for a memory check before each heavy step. Measured on 2026-10-09:
 - Whether the answer field's `scrollIntoView` on focus moves the page on desktop at each
   word; limit it to touch only if it does, and re-check phone width with touch emulation.
 
+## 2026-10-12: redesign merged to main and verified live
+
+Ian's review: the two-browser multiplayer pass was fine ("keyboard pass good enough").
+The answer-field question was left open, so it was measured (below). The phone shimmer is
+checked by Ian on the live site after the deploy.
+
+### Before the merge (branch `redesign/spelling-bee`)
+- main had nothing new for the branch (`git log HEAD..origin/main` empty).
+- **Fresh clone** of the branch from GitHub into a temp folder, `npm ci`, `npm run build`
+  with only the workflow's three `VITE_*` variables exported (no `.env` file in the clone):
+  passed; the Supabase URL and Turnstile key were each found once in the bundle.
+- Gates, one at a time, with Available memory read before each: lint 3738 MB (0 errors,
+  11 warnings, exit 0); `npm test` 3732 MB (119/119); `npm run test:db` 3783 MB (97/97).
+- **`run-checks.mjs` first failed for two harness bugs, not app bugs** (660394f):
+  - its harness build passed an absolute `--outDir` through `spawn(..., { shell: true })`
+    and the repo path has a space ("github projects"), so the argument split and the build
+    failed; it is now `dist`, relative to the harness config's root (same folder);
+  - with that fixed, 6 of 19 rows were "the app server is not answering before this
+    script", every other script, while each of those scripts then passed against the same
+    server. Cause: the probe used `fetch`'s keep-alive pool; each script runs under
+    `spawnSync`, which blocks the runner's event loop for minutes; `vite preview` closes
+    the idle socket after 5 s, the runner never processes the close, and the next probe is
+    written onto a dead socket (ECONNRESET). Reproduced with both servers and blocking
+    spawns: app `true, ECONNRESET, true, ECONNRESET...`, harness always `true`. With
+    `http.get` and `agent: false`: 6/6 on both.
+  - Playwright 1.64 was installed outside the repo and needed its own headless shell
+    (chromium-headless-shell v1248).
+- **Full suite after the fix (5955 MB): 13/13.** Contrast 840 pairs, 0 failing; tier bars
+  0 failures (focus lowest 7.35:1); tier focus 0 of 12; settings dialog 0; keyboard
+  elimination 0; reduced motion 68/68 pixel-identical at zero tolerance; network 36 loads,
+  250 requests, 0 off-origin; layering 22 overlaps, 3,084 points, 0 under the outline;
+  hover flash 32/32; real app 0; keyboard real app 0; unused selectors 0; unused tokens 0.
+- **Saved-data compatibility, 17/17.** On the live site (pre-redesign main) a headless
+  browser played a whole easy game (5 correct, 25 wrong), then set through the live Settings
+  UI a display name, the three sliders, sound effects off, Light, and reduce motion on. Its
+  localStorage (`best:easy` 150, `displayName`, `voice:rate` 1, `voice:volume` 0.85,
+  `sfx:volume` 0.45, `sfx:enabled` false, `theme` light, `reduceMotion` true) was loaded
+  into the branch build: light stays light (and paints the light palette), reduce motion
+  stays on, "Best 150" on easy and 0 elsewhere; a lower score (1 correct) is not a new best
+  and leaves 150; a higher score (30 correct) is a new best and stores 900; name, theme,
+  switches and all three sliders show the stored values; after a reload nothing else was
+  rewritten; the build contacted only its own origin. (A first run failed the slider row
+  because the sound-effects volume slider only renders while sound effects are on, on main
+  and on the branch alike; the test now switches it on to read it and off again.)
+- **The answer field does not nudge the page at each word on desktop.** Counting the app's
+  own `scrollIntoView` calls: exactly 1 per game (the input's first focus). At 1280x600 the
+  page never moved; at 1366x520 and 1024x480 it moved once at round start (57 and 97 px)
+  and then stayed put for every word. An apparent 8 px per word was the test's own reset
+  plus the browser revealing the caret when typing. No change made.
+- **CLAUDE.md trimmed** from 1,437 lines / 94.9 kB to about 20.8 kB (743847e); its full text
+  is the "Archived CLAUDE.md" section below, checked line by line and in order, with a
+  negative control (a planted line) that fails.
+
+### The merge
+- Tags pushed: `pre-redesign` -> 21c2601 (main before), `redesign-final` -> 743847e
+  (branch tip). Branch kept.
+- One squash commit, **08e95d0**, built in the temp clone: `git merge --squash` of the
+  branch onto main, then the 540 images under `design/` and `docs/review/` removed from
+  the index. Checked: the staged tree differs from `redesign-final` in exactly those 540
+  paths; 14 images kept (6 README screenshots + `elimination.jpg`, and every icon, the
+  favicon and the share card in `public/`); every image referenced by README, PRIVACY,
+  `index.html`, the manifest and `src` resolves; all 32 design markdown docs kept; the tree
+  builds. The design docs' links to the excluded images resolve on `redesign-final`.
+- Sizes (uncompressed objects): main before 4.6 MB, after 13.2 MB (8.6 MB new); the same
+  squash with the images would have added 57.4 MB; everything on GitHub including the tags
+  and branch history is 72.9 MB.
+- Pushed 21c2601..08e95d0. Deploy run 38332652884: build and deploy both success.
+
+### After the deploy, on the live site
+- Title "Spelling Bee | Hear the word. Spell it right."; the bundle hash
+  (`index-BFZyqfqC.js`) equals the local build of the squash tree.
+- 200 with the right types: `manifest.webmanifest` (application/manifest+json; name and
+  short name Spelling Bee, start_url and scope `/spellingbee/`, three icons),
+  `favicon.svg` (image/svg+xml, viewBox 0 0 100 100), and image/png at the declared sizes:
+  favicon-32 32x32, apple-touch-icon 180x180, icon-192 192x192, icon-512 512x512,
+  icon-maskable-512 512x512, og-card 1200x630 (and the og:image width/height tags agree).
+- One word played in a browser (easy, "rocket", "Correct!"): 7 requests, all to
+  `https://iangopen.github.io`. The Privacy link goes to PRIVACY.md on GitHub (200).
+- README on main shows the six new screenshots, the same blobs as `redesign-final`. About:
+  "Spelling Bee: a timed spelling game. Hear a word, type it. Singleplayer or real-time
+  multiplayer on Supabase.", homepage the live URL, licence MIT.
+
+### Rollback dry run
+In a throwaway clone of local main (squash 08e95d0 plus the commit recording it), push URL
+disabled, with the tags fetched:
+- A plain `git revert --no-edit 08e95d0` conflicts on exactly `CLAUDE.md` and
+  `docs/history.md` (this session's record edits both), which is why the documented command
+  keeps the current version of those two and continues.
+- The documented command produced revert commit a2d5902. Against `pre-redesign`, every path
+  except those two docs is identical (`git diff --quiet pre-redesign HEAD -- . ':!CLAUDE.md'
+  ':!docs/history.md'`); the code is therefore the exact tree that deployed successfully in
+  run 37271108951.
+- `git push --dry-run https://github.com/iangopen/spellingbee.git HEAD:main` reported
+  `08e95d0..a2d5902  HEAD -> main` (a fast-forward), and `git ls-remote` showed GitHub's main
+  still at 08e95d0: nothing was pushed.
+
+### Choices made without asking
+- The answer-field line was not filled in; it was measured instead of assumed, and no
+  touch-only change was made because there is no per-word nudge.
+- `design/stage-results/*.json` (5.2 MB) went to main: the rule excluded images only.
+- Commits keep this repo's configured author name (`iangopenbusinessai`); the "Ian Gopen"
+  name change discussed at the start of the session was for another repo.
+- The fresh-clone build used `npm ci` as asked, while the workflow still runs
+  `npm install`; both install from the same lockfile here.
+
 ## Archived CLAUDE.md (2026-10-12, before the trim)
 
 CLAUDE.md had grown to 1,437 lines (95 kB), re-read at every session. On 2026-10-12, before

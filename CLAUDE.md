@@ -295,15 +295,40 @@ Everything below is live unless marked open.
   end; rounds advance with no client attached (pg_cron sweepers). Hardening
   (migrations 0016-0020) and the 2 h CORS preflight cache are live and verified.
 - **Redesign "Spelling Bee"** (honey and ribbon, homemade strength `light`, dark
-  default): built on branch `redesign/spelling-bee` (kept on GitHub), all
-  merge-readiness checks passed on 2026-10-12; merging to main the same day.
+  default): LIVE since 2026-10-12, squash commit `08e95d0` on main, deploy run
+  38332652884 (success). Verified on the live site that day: title, manifest,
+  icons and share card (200, right types and sizes), one word played with every
+  request on the site's own origin, the Privacy link, the README screenshots and
+  the About text. Saved data from before the redesign (best scores, display
+  name, voice and sound settings, a light theme, reduce motion) loads unchanged.
+- Docs: README, PRIVACY.md (last checked 2026-09-29), LICENSE (MIT, Ian Gopen).
+  `design/README.md` maps the design folder; `design/PHASE3.md` is the design
+  system spec. The design images (prototype screenshots, baselines, stage
+  results, crops) are NOT on main; links to them from the design docs resolve on
+  tag `redesign-final`.
+
+### Redesign merge and rollback
+- Tags on GitHub: `pre-redesign` = main before the merge (`21c2601`);
+  `redesign-final` = the branch tip that was squashed (`743847e`), full history
+  and every design image. Branch `redesign/spelling-bee` is kept.
+- **Rollback** (from an up-to-date `main`, clean working tree). It reverts the
+  squash and keeps the current CLAUDE.md and docs/history.md, which later
+  commits edit, so they would otherwise conflict; then pushes, which redeploys:
+  ```
+  git revert --no-edit 08e95d0 || { git checkout --ours CLAUDE.md docs/history.md && git add CLAUDE.md docs/history.md && git -c core.editor=true revert --continue; }
+  git push origin main
+  ```
+  Then record the rollback in CLAUDE.md. Dry-run result: see docs/history.md,
+  2026-10-12.
 - Docs: README, PRIVACY.md (last checked 2026-09-29), LICENSE (MIT, Ian Gopen).
   `design/README.md` maps the design folder; `design/PHASE3.md` is the design
   system spec.
 
 ### Open
-- Ian: the shimmer on a real mid-range phone, on the live site (fallback:
-  `.bg-light { display: none }`).
+- Ian: the shimmer on a real mid-range phone, on the live site. If it stutters,
+  the static-glow fallback is one rule at the end of `src/honeycomb.css`:
+  `.bg-light { display: none; }` (the glow and cells stay; only the moving band
+  goes).
 - The frame-sampling flicker check on the Settings drawer ("Close settings"
   focus) and the lobby text fields; fix only if frames visibly change outside the
   element.
@@ -317,5 +342,11 @@ Everything below is live unless marked open.
   elimination keyboard pass in the harness runs on mocked state; race lanes show
   no per-player correct count (the client doesn't have it).
 - Follow-ups not started: move the deploy workflow to `npm ci` and Node 22
-  (it uses `npm install` and Node 20); the multiplayer modes spec on branch
-  `plan/multiplayer-modes` (its CORS note predates the change shipping on main).
+  (it uses `npm install` and Node 20; the 2026-10-12 run also warned that
+  `actions/deploy-pages@v4` targets the deprecated Node 20 runtime, and that
+  `ubuntu-latest` moves to Ubuntu 26 from 2026-10-19); the multiplayer modes
+  spec on branch `plan/multiplayer-modes` (its CORS note predates the change
+  shipping on main).
+- `design/stage-results/*.json` (5.2 MB of contrast measurements) went to main
+  with the squash because only images were excluded; they could be dropped from
+  main later if the repo size matters.
