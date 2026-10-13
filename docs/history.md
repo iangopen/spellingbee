@@ -559,6 +559,97 @@ has no `.nvmrc` or `engines` field, so nothing else names a Node version.
   disabled for this repository", so there are no alerts to compare; the
   advisory above came from `npm audit` alone.
 
+## 2026-10-13: phone singleplayer: touch auto-submit, first-word speech, debug log
+
+Reported: on a phone a correct word still needs Enter, and the word isn't spoken
+when the round starts, only on "Hear it again". (Which phone and how often were
+not given.) Branch `fix/mobile-singleplayer`, merged to main.
+
+### Where the word is spoken, and whether it is inside a user gesture
+1. `announceWord` (lead-in, pause, word) from `useAnnouncedWord`: an effect, a
+   200 ms timer, then `await loadVoices()`. NOT in a gesture. For the first word
+   the tap only starts the game (through a view transition); later words follow
+   the 1.1 s feedback timer.
+2. The word after the lead-in: the lead-in's `onend`, or a fallback timer. Not
+   in a gesture.
+3. `repeatWord` ("Hear it again", RoundScreen and TurnScreen): `onClick`, then
+   one `await`. In a gesture.
+4. `speakSample` (Settings "Test voice", choosing a voice): `onClick`.
+5. `stopSpeaking` (Quit): cancel only.
+
+### The four known causes, against the code
+- iOS drops a first speak() outside a gesture: SUPPORTED. Every announcement is
+  outside one; only the tap paths are inside, which matches the report exactly.
+- Android voices load late: SUPPORTED, and worse than expected. After the 3 s
+  wait timed out with no voices, `loadVoices()` returned that empty list for the
+  rest of the page, so every later word was spoken with no voice set.
+- cancel() straight before speak(): NOT supported. `afterClearing` only cancels
+  when something is playing, then waits `CANCEL_SETTLE_MS` (the earlier fix).
+- On-screen keyboard pausing speech: possible, not provable from code. The input
+  is focused around the moment the announcement starts. The debug log shows it.
+
+### Fixes
+- `unlockSpeech()`: one silent utterance (empty, volume 0) spoken synchronously
+  in singleplayer's start taps (tier bar, Play again), once per page; it also
+  starts loading voices. Measured in headless Chrome: the engine ends it after
+  ~1.1 s cold and ~0.2 s warm, and it was still "speaking" when the first word
+  arrived, so the first announcement now WAITS for it (at most 1.5 s) instead of
+  cancelling it.
+- `loadVoices()` reads the list afresh after a timed-out wait.
+- `speakTracked()`: an utterance not started after 1 s while nothing is speaking
+  is cancelled and spoken again, once; the lead-in's fallback timer restarts with
+  the retry (extending it instead broke an existing timing test).
+- Touch auto-submit: `(pointer: coarse) and (hover: none)`, the comparison moved
+  to `lib/answer.ts` (`guessMatches`; `checkAnswer` calls it), the same
+  `submit()` as Enter, composition-aware, singleplayer only, Settings switch on
+  touch devices (on by default).
+- `?debug=speech`: lazy `SpeechDebug` chunk (0.9 kB gz). At phone width a
+  three-line strip; measured clear of the answer field and Skip at 390x844
+  (panel top 724, Skip bottom 610) and 360x640 (520 vs 517).
+
+### Multiplayer
+`unlockSpeech()` is called only from the two singleplayer start taps. The 1.5 s
+wait is in the shared `afterClearing` but runs only while the unlock's own
+utterance is playing. The retry and the late-voices fix are shared and change
+nothing with a working engine. Three unit tests pin the multiplayer path: lead-in
+in the same tick, word on its end, nothing else for 20 s.
+
+### Verification
+- Unit: 144/144 (was 119). On the old code 11 of the new tests failed (unlock,
+  retry, late voices, auto-submit); the rest are guards that pass on both.
+  `guessMatches` agrees with the old `checkAnswer` expression on all 1200 words x
+  14 kinds of guess.
+- `check-touch-autosubmit.mjs` (phone emulation 390x844, touch, isMobile): old
+  build (`index-BFZyqfqC.js`, = live) 10 failures, exactly the new behaviour;
+  the fix 23/23. While writing it, a race in the TEST: Settings returns focus to
+  its gear from the dialog's `close` event ~10 ms after the open attribute goes,
+  so fast typing landed on the gear and Enter reopened Settings. The test now
+  waits for focus to settle; the app is unchanged.
+- `check-real-app.mjs` (speech and sound): 0 failures, one silent unlock, 60
+  utterances, 0 interrupted, same-origin only; its CONTROL=cancel negative still
+  fails. `keyboard-real-app.mjs`: 0 failures. Unused selectors 0, dead tokens 0.
+- Full run-checks did not complete on this laptop. Run 1: the app preview on
+  4173 died silently mid-run (its log shows only the start line; later scripts
+  got ERR_CONNECTION_REFUSED, i.e. nothing listening, not another project's
+  server). Run 2 was stopped by Claude Code for low system memory after these
+  passed: contrast (841 pairs, 0 failing), tier bars, tier focus, Settings
+  dialog, elimination keyboard, reduced motion 68/68, network, layering. No app
+  file changed after run 2 started; the five remaining checks above were run one
+  at a time on the same bundle (`index-Dp6w6GCi.js`).
+- Harness ports: run-checks now uses `SB_APP_PORT` (default 4273) and
+  `SB_HARNESS_PORT` (default 5199) and refuses a taken port before building
+  (0.1 s with a dummy server on 4273).
+- The two contrast reports that run 2 regenerated were reverted: every changed
+  row was a randomly chosen lead-in phrase (the lead-in colour), not a new
+  element; the harness renders neither the touch-only switch nor the debug strip.
+- Lint 0 errors (11 known warnings). Build passes. Database tests not run: nothing
+  under `supabase/` or the data layer changed (the only guarded path touched is
+  `useGameEngine.ts`, where `checkAnswer` calls `guessMatches` with the same
+  expression).
+- Memory was read before each step; two steps were skipped at 2269 and 2275 MB
+  and resumed later; one check ran after a 2272 MB reading because the reading
+  and the run were chained in one command (it passed).
+
 ## Archived CLAUDE.md (2026-10-12, before the trim)
 
 CLAUDE.md had grown to 1,437 lines (95 kB), re-read at every session. On 2026-10-12, before
