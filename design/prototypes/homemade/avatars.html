@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spelling Bee | Avatars</title>
+  <script src="params.js"></script>
+  <link rel="stylesheet" href="honeycomb.css" />
+  <link rel="stylesheet" href="fonts.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="homemade.css" />
+  <style>
+    body { padding: 16px; }
+    .sheet { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+    .sheet figure { margin: 0; display: grid; gap: 6px; justify-items: center; }
+    .sheet figcaption { font-size: 0.85rem; color: var(--text); background: var(--scrim); padding: 2px 8px; border-radius: 999px; }
+    .sheet .token { position: static; margin: 0; width: 100%; max-width: 96px; height: auto; aspect-ratio: 1; display: grid; place-items: center; }
+    .sheet .token svg { width: 72%; height: 72%; }
+  </style>
+</head>
+<body>
+  <div class="sheet" role="list" aria-label="The eight avatars">
+    <figure role="listitem"><span class="token"><i data-contestant="bee"></i></span><figcaption>Bee</figcaption></figure>
+    <figure role="listitem"><span class="token"><i data-contestant="queen"></i></span><figcaption>Queen</figcaption></figure>
+    <figure role="listitem"><span class="token"><i data-contestant="drone"></i></span><figcaption>Drone</figcaption></figure>
+    <figure role="listitem"><span class="token"><i data-contestant="hive"></i></span><figcaption>Hive</figcaption></figure>
+    <figure role="listitem"><span class="token"><i data-contestant="honey"></i></span><figcaption>Honey</figcaption></figure>
+    <figure role="listitem"><span class="token"><i data-contestant="blossom"></i></span><figcaption>Blossom</figcaption></figure>
+    <figure role="listitem"><span class="token"><i data-contestant="clover"></i></span><figcaption>Clover</figcaption></figure>
+    <figure role="listitem"><span class="token"><i data-contestant="wasp"></i></span><figcaption>Wasp</figcaption></figure>
+  </div>
+  <script src="honeycomb.js"></script>
+  <script src="homemade.js"></script>
+  <script src="art.js"></script>
+  <script src="../_shared/avatars.js"></script>
+</body>
+</html>

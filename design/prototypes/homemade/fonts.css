@@ -1,0 +1,11 @@
+/* Self-hosted: the redesign fonts already in src/assets/fonts, plus Caveat
+   Brush (SIL OFL 1.1, fonts/OFL-CaveatBrush.txt) for DECORATIVE TEXT ONLY:
+   the title, section headings and badges. Words, answers, instructions and
+   buttons never use it (see homemade.css, --hand). The file is already subset (pyftsubset) to
+   A-Z, a-z, space, comma, full stop and the ellipsis: 15.3 KB. It has no digits,
+   on purpose, so a number can never fall back into hand lettering. With the
+   redesign fonts (111.6 KB) the page total is 126.9 KB, inside the 150 KB budget. */
+@font-face { font-family: "Atkinson Hyperlegible"; font-weight: 400; font-display: swap; src: url("../../../src/assets/fonts/atkinson-hyperlegible-400-latin.woff2") format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible"; font-weight: 700; font-display: swap; src: url("../../../src/assets/fonts/atkinson-hyperlegible-700-latin.woff2") format("woff2"); }
+@font-face { font-family: "Bricolage Grotesque"; font-weight: 500 800; font-display: swap; src: url("../../../src/assets/fonts/bricolage-grotesque-500-800-latin.woff2") format("woff2"); }
+@font-face { font-family: "Caveat Brush"; font-weight: 400; font-display: swap; src: url("fonts/caveat-brush-letters.woff2") format("woff2"); }

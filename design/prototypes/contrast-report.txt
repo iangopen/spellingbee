@@ -1,0 +1,83 @@
+
+## A Blue Ribbon / light
+PASS  15.83:1  (need 4.5)  text on bg  #141a2e on #f3f5fb
+PASS  16.95:1  (need 4.5)  text on surface  #141a2e on #fcfdff
+PASS   6.47:1  (need 4.5)  muted on bg  #4f5873 on #f3f5fb
+PASS   6.93:1  (need 4.5)  muted on surface  #4f5873 on #fcfdff
+PASS   6.55:1  (need 4.5)  accent text on bg  #2346d8 on #f3f5fb
+PASS   7.02:1  (need 4.5)  on-accent on accent (buttons)  #fcfdff on #2346d8
+PASS   5.75:1  (need 4.5)  correct text on surface  #17734b on #fcfdff
+PASS   5.85:1  (need 4.5)  incorrect text on surface  #b8322b on #fcfdff
+PASS   3.70:1  (need 3)  control edge (inputs) on surface  #7a83a0 on #fcfdff
+PASS   6.55:1  (need 3)  focus ring on bg  #2346d8 on #f3f5fb
+PASS   5.52:1  (need 3)  timer fill vs track  #2346d8 on #dde2f0
+PASS  16.95:1  (need 3)  placard number on placard  #141a2e on #fcfdff
+
+## A Blue Ribbon / dark
+PASS  16.34:1  (need 4.5)  text on bg  #eef1f8 on #0f1322
+PASS  14.60:1  (need 4.5)  text on surface  #eef1f8 on #181e33
+PASS   7.81:1  (need 4.5)  muted on bg  #a0a8c2 on #0f1322
+PASS   6.98:1  (need 4.5)  muted on surface  #a0a8c2 on #181e33
+PASS   7.65:1  (need 4.5)  accent text on bg  #8aa2ff on #0f1322
+PASS   7.80:1  (need 4.5)  on-accent on accent (buttons)  #0b1024 on #8aa2ff
+PASS   9.05:1  (need 4.5)  correct text on surface  #55d6a0 on #181e33
+PASS   6.77:1  (need 4.5)  incorrect text on surface  #ff8078 on #181e33
+PASS   3.58:1  (need 3)  control edge (inputs) on surface  #6b7494 on #181e33
+PASS   7.65:1  (need 3)  focus ring on bg  #8aa2ff on #0f1322
+PASS   5.54:1  (need 3)  timer fill vs track  #8aa2ff on #262e49
+
+## B Clover Field / light
+PASS  13.63:1  (need 4.5)  text on bg  #1c281d on #eff3ea
+PASS  14.83:1  (need 4.5)  text on surface  #1c281d on #fafcf6
+PASS   6.04:1  (need 4.5)  muted on bg  #515f4c on #eff3ea
+PASS   6.57:1  (need 4.5)  muted on surface  #515f4c on #fafcf6
+PASS   6.20:1  (need 4.5)  accent text on bg  #a3275f on #eff3ea
+PASS   6.62:1  (need 4.5)  on-accent on accent (buttons)  #fff7fb on #a3275f
+PASS   5.85:1  (need 4.5)  correct text on surface  #26703f on #fafcf6
+PASS   5.95:1  (need 4.5)  incorrect text on surface  #a8401a on #fafcf6
+PASS   3.52:1  (need 3)  control edge (inputs) on surface  #7d8a76 on #fafcf6
+PASS   6.20:1  (need 3)  focus ring on bg  #a3275f on #eff3ea
+PASS   3.89:1  (need 3)  timer (stem) fill vs track  #3c7a3f on #d9e2d2
+PASS   6.57:1  (need 4.5)  label mono on surface  #515f4c on #fafcf6
+
+## B Clover Field / dark
+PASS  15.65:1  (need 4.5)  text on bg  #e8efe2 on #0f160f
+PASS  14.12:1  (need 4.5)  text on surface  #e8efe2 on #172117
+PASS   8.29:1  (need 4.5)  muted on bg  #a2b39c on #0f160f
+PASS   7.47:1  (need 4.5)  muted on surface  #a2b39c on #172117
+PASS   7.32:1  (need 4.5)  accent text on bg  #f27db3 on #0f160f
+PASS   7.20:1  (need 4.5)  on-accent on accent (buttons)  #2a0b19 on #f27db3
+PASS   9.55:1  (need 4.5)  correct text on surface  #7fd79a on #172117
+PASS   7.99:1  (need 4.5)  incorrect text on surface  #ff9a72 on #172117
+PASS   3.76:1  (need 3)  control edge (inputs) on surface  #6c7d66 on #172117
+PASS   7.32:1  (need 3)  focus ring on bg  #f27db3 on #0f160f
+PASS   7.61:1  (need 3)  timer (stem) fill vs track  #7fd79a on #26332a
+
+## C Bee Line / dark
+PASS  16.82:1  (need 4.5)  text on bg  #f3efe4 on #0e0e0c
+PASS  15.15:1  (need 4.5)  text on surface  #f3efe4 on #1b1a17
+PASS   7.56:1  (need 4.5)  muted on bg  #a6a293 on #0e0e0c
+PASS   6.80:1  (need 4.5)  muted on surface  #a6a293 on #1b1a17
+PASS   7.43:1  (need 4.5)  accent text on bg  #ff7a2f on #0e0e0c
+PASS   7.59:1  (need 4.5)  on-accent on accent (buttons)  #160700 on #ff7a2f
+PASS   9.94:1  (need 4.5)  correct text on surface  #46dd8f on #1b1a17
+PASS   5.91:1  (need 4.5)  incorrect text on surface  #ff5c86 on #1b1a17
+PASS   3.68:1  (need 3)  control edge (inputs) on surface  #77736a on #1b1a17
+PASS   7.43:1  (need 3)  focus ring on bg  #ff7a2f on #0e0e0c
+PASS   5.58:1  (need 3)  timer fill vs track  #ff7a2f on #2b2925
+PASS  16.82:1  (need 3)  stripe cream vs stripe ink  #f3efe4 on #0e0e0c
+
+## C Bee Line / light
+PASS  16.03:1  (need 4.5)  text on bg  #141310 on #f2eee3
+PASS  17.65:1  (need 4.5)  text on surface  #141310 on #fbf9f3
+PASS   6.22:1  (need 4.5)  muted on bg  #5b574c on #f2eee3
+PASS   6.85:1  (need 4.5)  muted on surface  #5b574c on #fbf9f3
+PASS   4.71:1  (need 4.5)  accent text on bg  #b8430a on #f2eee3
+PASS   7.65:1  (need 4.5)  ink on accent fill (buttons)  #140600 on #ff7a2f
+PASS   5.83:1  (need 4.5)  correct text on surface  #16703f on #fbf9f3
+PASS   6.19:1  (need 4.5)  incorrect text on surface  #b3204a on #fbf9f3
+PASS  17.65:1  (need 3)  control edge (inputs) on surface  #141310 on #fbf9f3
+PASS   4.71:1  (need 3)  focus ring on bg  #b8430a on #f2eee3
+PASS   3.76:1  (need 3)  timer fill vs track  #b8430a on #dcd6c6
+
+0 failing pair(s)

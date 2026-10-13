@@ -1,12 +1,12 @@
 # Privacy
 
-Last updated: 2026-09-29. Last checked against the code: 2026-09-29.
+Last updated: 2026-09-29. Last checked against the code: 2026-10-03.
 
 Spelling Bee is a free spelling game. It has no accounts, ads or analytics, and the app sets no cookies. It is not directed at children under 13.
 
 **Every visit.** GitHub Pages hosts the site and logs visitors' IP addresses for security.
 
-**Singleplayer** sends nothing else. Your best scores and settings stay in your browser's local storage.
+**Singleplayer** sends nothing else: the page, its fonts, icons and web manifest all come from the same site. Your best scores and settings (including the theme and the reduce-motion switch) stay in your browser's local storage.
 
 **Reading words aloud.** Your browser's voice reads the word, its definition and a short lead-in. Some browser voices run on the browser maker's servers, which then receive that text. Nothing you type is read aloud.
 

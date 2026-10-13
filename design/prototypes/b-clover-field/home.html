@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#eff3ea" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0f160f" media="(prefers-color-scheme: dark)" />
+  <title>Spelling Bee | A word is spoken. You spell it.</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <span class="brand"><i data-mark></i><span class="sr-only">Spelling Bee</span></span>
+      <button class="icon-btn" aria-label="Settings"><i data-icon="settings"></i></button>
+    </header>
+
+    <main class="home">
+      <section>
+        <span class="label">A listening and spelling game</span>
+        <h1 tabindex="-1">Spelling Bee</h1>
+        <p class="lede">A word is spoken and defined. You spell it before the clock runs out.</p>
+        <nav class="paths" aria-label="Choose how to play">
+          <button class="path">
+            <span><span class="path-title">Play solo</span><span class="path-sub">Eight levels, ten words a game</span></span>
+            <i data-icon="arrow-left"></i>
+          </button>
+          <button class="path">
+            <span><span class="path-title">Play with friends</span><span class="path-sub">Race each other, or take turns to survive</span></span>
+            <i data-icon="arrow-left"></i>
+          </button>
+        </nav>
+      </section>
+
+      <section class="meadow" aria-labelledby="meadow-h">
+        <div class="meadow-head"><h2 id="meadow-h">Your best scores</h2><span class="label">seed to bloom</span></div>
+        <ol class="stems" role="list">
+          <li class="stem"><span class="best num">214</span><span class="plant"><i data-plant="0" data-played="1"></i></span><span class="name">Novice</span></li>
+          <li class="stem"><span class="best num">187</span><span class="plant"><i data-plant="1" data-played="1"></i></span><span class="name">Easy</span></li>
+          <li class="stem"><span class="best num">152</span><span class="plant"><i data-plant="2" data-played="1"></i></span><span class="name">Building</span></li>
+          <li class="stem"><span class="best num">118</span><span class="plant"><i data-plant="3" data-played="1"></i></span><span class="name">Medium</span></li>
+          <li class="stem"><span class="best num">64</span><span class="plant"><i data-plant="4" data-played="1"></i></span><span class="name">Advanced</span></li>
+          <li class="stem unplayed"><span class="best num">0</span><span class="plant"><i data-plant="5"></i></span><span class="name">Hard</span></li>
+          <li class="stem unplayed"><span class="best num">0</span><span class="plant"><i data-plant="6"></i></span><span class="name">Expert</span></li>
+          <li class="stem unplayed"><span class="best num">0</span><span class="plant"><i data-plant="7"></i></span><span class="name">Master</span></li>
+        </ol>
+      </section>
+    </main>
+  </div>
+  <script src="../_shared/icons.js"></script>
+  <script src="art.js"></script>
+</body>
+</html>

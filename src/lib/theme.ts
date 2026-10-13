@@ -1,17 +1,17 @@
 // Theme resolution and persistence. Purely presentational — no game state.
 //
-// Three-way model on purpose: the stored preference is "light" | "dark" | null,
-// where null means "follow the OS". Only an explicit pick by the player is
-// written, so someone who never touches the toggle keeps tracking their system
-// setting forever rather than being frozen into whatever it happened to be on
-// their first visit.
+// The stored preference is "light" | "dark" | null. Since the redesign (stage 1,
+// Ian 2026-09-28) null means DARK, not "follow the OS": dark is the identity of
+// the new look and the operating system's setting is no longer consulted. Only
+// an explicit pick by the player is written, so the key and its two values are
+// unchanged and someone who chose light before the redesign keeps light.
 
 export type Theme = "light" | "dark";
 
 // Same "spellingbee:" convention as the best scores and voice prefs.
 const THEME_KEY = "spellingbee:theme";
 
-const MEDIA = "(prefers-color-scheme: light)";
+export const DEFAULT_THEME: Theme = "dark";
 
 export function getStoredTheme(): Theme | null {
   const raw = localStorage.getItem(THEME_KEY);
@@ -23,31 +23,14 @@ export function setStoredTheme(theme: Theme | null): void {
   else localStorage.removeItem(THEME_KEY);
 }
 
-export function getSystemTheme(): Theme {
-  if (typeof window === "undefined" || !window.matchMedia) return "dark";
-  return window.matchMedia(MEDIA).matches ? "light" : "dark";
-}
-
-/** What the app should actually render: an explicit pick wins, else the OS. */
+/** What the app should actually render: an explicit pick wins, else dark. */
 export function resolveTheme(): Theme {
-  return getStoredTheme() ?? getSystemTheme();
+  return getStoredTheme() ?? DEFAULT_THEME;
 }
 
-// The stylesheet keys off data-theme on <html>. index.css ALSO carries a
-// prefers-color-scheme fallback for :root:not([data-theme]), so the first paint
-// is already correct in the instant before this runs.
+// The stylesheet keys off data-theme on <html>. index.css puts the dark palette
+// on :root itself, so the first paint is already dark in the instant before this
+// runs; only a stored "light" needs the attribute.
 export function applyTheme(theme: Theme): void {
   document.documentElement.setAttribute("data-theme", theme);
-}
-
-/**
- * Call back when the OS theme changes. The caller is responsible for ignoring
- * this while an explicit override is set — the listener itself stays dumb.
- */
-export function onSystemThemeChange(fn: (theme: Theme) => void): () => void {
-  if (typeof window === "undefined" || !window.matchMedia) return () => {};
-  const mq = window.matchMedia(MEDIA);
-  const handler = (e: MediaQueryListEvent) => fn(e.matches ? "light" : "dark");
-  mq.addEventListener("change", handler);
-  return () => mq.removeEventListener("change", handler);
 }

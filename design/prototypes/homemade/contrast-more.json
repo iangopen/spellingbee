@@ -1,0 +1,6040 @@
+[
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Spelling Bee",
+  "color": "rgb(242, 189, 98)",
+  "need": 3,
+  "rects": [
+   [
+    136,
+    190.125,
+    579.328125,
+    317.125
+   ]
+  ],
+  "fg": "#f2bd62",
+  "worst": 6.62,
+  "wp": "#423928",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Solo or with friends",
+  "color": "rgb(26, 22, 16)",
+  "need": 4.5,
+  "rects": [
+   [
+    135,
+    141.125,
+    293.15625,
+    170.125
+   ]
+  ],
+  "fg": "#1a1610",
+  "worst": 8.53,
+  "wp": "#e8a63d",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Hear it. Spell it. Beat the clock.",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    42,
+    294.53125,
+    344.96875,
+    319.53125
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.06,
+  "wp": "#413829",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Listen to the word, read the definition, and typ",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    42,
+    330.5625,
+    336.546875,
+    352.5625
+   ],
+   [
+    42,
+    356.953125,
+    326.1875,
+    378.953125
+   ],
+   [
+    42,
+    383.34375,
+    232.375,
+    405.34375
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 4.95,
+  "wp": "#403625",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Play solo",
+  "color": "rgb(26, 22, 16)",
+  "need": 4.5,
+  "rects": [
+   [
+    191.546875,
+    516.765625,
+    265.453125,
+    537.765625
+   ]
+  ],
+  "fg": "#1a1610",
+  "worst": 8.53,
+  "wp": "#e8a63d",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Play with friends",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    361,
+    516.765625,
+    496.859375,
+    537.765625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 14.3,
+  "wp": "#241f16",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Your best scores",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    747.1875,
+    143,
+    935,
+    184
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.38,
+  "wp": "#3f3626",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Timed games only. Practice runs don't count.",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    747.1875,
+    205.59375,
+    1045.71875,
+    223.59375
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.06,
+  "wp": "#3d3525",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Novice",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    253.390625,
+    821.890625,
+    274.390625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.49,
+  "wp": "#3f3526",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "214",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    1124.375,
+    253.390625,
+    1152,
+    274.390625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.84,
+  "wp": "#3c3324",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Easy",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    297.890625,
+    804.34375,
+    318.890625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.53,
+  "wp": "#3e3526",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "187",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    1125.609375,
+    297.890625,
+    1152,
+    318.890625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.8,
+  "wp": "#3d3324",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Building",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    342.390625,
+    833.796875,
+    363.390625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.68,
+  "wp": "#3d3425",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "152",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    1124.703125,
+    342.390625,
+    1152,
+    363.390625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.88,
+  "wp": "#3b3324",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Medium",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    386.890625,
+    831.375,
+    407.890625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.53,
+  "wp": "#3e3526",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "118",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    1128.390625,
+    386.890625,
+    1152,
+    407.890625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.88,
+  "wp": "#3b3325",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Advanced",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    431.390625,
+    845.265625,
+    452.390625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.53,
+  "wp": "#3e3526",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "64",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    1129.34375,
+    431.390625,
+    1152,
+    452.390625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.91,
+  "wp": "#3a3325",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Hard",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    475.890625,
+    804.59375,
+    496.890625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.69,
+  "wp": "#3d3424",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Not played yet",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    1056.53125,
+    522.390625,
+    1152,
+    540.390625
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.07,
+  "wp": "#3c3527",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Expert",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    520.390625,
+    818.90625,
+    541.390625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.72,
+  "wp": "#3c3425",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Master",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    564.890625,
+    822.375,
+    585.890625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.68,
+  "wp": "#3d3425",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Settings button edge",
+  "color": "rgb(157, 141, 112)",
+  "need": 3,
+  "band": [
+   326,
+   24,
+   370,
+   68,
+   -3,
+   2,
+   16
+  ],
+  "fg": "#9d8d70",
+  "worst": 4.45,
+  "wp": "#2e2922",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Secondary button edge",
+  "color": "rgb(157, 141, 112)",
+  "need": 3,
+  "band": [
+   42,
+   501.734375,
+   348,
+   555.734375,
+   -3,
+   2,
+   15
+  ],
+  "fg": "#9d8d70",
+  "worst": 3.66,
+  "wp": "#3f3628",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 27,
+  "label": "focus ring: Settings button edge",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   1136,
+   24,
+   1180,
+   68,
+   3,
+   6,
+   19
+  ],
+  "fg": "#f5c46e",
+  "worst": 11.47,
+  "wp": "#16130f",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 28,
+  "label": "focus ring: Play solo",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   136,
+   500.265625,
+   293.453125,
+   554.265625,
+   3,
+   6,
+   18
+  ],
+  "fg": "#f5c46e",
+  "worst": 10.9,
+  "wp": "#1e1810",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 29,
+  "label": "focus ring: Secondary button edge",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   305.453125,
+   500.265625,
+   524.859375,
+   554.265625,
+   3,
+   6,
+   18
+  ],
+  "fg": "#f5c46e",
+  "worst": 11.47,
+  "wp": "#16130f",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Spelling Bee",
+  "color": "rgb(143, 90, 14)",
+  "need": 3,
+  "rects": [
+   [
+    136,
+    190.125,
+    579.328125,
+    317.125
+   ]
+  ],
+  "fg": "#8f5a0e",
+  "worst": 5.05,
+  "wp": "#f7efdf",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Solo or with friends",
+  "color": "rgb(43, 33, 21)",
+  "need": 4.5,
+  "rects": [
+   [
+    135,
+    141.125,
+    293.15625,
+    170.125
+   ]
+  ],
+  "fg": "#2b2115",
+  "worst": 6.63,
+  "wp": "#e09a2c",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Hear it. Spell it. Beat the clock.",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    42,
+    294.53125,
+    344.96875,
+    319.53125
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.37,
+  "wp": "#f7efdf",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Listen to the word, read the definition, and typ",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    136,
+    395.09375,
+    464.078125,
+    417.09375
+   ],
+   [
+    136,
+    421.484375,
+    482.34375,
+    443.484375
+   ],
+   [
+    136,
+    447.875,
+    230.703125,
+    469.875
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 5.84,
+  "wp": "#f7f0e1",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Play solo",
+  "color": "rgb(43, 33, 21)",
+  "need": 4.5,
+  "rects": [
+   [
+    191.546875,
+    516.765625,
+    265.453125,
+    537.765625
+   ]
+  ],
+  "fg": "#2b2115",
+  "worst": 6.63,
+  "wp": "#e09a2c",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Play with friends",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    361,
+    516.765625,
+    496.859375,
+    537.765625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 14.79,
+  "wp": "#fefbf3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Your best scores",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    747.1875,
+    143,
+    935,
+    184
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.47,
+  "wp": "#f7f0e1",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Timed games only. Practice runs don't count.",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    747.1875,
+    205.59375,
+    1045.71875,
+    223.59375
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 5.87,
+  "wp": "#f9f0e2",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Novice",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    253.390625,
+    821.890625,
+    274.390625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.59,
+  "wp": "#f8f1e1",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "214",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    1124.375,
+    253.390625,
+    1152,
+    274.390625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.63,
+  "wp": "#f9f1e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Easy",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    297.890625,
+    804.34375,
+    318.890625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.5,
+  "wp": "#f8f0e1",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "187",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    1125.609375,
+    297.890625,
+    1152,
+    318.890625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.72,
+  "wp": "#f9f2e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Building",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    342.390625,
+    833.796875,
+    363.390625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.6,
+  "wp": "#f8f1e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "152",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    1124.703125,
+    342.390625,
+    1152,
+    363.390625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.63,
+  "wp": "#f9f1e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Medium",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    386.890625,
+    831.375,
+    407.890625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.51,
+  "wp": "#f8f0e2",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "118",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    1128.390625,
+    386.890625,
+    1152,
+    407.890625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.7,
+  "wp": "#f8f2e4",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Advanced",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    431.390625,
+    845.265625,
+    452.390625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.5,
+  "wp": "#f8f0e1",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "64",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    1129.34375,
+    431.390625,
+    1152,
+    452.390625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.73,
+  "wp": "#f9f2e5",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Hard",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    475.890625,
+    804.59375,
+    496.890625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.63,
+  "wp": "#f9f1e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Not played yet",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    1056.53125,
+    522.390625,
+    1152,
+    540.390625
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 5.86,
+  "wp": "#f8f0e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Expert",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    520.390625,
+    818.90625,
+    541.390625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.63,
+  "wp": "#f9f1e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Master",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    767.1875,
+    564.890625,
+    822.375,
+    585.890625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.63,
+  "wp": "#f9f1e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Settings button edge",
+  "color": "rgb(127, 106, 72)",
+  "need": 3,
+  "band": [
+   326,
+   24,
+   370,
+   68,
+   -3,
+   2,
+   16
+  ],
+  "fg": "#7f6a48",
+  "worst": 3.14,
+  "wp": "#d8c8a9",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Secondary button edge",
+  "color": "rgb(127, 106, 72)",
+  "need": 3,
+  "band": [
+   305.453125,
+   500.265625,
+   524.859375,
+   554.265625,
+   -3,
+   2,
+   15
+  ],
+  "fg": "#7f6a48",
+  "worst": 3.38,
+  "wp": "#decfb7",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 27,
+  "label": "focus ring: Settings button edge",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   1136,
+   24,
+   1180,
+   68,
+   3,
+   6,
+   19
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.35,
+  "wp": "#fffdf8",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 28,
+  "label": "focus ring: Play solo",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   136,
+   500.265625,
+   293.453125,
+   554.265625,
+   3,
+   6,
+   18
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.11,
+  "wp": "#fdf9ef",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "home",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 29,
+  "label": "focus ring: Secondary button edge",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   305.453125,
+   500.265625,
+   524.859375,
+   554.265625,
+   3,
+   6,
+   18
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.35,
+  "wp": "#fffdf8",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Modes",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    55.546875,
+    35.25,
+    105.640625,
+    56.25
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 15.9,
+  "wp": "#181510",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Spelling Bee",
+  "color": "rgb(242, 189, 98)",
+  "need": 3,
+  "rects": [
+   [
+    485.1875,
+    96,
+    794.8125,
+    185
+   ]
+  ],
+  "fg": "#f2bd62",
+  "worst": 6.61,
+  "wp": "#42392a",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Hear it. Spell it. Beat the clock.",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    80.578125,
+    195.984375,
+    309.40625,
+    216.984375
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 4.81,
+  "wp": "#413828",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Practice mode",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    520.75,
+    276.078125,
+    617.40625,
+    294.078125
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 16.17,
+  "wp": "#16130f",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Hide definition",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    683.359375,
+    276.078125,
+    783.1875,
+    294.078125
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 16.17,
+  "wp": "#16130f",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Timed, with a definition for every word.",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    517.53125,
+    316.484375,
+    762.46875,
+    334.484375
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 4.94,
+  "wp": "#403626",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Novice",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    391.859375,
+    516.421875,
+    412.859375
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 9.62,
+  "wp": "#393e30",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "First words, short and simple",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    414.328125,
+    622.109375,
+    430.328125
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 4.74,
+  "wp": "#373c2f",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Best 214",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    282.171875,
+    379.09375,
+    340,
+    393.09375
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.44,
+  "wp": "#303227",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Easy",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    455.859375,
+    499.296875,
+    476.859375
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 9.32,
+  "wp": "#3d402c",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Common everyday words",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    478.328125,
+    600.1875,
+    494.328125
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 4.54,
+  "wp": "#3b3f2b",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Best 187",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    283,
+    443.09375,
+    340,
+    457.09375
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.29,
+  "wp": "#333424",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Building",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    519.859375,
+    526.9375,
+    540.859375
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 9.16,
+  "wp": "#434027",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Longer, still familiar",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    542.328125,
+    570.9375,
+    558.328125
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 4.52,
+  "wp": "#413e26",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Best 152",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    282.359375,
+    507.09375,
+    340,
+    521.09375
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.29,
+  "wp": "#373320",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Medium",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    583.859375,
+    527.078125,
+    604.859375
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 9.32,
+  "wp": "#4b3c21",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Trickier spellings",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    606.328125,
+    555.015625,
+    622.328125
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 4.59,
+  "wp": "#493a21",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Best 118",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    284.875,
+    571.09375,
+    340,
+    585.09375
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.37,
+  "wp": "#3c301d",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Advanced",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    647.859375,
+    541.8125,
+    668.859375
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 9.61,
+  "wp": "#4e381d",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Unusual letter patterns",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    670.328125,
+    588.578125,
+    686.328125
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 4.75,
+  "wp": "#4b361d",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Best 64",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    286.328125,
+    635.09375,
+    340,
+    649.09375
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.44,
+  "wp": "#3e2e1b",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Hard",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    711.859375,
+    499.765625,
+    732.859375
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.35,
+  "wp": "#4d311c",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Multi-syllable words",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    734.328125,
+    571.03125,
+    750.328125
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.07,
+  "wp": "#4a301b",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Best 0",
+  "color": "rgb(36, 26, 9)",
+  "need": 4.5,
+  "rects": [
+   [
+    774.546875,
+    789.09375,
+    820,
+    803.09375
+   ]
+  ],
+  "fg": "#241a09",
+  "worst": 5.26,
+  "wp": "#c08223",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Expert",
+  "color": "rgb(36, 26, 9)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    749.859375,
+    104.609375,
+    770.859375
+   ]
+  ],
+  "fg": "#241a09",
+  "worst": 7.36,
+  "wp": "#dd9e3a",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Competition-level",
+  "color": "rgb(36, 26, 9)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    772.328125,
+    150.109375,
+    788.328125
+   ]
+  ],
+  "fg": "#241a09",
+  "worst": 6.62,
+  "wp": "#d39533",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Master",
+  "color": "rgb(255, 241, 228)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    839.859375,
+    518.171875,
+    860.859375
+   ]
+  ],
+  "fg": "#fff1e4",
+  "worst": 4.72,
+  "wp": "#b54c1a",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Championship rarities",
+  "color": "rgb(255, 241, 228)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    862.328125,
+    584.59375,
+    878.328125
+   ]
+  ],
+  "fg": "#fff1e4",
+  "worst": 4.91,
+  "wp": "#b14a19",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Settings button edge",
+  "color": "rgb(157, 141, 112)",
+  "need": 3,
+  "band": [
+   326,
+   24,
+   370,
+   68,
+   -3,
+   2,
+   16
+  ],
+  "fg": "#9d8d70",
+  "worst": 4.45,
+  "wp": "#2e2922",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Practice mode chip edge",
+  "color": "rgb(157, 141, 112)",
+  "need": 3,
+  "band": [
+   34.796875,
+   239.484375,
+   189.40625,
+   283.484375,
+   -3,
+   2,
+   15
+  ],
+  "fg": "#9d8d70",
+  "worst": 3.76,
+  "wp": "#3e3424",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Hide definition chip edge",
+  "color": "rgb(157, 141, 112)",
+  "need": 3,
+  "band": [
+   642.40625,
+   263.484375,
+   800.1875,
+   307.484375,
+   -3,
+   2,
+   15
+  ],
+  "fg": "#9d8d70",
+  "worst": 3.67,
+  "wp": "#3f3626",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 33,
+  "label": "focus ring: Modes",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   100,
+   24,
+   199.640625,
+   68,
+   3,
+   6,
+   1002
+  ],
+  "fg": "#f5c46e",
+  "worst": 11.47,
+  "wp": "#16130f",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 34,
+  "label": "focus ring: Settings button edge",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   1136,
+   24,
+   1180,
+   68,
+   3,
+   6,
+   19
+  ],
+  "fg": "#f5c46e",
+  "worst": 11.47,
+  "wp": "#16130f",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 35,
+  "label": "focus ring: Practice mode chip edge",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   479.796875,
+   263.484375,
+   634.40625,
+   307.484375,
+   3,
+   6,
+   18
+  ],
+  "fg": "#f5c46e",
+  "worst": 10.77,
+  "wp": "#201910",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 36,
+  "label": "focus ring: Hide definition chip edge",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   642.40625,
+   263.484375,
+   800.1875,
+   307.484375,
+   3,
+   6,
+   18
+  ],
+  "fg": "#f5c46e",
+  "worst": 11.35,
+  "wp": "#18140f",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 37,
+  "label": "focus ring: NoviceFirst words, short and sim",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   383.09375,
+   850,
+   441.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 38,
+  "label": "focus ring: EasyCommon everyday wordsBest 18",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   447.09375,
+   850,
+   505.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 39,
+  "label": "focus ring: BuildingLonger, still familiarBe",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   511.09375,
+   850,
+   569.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 40,
+  "label": "focus ring: MediumTrickier spellingsBest 118",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   575.09375,
+   850,
+   633.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 41,
+  "label": "focus ring: AdvancedUnusual letter patternsB",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   639.09375,
+   850,
+   697.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 42,
+  "label": "focus ring: HardMulti-syllable wordsBest 0",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   703.09375,
+   850,
+   761.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 43,
+  "label": "focus ring: ExpertCompetition-levelBest 0",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   767.09375,
+   850,
+   825.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 44,
+  "label": "focus ring: MasterChampionship raritiesBest ",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   831.09375,
+   850,
+   889.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Modes",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    55.546875,
+    35.25,
+    105.640625,
+    56.25
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.61,
+  "wp": "#f9f1e1",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Spelling Bee",
+  "color": "rgb(143, 90, 14)",
+  "need": 3,
+  "rects": [
+   [
+    485.1875,
+    96,
+    794.8125,
+    185
+   ]
+  ],
+  "fg": "#8f5a0e",
+  "worst": 5.05,
+  "wp": "#f7efe0",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Hear it. Spell it. Beat the clock.",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    80.578125,
+    195.984375,
+    309.40625,
+    216.984375
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 5.82,
+  "wp": "#f8efe1",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Practice mode",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    520.75,
+    276.078125,
+    617.40625,
+    294.078125
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 15.04,
+  "wp": "#fffdf8",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Hide definition",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    683.359375,
+    276.078125,
+    783.1875,
+    294.078125
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 15.04,
+  "wp": "#fffdf8",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Timed, with a definition for every word.",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    517.53125,
+    316.484375,
+    762.46875,
+    334.484375
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 5.86,
+  "wp": "#f8f0e1",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Novice",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    365.859375,
+    106.421875,
+    386.859375
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 11.5,
+  "wp": "#dbe2d0",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "First words, short and simple",
+  "color": "rgb(90, 74, 51)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    388.328125,
+    212.109375,
+    404.328125
+   ]
+  ],
+  "fg": "#5a4a33",
+  "worst": 6.05,
+  "wp": "#d5dcc7",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Best 214",
+  "color": "rgb(90, 74, 51)",
+  "need": 4.5,
+  "rects": [
+   [
+    762.171875,
+    405.09375,
+    820,
+    419.09375
+   ]
+  ],
+  "fg": "#5a4a33",
+  "worst": 5.79,
+  "wp": "#d0d8bf",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Easy",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    429.859375,
+    89.296875,
+    450.859375
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 11.66,
+  "wp": "#dfe3ce",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Common everyday words",
+  "color": "rgb(90, 74, 51)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    452.328125,
+    190.1875,
+    468.328125
+   ]
+  ],
+  "fg": "#5a4a33",
+  "worst": 6.18,
+  "wp": "#dadec4",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Best 187",
+  "color": "rgb(90, 74, 51)",
+  "need": 4.5,
+  "rects": [
+   [
+    763,
+    469.09375,
+    820,
+    483.09375
+   ]
+  ],
+  "fg": "#5a4a33",
+  "worst": 5.88,
+  "wp": "#d5d9bb",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Building",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    493.859375,
+    116.9375,
+    514.859375
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 11.67,
+  "wp": "#e5e2c6",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Longer, still familiar",
+  "color": "rgb(90, 74, 51)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    516.328125,
+    160.9375,
+    532.328125
+   ]
+  ],
+  "fg": "#5a4a33",
+  "worst": 6.32,
+  "wp": "#e2dfc0",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Best 152",
+  "color": "rgb(90, 74, 51)",
+  "need": 4.5,
+  "rects": [
+   [
+    762.359375,
+    533.09375,
+    820,
+    547.09375
+   ]
+  ],
+  "fg": "#5a4a33",
+  "worst": 5.95,
+  "wp": "#ddd9b4",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Medium",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    557.859375,
+    117.078125,
+    578.859375
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 11.74,
+  "wp": "#efe0c4",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Trickier spellings",
+  "color": "rgb(90, 74, 51)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    580.328125,
+    145.015625,
+    596.328125
+   ]
+  ],
+  "fg": "#5a4a33",
+  "worst": 6.42,
+  "wp": "#eddebf",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Best 118",
+  "color": "rgb(90, 74, 51)",
+  "need": 4.5,
+  "rects": [
+   [
+    764.875,
+    597.09375,
+    820,
+    611.09375
+   ]
+  ],
+  "fg": "#5a4a33",
+  "worst": 6.03,
+  "wp": "#ead7b1",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Advanced",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    621.859375,
+    131.8125,
+    642.859375
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 11.4,
+  "wp": "#f1dbc3",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Unusual letter patterns",
+  "color": "rgb(90, 74, 51)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    644.328125,
+    178.578125,
+    660.328125
+   ]
+  ],
+  "fg": "#5a4a33",
+  "worst": 6.14,
+  "wp": "#efd7bc",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Best 64",
+  "color": "rgb(90, 74, 51)",
+  "need": 4.5,
+  "rects": [
+   [
+    766.328125,
+    661.09375,
+    820,
+    675.09375
+   ]
+  ],
+  "fg": "#5a4a33",
+  "worst": 5.83,
+  "wp": "#edd1b1",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Hard",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    685.859375,
+    89.765625,
+    706.859375
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 11.16,
+  "wp": "#f0d8c5",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Multi-syllable words",
+  "color": "rgb(90, 74, 51)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    708.328125,
+    161.03125,
+    724.328125
+   ]
+  ],
+  "fg": "#5a4a33",
+  "worst": 5.92,
+  "wp": "#eed2bc",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Best 0",
+  "color": "rgb(90, 74, 51)",
+  "need": 4.5,
+  "rects": [
+   [
+    774.546875,
+    725.09375,
+    820,
+    739.09375
+   ]
+  ],
+  "fg": "#5a4a33",
+  "worst": 5.52,
+  "wp": "#ebcaaf",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Expert",
+  "color": "rgb(43, 33, 21)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    749.859375,
+    104.609375,
+    770.859375
+   ]
+  ],
+  "fg": "#2b2115",
+  "worst": 7.12,
+  "wp": "#e7a035",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Competition-level",
+  "color": "rgb(43, 33, 21)",
+  "need": 4.5,
+  "rects": [
+   [
+    50,
+    772.328125,
+    150.109375,
+    788.328125
+   ]
+  ],
+  "fg": "#2b2115",
+  "worst": 6.63,
+  "wp": "#e2992e",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Master",
+  "color": "rgb(255, 241, 228)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    839.859375,
+    518.171875,
+    860.859375
+   ]
+  ],
+  "fg": "#fff1e4",
+  "worst": 4.56,
+  "wp": "#bc4b16",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Championship rarities",
+  "color": "rgb(255, 241, 228)",
+  "need": 4.5,
+  "rects": [
+   [
+    460,
+    862.328125,
+    584.59375,
+    878.328125
+   ]
+  ],
+  "fg": "#fff1e4",
+  "worst": 4.77,
+  "wp": "#b84816",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Settings button edge",
+  "color": "rgb(127, 106, 72)",
+  "need": 3,
+  "band": [
+   326,
+   24,
+   370,
+   68,
+   -3,
+   2,
+   16
+  ],
+  "fg": "#7f6a48",
+  "worst": 3.14,
+  "wp": "#d8c8a9",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Practice mode chip edge",
+  "color": "rgb(127, 106, 72)",
+  "need": 3,
+  "band": [
+   479.796875,
+   263.484375,
+   634.40625,
+   307.484375,
+   -3,
+   2,
+   15
+  ],
+  "fg": "#7f6a48",
+  "worst": 4.61,
+  "wp": "#f9f1e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Hide definition chip edge",
+  "color": "rgb(127, 106, 72)",
+  "need": 3,
+  "band": [
+   642.40625,
+   263.484375,
+   800.1875,
+   307.484375,
+   -3,
+   2,
+   15
+  ],
+  "fg": "#7f6a48",
+  "worst": 4.57,
+  "wp": "#f8f0e1",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 33,
+  "label": "focus ring: Modes",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   100,
+   24,
+   199.640625,
+   68,
+   3,
+   6,
+   1002
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.35,
+  "wp": "#fffdf8",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 34,
+  "label": "focus ring: Settings button edge",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   1136,
+   24,
+   1180,
+   68,
+   3,
+   6,
+   19
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.35,
+  "wp": "#fffdf8",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 35,
+  "label": "focus ring: Practice mode chip edge",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   479.796875,
+   263.484375,
+   634.40625,
+   307.484375,
+   3,
+   6,
+   18
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.1,
+  "wp": "#fdf9ee",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 36,
+  "label": "focus ring: Hide definition chip edge",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   642.40625,
+   263.484375,
+   800.1875,
+   307.484375,
+   3,
+   6,
+   18
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.28,
+  "wp": "#fefcf5",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 37,
+  "label": "focus ring: NoviceFirst words, short and sim",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   383.09375,
+   850,
+   441.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 38,
+  "label": "focus ring: EasyCommon everyday wordsBest 18",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   447.09375,
+   850,
+   505.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 39,
+  "label": "focus ring: BuildingLonger, still familiarBe",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   511.09375,
+   850,
+   569.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 40,
+  "label": "focus ring: MediumTrickier spellingsBest 118",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   575.09375,
+   850,
+   633.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 41,
+  "label": "focus ring: AdvancedUnusual letter patternsB",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   639.09375,
+   850,
+   697.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 42,
+  "label": "focus ring: HardMulti-syllable wordsBest 0",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   703.09375,
+   850,
+   761.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 43,
+  "label": "focus ring: ExpertCompetition-levelBest 0",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   767.09375,
+   850,
+   825.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "difficulty",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 44,
+  "label": "focus ring: MasterChampionship raritiesBest ",
+  "color": null,
+  "need": 3,
+  "band": [
+   430,
+   831.09375,
+   850,
+   889.09375,
+   3,
+   6,
+   3
+  ],
+  "fg": null,
+  "worst": null,
+  "wp": null,
+  "note": "no outline when focused (focus shown some other way)",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Quit",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    55.546875,
+    35.25,
+    87.703125,
+    56.25
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 15.9,
+  "wp": "#181510",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Medium",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    316,
+    116.390625,
+    380.1875,
+    137.390625
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.1,
+  "wp": "#3d3426",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "correct",
+  "kind": "text",
+  "label": "4",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    390.796875,
+    647.796875,
+    403.53125,
+    671.796875
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 11.35,
+  "wp": "#383023",
+  "where": "desktop, bee, correct"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "of 10 words",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    607.640625,
+    131.796875,
+    672.34375,
+    147.796875
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 7.06,
+  "wp": "#211c15",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "9",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    322.515625,
+    105.140625,
+    343.203125,
+    144.140625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.88,
+  "wp": "#3b3324",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "s",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    977.203125,
+    124.75,
+    984,
+    142.75
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.11,
+  "wp": "#3d3425",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Your word is…",
+  "color": "rgb(163, 181, 255)",
+  "need": 3,
+  "rects": [
+   [
+    72,
+    196.296875,
+    208.328125,
+    230.296875
+   ]
+  ],
+  "fg": "#a3b5ff",
+  "worst": 5.89,
+  "wp": "#413728",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "“A strong, regular repeated pattern of sound”",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    308,
+    256.5,
+    844.15625,
+    287.5
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.22,
+  "wp": "#403727",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Hear it again",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    84.546875,
+    320.75,
+    188.15625,
+    341.75
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.22,
+  "wp": "#403727",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Spell it",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    302,
+    422.046875,
+    360.203125,
+    443.046875
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.53,
+  "wp": "#3e3525",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "58",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    36,
+    629.25,
+    61.375,
+    653.25
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.88,
+  "wp": "#3b3325",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "points",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    65.375,
+    632.25,
+    111.6875,
+    653.25
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.05,
+  "wp": "#3d3527",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "3",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    133.6875,
+    629.25,
+    145.859375,
+    653.25
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 11.24,
+  "wp": "#383123",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "in a row",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    149.859375,
+    632.25,
+    208.625,
+    653.25
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.2,
+  "wp": "#3b3325",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "correct",
+  "kind": "text",
+  "label": "Skip this word",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    240.265625,
+    655.25,
+    346,
+    676.25
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.88,
+  "wp": "#3b3325",
+  "where": "phone, bee, correct"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "typed \"rhyt\"",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    318,
+    471.546875,
+    918,
+    527.546875
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 16.17,
+  "wp": "#16130f",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Hear-again button edge",
+  "color": "rgb(232, 166, 61)",
+  "need": 3,
+  "band": [
+   308,
+   308.046875,
+   473.15625,
+   352.046875,
+   -3,
+   2,
+   15
+  ],
+  "fg": "#e8a63d",
+  "worst": 5.63,
+  "wp": "#3f3626",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Answer field edge",
+  "color": "rgb(232, 166, 61)",
+  "need": 3,
+  "band": [
+   36,
+   453,
+   354,
+   521,
+   -3,
+   2,
+   14
+  ],
+  "fg": "#e8a63d",
+  "worst": 5.78,
+  "wp": "#3e3425",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 18,
+  "label": "focus ring: Quit",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   100,
+   24,
+   181.703125,
+   68,
+   3,
+   6,
+   1002
+  ],
+  "fg": "#f5c46e",
+  "worst": 11.47,
+  "wp": "#16130f",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 19,
+  "label": "focus ring: Settings",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   1136,
+   24,
+   1180,
+   68,
+   3,
+   6,
+   19
+  ],
+  "fg": "#f5c46e",
+  "worst": 11.47,
+  "wp": "#16130f",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 20,
+  "label": "focus ring: Hear-again button edge",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   40,
+   309.5,
+   205.15625,
+   353.5,
+   3,
+   6,
+   18
+  ],
+  "fg": "#f5c46e",
+  "worst": 10.79,
+  "wp": "#1f1911",
+  "focused": true,
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 21,
+  "label": "focus ring: Answer field edge",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   302,
+   461.546875,
+   978,
+   537.546875,
+   3,
+   6,
+   17
+  ],
+  "fg": "#f5c46e",
+  "worst": 11.47,
+  "wp": "#16130f",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 22,
+  "label": "focus ring: Skip this word",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   862.265625,
+   639.546875,
+   984,
+   683.546875,
+   3,
+   6,
+   3
+  ],
+  "fg": "#f5c46e",
+  "worst": 11.47,
+  "wp": "#16130f",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "correct",
+  "kind": "text",
+  "label": "+14",
+  "color": "rgb(92, 196, 156)",
+  "need": 3,
+  "rects": [
+   [
+    945.453125,
+    425.546875,
+    974,
+    448.546875
+   ]
+  ],
+  "fg": "#5cc49c",
+  "worst": 5.64,
+  "wp": "#3e3526",
+  "where": "desktop, bee, correct"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "correct",
+  "kind": "text",
+  "label": "Correct. 2.1 seconds, 57 words a minute.",
+  "color": "rgb(92, 196, 156)",
+  "need": 4.5,
+  "rects": [
+   [
+    302,
+    572.796875,
+    625.515625,
+    593.796875
+   ]
+  ],
+  "fg": "#5cc49c",
+  "worst": 5.66,
+  "wp": "#3d3527",
+  "where": "desktop, bee, correct"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "correct",
+  "kind": "text",
+  "label": "72",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    36,
+    652.25,
+    58.484375,
+    676.25
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 11.4,
+  "wp": "#373022",
+  "where": "phone, bee, correct"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "incorrect",
+  "kind": "text",
+  "label": "Missed. The word was “rhythm”.",
+  "color": "rgb(236, 127, 116)",
+  "need": 4.5,
+  "rects": [
+   [
+    329.546875,
+    572.796875,
+    588.9375,
+    593.796875
+   ]
+  ],
+  "fg": "#ec7f74",
+  "worst": 4.52,
+  "wp": "#3d3527",
+  "where": "desktop, bee, incorrect"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "incorrect",
+  "kind": "text",
+  "label": "0",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    133.6875,
+    629.25,
+    147,
+    653.25
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 11.24,
+  "wp": "#383123",
+  "where": "phone, bee, incorrect"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "“A strong, regular repeated pattern of sound”",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    40,
+    238.5,
+    292.015625,
+    262.5
+   ],
+   [
+    40,
+    265.5,
+    205.34375,
+    289.5
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.22,
+  "wp": "#403727",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Quit",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    55.546875,
+    35.25,
+    87.703125,
+    56.25
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.61,
+  "wp": "#f9f1e1",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Medium",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    316,
+    116.390625,
+    380.1875,
+    137.390625
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 5.91,
+  "wp": "#f9f1e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "correct",
+  "kind": "text",
+  "label": "4",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    390.796875,
+    647.796875,
+    403.53125,
+    671.796875
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.83,
+  "wp": "#f9f3e6",
+  "where": "desktop, bee, correct"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "of 10 words",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    607.640625,
+    131.796875,
+    672.34375,
+    147.796875
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 6.47,
+  "wp": "#fffcf5",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "9",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    949.5625,
+    104.75,
+    973.203125,
+    148.75
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.65,
+  "wp": "#f9f1e5",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "s",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    977.203125,
+    124.75,
+    984,
+    142.75
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 5.91,
+  "wp": "#f9f1e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Your word is…",
+  "color": "rgb(35, 70, 216)",
+  "need": 3,
+  "rects": [
+   [
+    72,
+    196.296875,
+    208.328125,
+    230.296875
+   ]
+  ],
+  "fg": "#2346d8",
+  "worst": 6.27,
+  "wp": "#f8efe1",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "“A strong, regular repeated pattern of sound”",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    308,
+    256.5,
+    844.15625,
+    287.5
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.41,
+  "wp": "#f8efe1",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Hear it again",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    84.546875,
+    320.75,
+    188.15625,
+    341.75
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.41,
+  "wp": "#f8efe0",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Spell it",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    302,
+    422.046875,
+    360.203125,
+    443.046875
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.47,
+  "wp": "#f7f0e1",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "58",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    36,
+    629.25,
+    61.375,
+    653.25
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.6,
+  "wp": "#f8f1e3",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "points",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    65.375,
+    632.25,
+    111.6875,
+    653.25
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 5.86,
+  "wp": "#f8f0e3",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "3",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    133.6875,
+    629.25,
+    145.859375,
+    653.25
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.77,
+  "wp": "#faf2e6",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "in a row",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    149.859375,
+    632.25,
+    208.625,
+    653.25
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 5.94,
+  "wp": "#f8f2e4",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "correct",
+  "kind": "text",
+  "label": "Skip this word",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    240.265625,
+    655.25,
+    346,
+    676.25
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.62,
+  "wp": "#f8f1e5",
+  "where": "phone, bee, correct"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "typed \"rhyt\"",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    318,
+    471.546875,
+    918,
+    527.546875
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 15.04,
+  "wp": "#fffdf8",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Hear-again button edge",
+  "color": "rgb(143, 90, 14)",
+  "need": 3,
+  "band": [
+   308,
+   308.046875,
+   473.15625,
+   352.046875,
+   -3,
+   2,
+   15
+  ],
+  "fg": "#8f5a0e",
+  "worst": 5.1,
+  "wp": "#f8f0e1",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "edge",
+  "label": "Answer field edge",
+  "color": "rgb(143, 90, 14)",
+  "need": 3,
+  "band": [
+   36,
+   453,
+   354,
+   521,
+   -3,
+   2,
+   14
+  ],
+  "fg": "#8f5a0e",
+  "worst": 5.1,
+  "wp": "#f8f0e2",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 18,
+  "label": "focus ring: Quit",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   100,
+   24,
+   181.703125,
+   68,
+   3,
+   6,
+   1002
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.35,
+  "wp": "#fffdf8",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 19,
+  "label": "focus ring: Settings",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   1136,
+   24,
+   1180,
+   68,
+   3,
+   6,
+   19
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.35,
+  "wp": "#fffdf8",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 20,
+  "label": "focus ring: Hear-again button edge",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   40,
+   309.5,
+   205.15625,
+   353.5,
+   3,
+   6,
+   18
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.06,
+  "wp": "#fdf8ef",
+  "focused": true,
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 21,
+  "label": "focus ring: Answer field edge",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   302,
+   461.546875,
+   978,
+   537.546875,
+   3,
+   6,
+   17
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.35,
+  "wp": "#fffdf8",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 22,
+  "label": "focus ring: Skip this word",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   862.265625,
+   639.546875,
+   984,
+   683.546875,
+   3,
+   6,
+   3
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.35,
+  "wp": "#fffdf8",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "correct",
+  "kind": "text",
+  "label": "+14",
+  "color": "rgb(37, 112, 90)",
+  "need": 3,
+  "rects": [
+   [
+    945.453125,
+    425.546875,
+    974,
+    448.546875
+   ]
+  ],
+  "fg": "#25705a",
+  "worst": 5.22,
+  "wp": "#f6f0e3",
+  "where": "desktop, bee, correct"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "correct",
+  "kind": "text",
+  "label": "Correct. 2.1 seconds, 57 words a minute.",
+  "color": "rgb(37, 112, 90)",
+  "need": 4.5,
+  "rects": [
+   [
+    302,
+    572.796875,
+    625.515625,
+    593.796875
+   ]
+  ],
+  "fg": "#25705a",
+  "worst": 5.27,
+  "wp": "#f8f1e2",
+  "where": "desktop, bee, correct"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "correct",
+  "kind": "text",
+  "label": "72",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    296,
+    647.796875,
+    318.484375,
+    671.796875
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.74,
+  "wp": "#f9f2e6",
+  "where": "desktop, bee, correct"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "incorrect",
+  "kind": "text",
+  "label": "Missed. The word was “rhythm”.",
+  "color": "rgb(173, 61, 53)",
+  "need": 4.5,
+  "rects": [
+   [
+    329.546875,
+    572.796875,
+    588.9375,
+    593.796875
+   ]
+  ],
+  "fg": "#ad3d35",
+  "worst": 5.34,
+  "wp": "#f8f1e2",
+  "where": "desktop, bee, incorrect"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "incorrect",
+  "kind": "text",
+  "label": "0",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    133.6875,
+    629.25,
+    147,
+    653.25
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.77,
+  "wp": "#faf2e6",
+  "where": "phone, bee, incorrect"
+ },
+ {
+  "h": "more",
+  "page": "round",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "“A strong, regular repeated pattern of sound”",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    40,
+    238.5,
+    292.015625,
+    262.5
+   ],
+   [
+    40,
+    265.5,
+    205.34375,
+    289.5
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.39,
+  "wp": "#f7efe1",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Spelling Bee",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    72,
+    28.796875,
+    188.109375,
+    61.796875
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 15.73,
+  "wp": "#1a1610",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Race over",
+  "color": "rgb(26, 22, 16)",
+  "need": 4.5,
+  "rects": [
+   [
+    933.40625,
+    263.015625,
+    1011,
+    292.015625
+   ]
+  ],
+  "fg": "#1a1610",
+  "worst": 8.53,
+  "wp": "#e8a63d",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Race winner, Medium words",
+  "color": "rgb(163, 181, 255)",
+  "need": 3,
+  "rects": [
+   [
+    60,
+    250,
+    330,
+    284
+   ]
+  ],
+  "fg": "#a3b5ff",
+  "worst": 5.48,
+  "wp": "#463c26",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Tomasz",
+  "color": "rgb(242, 189, 98)",
+  "need": 3,
+  "rects": [
+   [
+    398,
+    139.203125,
+    583.703125,
+    205.203125
+   ]
+  ],
+  "fg": "#f2bd62",
+  "worst": 6.72,
+  "wp": "#413828",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "You came 2nd with 205 points, 3 behind.",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    398,
+    235.921875,
+    702.609375,
+    256.921875
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 4.87,
+  "wp": "#413726",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "1",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    269.671875,
+    326.71875,
+    280.3125,
+    362.71875
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.88,
+  "wp": "#3b3324",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Tomasz",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    84,
+    459.953125,
+    146.09375,
+    480.953125
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.85,
+  "wp": "#3c3323",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "8 of 10 spelled",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    84,
+    488.875,
+    175.875,
+    505.875
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.03,
+  "wp": "#3e3526",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "208",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    315.90625,
+    470.265625,
+    356,
+    495.265625
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.72,
+  "wp": "#3c3426",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "2",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    265.859375,
+    408.71875,
+    284.140625,
+    444.71875
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.72,
+  "wp": "#3c3425",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Maya",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    314,
+    410.203125,
+    356.296875,
+    431.203125
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.88,
+  "wp": "#3b3324",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "205",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    982.9375,
+    419.921875,
+    1028,
+    447.921875
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.92,
+  "wp": "#3a3324",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "3",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    265.84375,
+    490.71875,
+    284.15625,
+    526.71875
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.68,
+  "wp": "#3d3425",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Adaeze",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    314,
+    492.203125,
+    374.265625,
+    513.203125
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.84,
+  "wp": "#3c3325",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "6 of 10 spelled",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    314,
+    521.125,
+    405.640625,
+    538.125
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.11,
+  "wp": "#3d3425",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "141",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    996.375,
+    501.921875,
+    1028,
+    529.921875
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.76,
+  "wp": "#3b3425",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "4",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    265.390625,
+    573.21875,
+    284.609375,
+    609.21875
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 10.88,
+  "wp": "#3b3325",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Rafael",
+  "color": "rgb(245, 239, 227)",
+  "need": 4.5,
+  "rects": [
+   [
+    314,
+    574.703125,
+    365.578125,
+    595.703125
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 11,
+  "wp": "#3b3224",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "3 of 10 spelled",
+  "color": "rgb(179, 166, 143)",
+  "need": 4.5,
+  "rects": [
+   [
+    314,
+    603.625,
+    405.296875,
+    620.625
+   ]
+  ],
+  "fg": "#b3a68f",
+  "worst": 5.22,
+  "wp": "#3a3324",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "67",
+  "color": "rgb(245, 239, 227)",
+  "need": 3,
+  "rects": [
+   [
+    1000.109375,
+    584.421875,
+    1028,
+    612.421875
+   ]
+  ],
+  "fg": "#f5efe3",
+  "worst": 11.19,
+  "wp": "#393124",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Back to lobby",
+  "color": "rgb(26, 22, 16)",
+  "need": 4.5,
+  "rects": [
+   [
+    258,
+    687.921875,
+    367.71875,
+    708.921875
+   ]
+  ],
+  "fg": "#1a1610",
+  "worst": 8.53,
+  "wp": "#e8a63d",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 22,
+  "label": "focus ring: Settings",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   1136,
+   24,
+   1180,
+   68,
+   3,
+   6,
+   19
+  ],
+  "fg": "#f5c46e",
+  "worst": 11.47,
+  "wp": "#16130f",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "dark",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 23,
+  "label": "focus ring: Back to lobby",
+  "color": "rgb(245, 196, 110)",
+  "need": 3,
+  "band": [
+   230,
+   671.421875,
+   395.71875,
+   725.421875,
+   3,
+   6,
+   18
+  ],
+  "fg": "#f5c46e",
+  "worst": 11.47,
+  "wp": "#16130f",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Spelling Bee",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    152,
+    28.796875,
+    268.109375,
+    61.796875
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.61,
+  "wp": "#f9f1e1",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Race over",
+  "color": "rgb(43, 33, 21)",
+  "need": 4.5,
+  "rects": [
+   [
+    933.40625,
+    263.015625,
+    1011,
+    292.015625
+   ]
+  ],
+  "fg": "#2b2115",
+  "worst": 6.63,
+  "wp": "#e09a2c",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Race winner, Medium words",
+  "color": "rgb(35, 70, 216)",
+  "need": 3,
+  "rects": [
+   [
+    60,
+    250,
+    330,
+    284
+   ]
+  ],
+  "fg": "#2346d8",
+  "worst": 6.1,
+  "wp": "#f6ecdb",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Tomasz",
+  "color": "rgb(143, 90, 14)",
+  "need": 3,
+  "rects": [
+   [
+    398,
+    139.203125,
+    583.703125,
+    205.203125
+   ]
+  ],
+  "fg": "#8f5a0e",
+  "worst": 5.05,
+  "wp": "#f7efe0",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "You came 2nd with 205 points, 3 behind.",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    398,
+    235.921875,
+    702.609375,
+    256.921875
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 5.8,
+  "wp": "#f7efe0",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "1",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    269.671875,
+    326.71875,
+    280.3125,
+    362.71875
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.63,
+  "wp": "#f9f1e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Tomasz",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    84,
+    459.953125,
+    146.09375,
+    480.953125
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.61,
+  "wp": "#f8f1e4",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "8 of 10 spelled",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    84,
+    488.875,
+    175.875,
+    505.875
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 5.86,
+  "wp": "#f8f0e2",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "208",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    315.90625,
+    470.265625,
+    356,
+    495.265625
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.59,
+  "wp": "#f8f1e2",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "2",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    265.859375,
+    408.71875,
+    284.140625,
+    444.71875
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.6,
+  "wp": "#f8f1e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Maya",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    84,
+    586.375,
+    126.296875,
+    607.375
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.54,
+  "wp": "#f9f0e3",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "phone",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "205",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    316.796875,
+    596.6875,
+    356,
+    621.6875
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.65,
+  "wp": "#f9f1e5",
+  "where": "phone, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "3",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    265.84375,
+    490.71875,
+    284.15625,
+    526.71875
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.51,
+  "wp": "#f8f0e2",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Adaeze",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    314,
+    492.203125,
+    374.265625,
+    513.203125
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.63,
+  "wp": "#f9f1e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "6 of 10 spelled",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    314,
+    521.125,
+    405.640625,
+    538.125
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 5.91,
+  "wp": "#f9f1e3",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "141",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    996.375,
+    501.921875,
+    1028,
+    529.921875
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.61,
+  "wp": "#f8f1e4",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "4",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    265.390625,
+    573.21875,
+    284.609375,
+    609.21875
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.61,
+  "wp": "#f8f1e4",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Rafael",
+  "color": "rgb(44, 36, 25)",
+  "need": 4.5,
+  "rects": [
+   [
+    314,
+    574.703125,
+    365.578125,
+    595.703125
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.64,
+  "wp": "#f9f1e4",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "3 of 10 spelled",
+  "color": "rgb(107, 90, 66)",
+  "need": 4.5,
+  "rects": [
+   [
+    314,
+    603.625,
+    405.296875,
+    620.625
+   ]
+  ],
+  "fg": "#6b5a42",
+  "worst": 5.95,
+  "wp": "#f9f2e4",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "67",
+  "color": "rgb(44, 36, 25)",
+  "need": 3,
+  "rects": [
+   [
+    1000.109375,
+    584.421875,
+    1028,
+    612.421875
+   ]
+  ],
+  "fg": "#2c2419",
+  "worst": 13.72,
+  "wp": "#f8f2e7",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "text",
+  "label": "Back to lobby",
+  "color": "rgb(43, 33, 21)",
+  "need": 4.5,
+  "rects": [
+   [
+    258,
+    687.921875,
+    367.71875,
+    708.921875
+   ]
+  ],
+  "fg": "#2b2115",
+  "worst": 6.63,
+  "wp": "#e09a2c",
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 22,
+  "label": "focus ring: Settings",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   1136,
+   24,
+   1180,
+   68,
+   3,
+   6,
+   19
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.35,
+  "wp": "#fffdf8",
+  "focused": true,
+  "where": "desktop, bee"
+ },
+ {
+  "h": "more",
+  "page": "race-results",
+  "theme": "light",
+  "w": "desktop",
+  "bee": "1",
+  "state": "",
+  "kind": "ring",
+  "idx": 23,
+  "label": "focus ring: Back to lobby",
+  "color": "rgb(122, 74, 8)",
+  "need": 3,
+  "band": [
+   230,
+   671.421875,
+   395.71875,
+   725.421875,
+   3,
+   6,
+   18
+  ],
+  "fg": "#7a4a08",
+  "worst": 7.16,
+  "wp": "#fcfaf4",
+  "focused": true,
+  "where": "desktop, bee"
+ }
+]

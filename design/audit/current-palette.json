@@ -1,0 +1,32 @@
+{
+  "Current dark": { "pairs": [
+    ["body text", "#f5efe3", "#16130f", "text"],
+    ["body text on card", "#f5efe3", "#211c15", "text"],
+    ["muted text", "#a89c86", "#16130f", "text"],
+    ["muted text on card", "#a89c86", "#211c15", "text"],
+    ["honey text / headings", "#e8a63d", "#16130f", "text"],
+    ["honey text on card", "#e8a63d", "#211c15", "text"],
+    ["ink on honey button", "#1a1610", "#e8a63d", "text"],
+    ["correct text", "#4fae8c", "#16130f", "text"],
+    ["incorrect text", "#d9645c", "#16130f", "text"],
+    ["card border vs bg", "#3a3226", "#16130f", "ui"],
+    ["input border (honey) vs bg", "#e8a63d", "#16130f", "ui"],
+    ["spectate blue text", "#5b8fb0", "#16130f", "text"],
+    ["out/ghost grey vs bg", "#6f6455", "#16130f", "ui"]
+  ]},
+  "Current light": { "pairs": [
+    ["body text", "#2c2419", "#faf3e3", "text"],
+    ["body text on card", "#2c2419", "#fffcf5", "text"],
+    ["muted text", "#7b6a51", "#faf3e3", "text"],
+    ["muted text on card", "#7b6a51", "#fffcf5", "text"],
+    ["honey text / headings", "#9a6210", "#faf3e3", "text"],
+    ["ink on honey button", "#2b2115", "#e09a2c", "text"],
+    ["correct text", "#2c7a60", "#faf3e3", "text"],
+    ["incorrect text", "#b4423a", "#faf3e3", "text"],
+    ["card border vs bg", "#e6d6b4", "#faf3e3", "ui"],
+    ["card border vs card", "#e6d6b4", "#fffcf5", "ui"],
+    ["input border (honey) vs bg", "#9a6210", "#faf3e3", "ui"],
+    ["timer fill vs track", "#e09a2c", "#faf3e3", "ui"],
+    ["out/ghost grey vs bg", "#9a8b74", "#faf3e3", "ui"]
+  ]}
+}

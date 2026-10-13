@@ -1,0 +1,75 @@
+Detector sanity: flags #f7da21 (NYT Spelling Bee yellow); passes #e8a63d (old honey), #f2bd62 (hybrid heading), #e09a2c (light fill), #f5c46e (focus ring).
+
+## Reduced motion: shimmer under reduced motion vs the static background (tolerance 8/255 per channel)
+STILL OK  a--still-home--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  a--still-home--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  a--still-home--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  a--still-home--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  a--still-round--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  a--still-round--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  a--still-round--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  a--still-round--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  a--still-race-results--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  a--still-race-results--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  a--still-race-results--phone--dark: max channel diff 1/255, pixels over tolerance 0
+STILL OK  a--still-race-results--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  b--still-home--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  b--still-home--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  b--still-home--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  b--still-home--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  b--still-round--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  b--still-round--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  b--still-round--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  b--still-round--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  b--still-race-results--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  b--still-race-results--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  b--still-race-results--phone--dark: max channel diff 1/255, pixels over tolerance 0
+STILL OK  b--still-race-results--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  c--still-home--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  c--still-home--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  c--still-home--phone--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  c--still-home--phone--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  c--still-round--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  c--still-round--desktop--light: max channel diff 0/255, pixels over tolerance 0
+STILL OK  c--still-round--phone--dark: max channel diff 1/255, pixels over tolerance 0
+STILL OK  c--still-round--phone--light: max channel diff 2/255, pixels over tolerance 0
+STILL OK  c--still-race-results--desktop--dark: max channel diff 0/255, pixels over tolerance 0
+STILL OK  c--still-race-results--desktop--light: max channel diff 2/255, pixels over tolerance 0
+STILL OK  c--still-race-results--phone--dark: max channel diff 1/255, pixels over tolerance 0
+STILL OK  c--still-race-results--phone--light: max channel diff 0/255, pixels over tolerance 0
+Reduced-motion stills identical to static: 36/36
+
+## Colour: lemon-yellow pixels (must be 0) and honey pixels, per variant, over every saved capture (lossless)
+variant a: 23,698,560 px in 34 captures; lemon yellow 0; honey/amber 5,889,447 (24.9%)
+variant b: 23,698,560 px in 34 captures; lemon yellow 0; honey/amber 5,929,520 (25.0%)
+variant c: 23,698,560 px in 34 captures; lemon yellow 0; honey/amber 2,121,712 (9.0%)
+
+## Structure: honeycomb is decoration only; no grey tiles; no letter board
+a home (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+a home (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+a round (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+a round (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+a race-results (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+a race-results (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+a avatars (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+a avatars (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+b home (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+b home (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+b round (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+b round (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+b race-results (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+b race-results (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+b avatars (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+b avatars (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+c home (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+c home (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+c round (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+c round (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+c race-results (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+c race-results (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+c avatars (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+c avatars (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, six-point polygon elements in content=0, honeycomb tiles outside the background=0, flat grey filled elements=0
+Answers are typed into a standard text input on the round screen; no screen has a letter board or letter tiles.
+
+captured 102 screenshots -> C:\devwork\github projects\spellingbee\design\prototypes\honey-hybrid\screens
+page errors: 0

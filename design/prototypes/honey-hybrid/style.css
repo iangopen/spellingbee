@@ -1,0 +1,340 @@
+/* Honey hybrid: the old live design's warm honey palette and character, with
+   the Blue Ribbon glow direction's polish (lit panels, glow on focus and the
+   primary button, the answer moments, screen transitions, the bee, the type
+   pairing and C's race lanes).
+   Fonts: Bricolage Grotesque (display) + Atkinson Hyperlegible (body), both OFL.
+
+   Three variants, chosen by ?v= (params.js sets data-v on <html>):
+     a  Hive              the old palette throughout, a gentle honey glow
+     b  Honey and ribbon  honey leads; ribbon blue only on the award marks
+     c  Split             a rich honey glow in dark, the old flat cream in light
+
+   Trademark distance: warm honey and amber only (hue 30-42 degrees), never
+   lemon yellow, never on flat grey tiles; the honeycomb is background only.
+   Checked by design/harness/shoot-hybrid.mjs.
+
+   Contrast rule: text never sits on bare glow. Every text block is on a lit
+   panel or a scrim, and design/harness/measure.mjs (TARGET=hybrid) checks each
+   text pair against the worst pixel behind it with the background at its peak. */
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap");
+@view-transition { navigation: auto; }
+
+/* ============ tokens: variant a, dark (the old live dark palette) ============ */
+:root {
+  color-scheme: dark;
+  /* background: the old #16130f charcoal, honey cells */
+  --bg-top: #16130f; --bg-bottom: #0f0c08;
+  --bg-glow: rgba(232, 166, 61, 0.1); --bg-glow-2: rgba(201, 113, 58, 0.07);
+  --bg-edge: rgba(8, 6, 3, 0.85);
+  --cell-line: rgba(232, 166, 61, 0.16); --cell-line-bright: rgba(247, 196, 110, 0.52);
+  --cells-opacity: 1; --cells-glow-opacity: 0.28; --light-peak: 0.38;
+  /* surfaces: the old #211c15 card */
+  --panel: rgba(33, 28, 21, 0.88); --panel-solid: #211c15;
+  --panel-edge: rgba(232, 166, 61, 0.18); --panel-highlight: rgba(255, 232, 190, 0.07);
+  --scrim: rgba(16, 13, 9, 0.76);
+  --raised: rgba(232, 166, 61, 0.13);
+  --field: #16130f;
+  /* ink: the old cream text and honey accent */
+  --text: #f5efe3; --muted: #b3a68f;
+  --accent: #e8a63d; --accent-strong: #f2bd62; --accent-fill: #e8a63d; --on-accent: #1a1610;
+  --heading: #f2bd62; --kicker: #f2bd62; --you: #f2bd62;
+  --edge: #9d8d70; --ring: #f5c46e; --focus-moat: #16130f; --glow-soft: rgba(232, 166, 61, 0.3);
+  --good: #5cc49c; --bad: #ec7f74;
+  --glow-accent: rgba(232, 166, 61, 0.5); --glow-good: rgba(92, 196, 156, 0.45); --glow-bad: rgba(236, 127, 116, 0.4);
+  /* the rosette and the place ribbons: gold, silver, bronze */
+  --mark: #e8a63d; --mark-2: #c7841c; --mark-ring: #e8a63d;
+  --ribbon-1: #e8a63d; --ribbon-2: #cfc6b6; --ribbon-3: #c9713a;
+  /* the old difficulty ramp: sage, olive, amber, burnt orange, honey, then master's rust */
+  --t-novice: #7fa382; --t-easy: #8fae70; --t-building: #a9ad5a; --t-medium: #c99a45;
+  --t-advanced: #d48a35; --t-hard: #d0702e; --t-expert: #e8a63d; --t-master: #d95d25;
+  /* bee art: a honey bee with cocoa bands */
+  --bee-body: #f0b24c; --bee-stripe: #2a2013; --bee-wing: rgba(255, 246, 228, 0.75); --bee-line: #1a1410; --bee-cheek: #ff9fb2;
+  --shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.8);
+  --hex-mask: radial-gradient(75% 70% at 50% 40%, #000 25%, rgba(0,0,0,.35) 70%, transparent 100%);
+  --display: "Bricolage Grotesque", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", system-ui, sans-serif;
+  --r-sm: 8px; --r-md: 14px; --r-lg: 22px; --r-pill: 999px;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+/* ============ variant a, light (the old warm cream palette) ============ */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg-top: #faf3e3; --bg-bottom: #f4e8cc;
+  --bg-glow: rgba(224, 154, 44, 0.16); --bg-glow-2: rgba(201, 113, 58, 0.1); --bg-edge: rgba(240, 226, 196, 0.9);
+  --cell-line: rgba(201, 135, 30, 0.2); --cell-line-bright: rgba(196, 124, 20, 0.42);
+  --cells-opacity: 1; --cells-glow-opacity: 0.3; --light-peak: 0.55;
+  --panel: rgba(255, 252, 245, 0.92); --panel-solid: #fffcf5; --panel-edge: rgba(154, 98, 16, 0.16); --panel-highlight: rgba(255, 255, 255, 0.9);
+  --scrim: rgba(250, 243, 227, 0.84); --raised: rgba(201, 135, 30, 0.13); --field: #fffdf8;
+  --text: #2c2419; --muted: #6b5a42;
+  --accent: #8f5a0e; --accent-strong: #7a4b08; --accent-fill: #e09a2c; --on-accent: #2b2115;
+  --heading: #8f5a0e; --kicker: #8f5a0e; --you: #7a4b08;
+  --edge: #7f6a48; --ring: #7a4a08; --focus-moat: #fffdf8; --glow-soft: rgba(224, 154, 44, 0.3);
+  --good: #25705a; --bad: #ad3d35;
+  --glow-accent: rgba(224, 154, 44, 0.45); --glow-good: rgba(37, 112, 90, 0.3); --glow-bad: rgba(173, 61, 53, 0.28);
+  --mark: #e09a2c; --mark-2: #b0741a; --mark-ring: #b0741a;
+  --ribbon-1: #e09a2c; --ribbon-2: #8f887c; --ribbon-3: #b0602a;
+  --t-novice: #5a8a5e; --t-easy: #6b8f4e; --t-building: #8a8f35; --t-medium: #b7862a;
+  --t-advanced: #c0722a; --t-hard: #b95a22; --t-expert: #e09a2c; --t-master: #b8471a;
+  --bee-body: #eaa640; --bee-stripe: #2c2419; --bee-wing: rgba(255, 255, 255, 0.85); --bee-line: #2c2419;
+  --shadow: 0 18px 40px -22px rgba(120, 80, 20, 0.35);
+}
+
+/* ============ variant b: honey leads, ribbon blue as the award accent ============ */
+/* Blue appears ONLY on the award marks: the rosette's ribbon, the first-place
+   ribbon, the winner kicker, the "you" tag and the "Your word is" cue. Every
+   control, focus ring and fill stays honey. The glow is a little richer than a. */
+:root[data-v="b"]:not([data-theme="light"]) {
+  --bg-glow: rgba(232, 150, 50, 0.2); --bg-glow-2: rgba(92, 124, 255, 0.09);
+  --cell-line: rgba(236, 170, 70, 0.26); --cell-line-bright: rgba(255, 205, 120, 0.74);
+  --cells-glow-opacity: 0.45; --light-peak: 0.5;
+  --kicker: #a3b5ff; --you: #a3b5ff;
+  --mark-2: #8aa2ff; --mark-ring: #8aa2ff; --ribbon-1: #8aa2ff; --ribbon-2: #cfc6b6; --ribbon-3: #c9713a;
+}
+:root[data-v="b"][data-theme="light"] {
+  --bg-glow: rgba(224, 154, 44, 0.2); --bg-glow-2: rgba(35, 70, 216, 0.08);
+  --cell-line: rgba(201, 135, 30, 0.22); --cell-line-bright: rgba(196, 124, 20, 0.46);
+  --cells-glow-opacity: 0.34; --light-peak: 0.58;
+  --kicker: #2346d8; --you: #2346d8;
+  --mark-2: #2346d8; --mark-ring: #2346d8; --ribbon-1: #2346d8; --ribbon-2: #8f887c; --ribbon-3: #b0602a;
+}
+
+/* ============ variant c: honey glow in dark, the old flat palette in light ============ */
+/* Dark gets the full Blue Ribbon glow intensity, translated to amber: a deep
+   cocoa-black with a warm bloom and bright honey cell edges. */
+:root[data-v="c"]:not([data-theme="light"]) {
+  --bg-top: #120d07; --bg-bottom: #0a0704;
+  --bg-glow: rgba(214, 120, 30, 0.42); --bg-glow-2: rgba(255, 176, 80, 0.14); --bg-edge: rgba(5, 3, 1, 0.88);
+  --cell-line: rgba(240, 170, 80, 0.32); --cell-line-bright: rgba(255, 214, 140, 0.85);
+  --cells-glow-opacity: 0.55; --light-peak: 0.55;
+  --panel: rgba(28, 21, 13, 0.88); --panel-solid: #1c150d; --panel-edge: rgba(240, 170, 80, 0.2); --panel-highlight: rgba(255, 226, 180, 0.09);
+  --scrim: rgba(12, 8, 4, 0.76); --field: #120d07; --focus-moat: #120d07;
+}
+/* Light is the old live site as it was: flat cream, the honeycomb at low
+   alpha, no bloom, no vignette and no moving light. Only the UI polish
+   (panels, focus, buttons, answer moments, lanes) is new. */
+:root[data-v="c"][data-theme="light"] {
+  --bg-top: #faf3e3; --bg-bottom: #faf3e3;
+  --bg-glow: transparent; --bg-glow-2: transparent; --bg-edge: transparent;
+  --cell-line: rgba(232, 166, 61, 0.22);
+  --cells-glow-opacity: 0; --light-peak: 0;
+  --panel: rgba(255, 252, 245, 0.97); --panel-edge: rgba(154, 98, 16, 0.2);
+  --shadow: 0 6px 18px rgba(90, 66, 20, 0.12);
+  --hex-mask: none;
+}
+:root[data-v="c"][data-theme="light"] .bg-light { display: none !important; }
+
+/* ---------------- base ---------------- */
+* { box-sizing: border-box; }
+html { background: var(--bg-bottom); }
+html, body { margin: 0; }
+body { color: var(--text); font: 400 17px/1.5 var(--body); min-height: 100dvh; -webkit-tap-highlight-color: transparent; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; touch-action: manipulation; }
+svg { width: 1.15em; height: 1.15em; flex: none; }
+.num { font-variant-numeric: tabular-nums; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Focus: a solid ring drawn inside a 7px moat of solid background colour, with
+   the soft halo only beyond the moat. The ring therefore always meets the moat
+   on both sides, whatever glow sits behind the control. */
+:root :is(a, button, input, [tabindex]):focus-visible { outline: 3px solid var(--ring); outline-offset: 3px; box-shadow: 0 0 0 7px var(--focus-moat), 0 0 0 13px var(--glow-soft); }
+
+/* Reduced motion: the same single global block the app already has
+   (src/index.css). It zeroes TRANSITIONS as well as animations, so hover and
+   focus glows snap instead of fading. Every state is still shown. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------------- panels: softly lit glass ---------------- */
+.panel {
+  position: relative; background: var(--panel); border-radius: var(--r-lg);
+  box-shadow: inset 0 1px 0 var(--panel-highlight), inset 0 0 0 1px var(--panel-edge), var(--shadow);
+}
+@media (hover: hover) and (pointer: fine) and (min-width: 900px) {
+  /* Blur only where it's cheap. Over a moving background a backdrop blur
+     re-renders every frame, so phones get a slightly more opaque panel instead. */
+  .panel { -webkit-backdrop-filter: blur(12px) saturate(1.2); backdrop-filter: blur(12px) saturate(1.2); }
+}
+@media (prefers-reduced-transparency: reduce) { .panel { background: var(--panel-solid); backdrop-filter: none; -webkit-backdrop-filter: none; } }
+
+/* ---------------- layout ---------------- */
+.page { max-width: 1120px; margin: 0 auto; padding: 16px 20px 48px; }
+.topbar { display: flex; align-items: center; justify-content: space-between; min-height: 60px; gap: 12px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font: 800 20px/1 var(--display); letter-spacing: -0.02em; color: var(--text); text-decoration: none; padding: 6px 12px 6px 6px; border-radius: var(--r-pill); background: var(--scrim); }
+.brand .mark-svg { width: 36px; height: 36px; }
+.icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: var(--r-pill); border: 1.5px solid var(--edge); background: var(--panel); color: var(--accent); transition: transform 0.15s var(--ease-out), box-shadow 0.2s ease; }
+.icon-btn:hover { box-shadow: 0 0 18px var(--glow-accent); }
+.link-back { text-decoration: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px 0 10px; border-radius: var(--r-pill); border: 0; background: var(--scrim); color: var(--text); }
+
+/* ---------------- buttons ---------------- */
+.btn { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 54px; padding: 0 26px; border-radius: var(--r-md); font: 700 17px/1 var(--body); border: 2px solid transparent; transition: transform 0.15s var(--ease-out), box-shadow 0.25s ease, background-color 0.2s ease; }
+.btn:active { transform: translateY(1px) scale(0.99); }
+.btn-primary { background: var(--accent-fill); color: var(--on-accent); box-shadow: 0 0 0 1px rgba(255, 244, 220, 0.16) inset, 0 8px 28px -8px var(--glow-accent); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px rgba(255, 244, 220, 0.22) inset, 0 12px 36px -6px var(--glow-accent); }
+.btn-secondary { background: var(--panel); color: var(--text); border-color: var(--edge); }
+.btn-secondary svg { color: var(--accent); }
+.btn-secondary:hover { box-shadow: 0 0 22px -4px var(--glow-accent); }
+
+/* ---------------- screen entry (motion = "this screen just arrived") ---------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .enter > * { animation: rise 0.55s var(--ease-out) both; }
+  .enter > *:nth-child(2) { animation-delay: 60ms; } .enter > *:nth-child(3) { animation-delay: 120ms; } .enter > *:nth-child(4) { animation-delay: 180ms; }
+  ::view-transition-old(root) { animation: 0.18s ease both fade-out; }
+  ::view-transition-new(root) { animation: 0.3s var(--ease-out) both rise; }
+}
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+@keyframes fade-out { to { opacity: 0; } }
+
+/* ---------------- home ---------------- */
+.home { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; padding-top: 44px; }
+.hero { padding: 36px 36px 38px; }
+/* The old site's signature: the title itself in honey. */
+.hero h1 { font: 800 clamp(3rem, 7vw, 5.4rem)/0.95 var(--display); letter-spacing: -0.035em; margin: 0 0 14px; text-wrap: balance; color: var(--heading); }
+.hero .tagline { font: 700 1.3rem/1.3 var(--display); margin: 0 0 8px; }
+.hero .lede { font-size: 1.1rem; color: var(--muted); max-width: 34ch; margin: 0 0 28px; text-wrap: pretty; }
+.hero .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.hero .mascot { position: absolute; right: 22px; top: -84px; width: 112px; height: 112px; }
+:root[data-bee="0"] .mascot { display: none; }
+.mascot svg, .rosette svg, .token svg.bee-art { width: 100%; height: 100%; }
+@media (prefers-reduced-motion: no-preference) { .mascot svg { animation: hover-bee 5s ease-in-out infinite; } }
+@keyframes hover-bee { 50% { transform: translateY(-5px) rotate(-2deg); } }
+.bests { padding: 28px; }
+.bests h2 { font: 700 1.1rem/1.2 var(--display); margin: 0 0 4px; }
+.bests p { margin: 0 0 16px; color: var(--muted); font-size: 0.95rem; }
+.bests ol { list-style: none; margin: 0; padding: 0; }
+.bests li { display: grid; grid-template-columns: 1fr auto; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--panel-edge); }
+.bests li:last-child { border-bottom: 0; }
+.bests .tier { font-weight: 700; }
+.bests .score { font: 700 1.1rem/1 var(--display); }
+.bests .score.none { color: var(--muted); font: 400 0.95rem var(--body); }
+.rosette-float { position: absolute; top: -40px; right: -16px; width: 96px; height: 96px; transform: rotate(8deg); filter: drop-shadow(0 6px 18px var(--glow-accent)); }
+/* The old difficulty ramp, kept as a small swatch beside each tier name. The
+   name carries the meaning; the colour is the old site's character. */
+.swatch { display: inline-block; width: 10px; height: 18px; border-radius: 3px; margin-right: 10px; vertical-align: -3px; background: var(--t); }
+[data-tier="novice"] { --t: var(--t-novice); } [data-tier="easy"] { --t: var(--t-easy); } [data-tier="building"] { --t: var(--t-building); }
+[data-tier="medium"] { --t: var(--t-medium); } [data-tier="advanced"] { --t: var(--t-advanced); } [data-tier="hard"] { --t: var(--t-hard); }
+[data-tier="expert"] { --t: var(--t-expert); } [data-tier="master"] { --t: var(--t-master); }
+
+/* ---------------- round ---------------- */
+.round { max-width: 720px; margin: 0 auto; padding-top: 8px; }
+.round-head { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-bottom: 22px; padding: 10px 16px; border-radius: var(--r-pill); }
+.round-head .tier-name { color: var(--muted); font-weight: 700; }
+.placard { justify-self: center; background: var(--panel-solid); border: 2px solid var(--text); border-radius: var(--r-sm); padding: 5px 16px 7px; text-align: center; transition: box-shadow 0.4s ease; }
+.placard b { display: block; font: 800 1.55rem/1 var(--display); }
+.placard span { font-size: 0.8rem; color: var(--muted); }
+.clock { justify-self: end; display: flex; align-items: baseline; gap: 4px; font: 800 2.3rem/1 var(--display); }
+.clock small { font: 400 0.9rem var(--body); color: var(--muted); }
+.pronouncer { padding: 26px 28px; }
+.pronouncer .who { display: flex; align-items: center; gap: 10px; color: var(--kicker); font-weight: 700; margin: 0 0 10px; }
+.pronouncer .who svg { width: 22px; height: 22px; }
+.definition { font: 500 clamp(1.25rem, 3.2vw, 1.6rem)/1.35 var(--display); margin: 0 0 18px; text-wrap: pretty; }
+/* The old "Hear it again": a honey-outlined pill. */
+.chip-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: var(--r-pill); border: 1.5px solid var(--accent); background: transparent; font-weight: 700; transition: box-shadow 0.2s ease; }
+.chip-btn svg { color: var(--accent); }
+.chip-btn:hover { box-shadow: 0 0 20px -4px var(--glow-accent); }
+.answer { margin-top: 22px; padding: 20px 22px 18px; }
+.answer label { display: block; font-weight: 700; margin-bottom: 16px; }
+.field-wrap { position: relative; }
+.answer-field {
+  width: 100%; min-height: 76px; padding: 0 64px 0 20px; background: var(--field); color: var(--text);
+  border: 2px solid var(--edge); border-radius: var(--r-md); font: 700 2.1rem/1 var(--body); letter-spacing: 0.08em;
+  transition: border-color 0.2s ease, box-shadow 0.35s ease;
+}
+/* Glows start after a gap ring in the field colour, so the border always
+   meets the field colour, never its own halo. */
+.answer-field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 7px var(--field), 0 0 0 11px var(--glow-accent), 0 0 26px -4px var(--glow-accent); }
+:root .answer-field:focus-visible { outline: 3px solid var(--ring); outline-offset: 3px; box-shadow: 0 0 0 7px var(--field), 0 0 0 11px var(--glow-accent), 0 0 26px -4px var(--glow-accent); }
+.outcome-icon { position: absolute; right: 18px; top: 50%; width: 32px; height: 32px; margin-top: -16px; opacity: 0; transform: scale(0.6); transition: opacity 0.2s ease, transform 0.35s cubic-bezier(0.2, 1.6, 0.4, 1); }
+.outcome-icon svg { width: 32px; height: 32px; }
+.timer { height: 10px; border-radius: var(--r-pill); background: var(--raised); margin-top: 10px; overflow: hidden; }
+.timer i { display: block; height: 100%; width: 58%; background: var(--accent-fill); border-radius: inherit; box-shadow: 0 0 14px var(--glow-accent); }
+.feedback { min-height: 28px; margin: 12px 0 0; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.feedback .bell { display: inline-grid; }
+.round-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; gap: 12px; flex-wrap: wrap; padding: 8px 16px; border-radius: var(--r-pill); }
+.tally { display: flex; gap: 22px; color: var(--muted); }
+.tally b { color: var(--text); font: 800 1.25rem/1 var(--display); margin-right: 4px; }
+.text-btn { background: none; border: 0; color: var(--text); text-decoration: underline; text-underline-offset: 3px; min-height: 44px; padding: 0 8px; }
+.float-points { position: absolute; right: 4px; top: -36px; font: 800 1.2rem var(--display); color: var(--good); opacity: 0; }
+
+/* correct: the field lights up green, the placard glows, "+14" floats up */
+:root[data-state="correct"] .answer-field, :root[data-state="correct"] .answer-field:focus-visible { border-color: var(--good); box-shadow: 0 0 0 7px var(--field), 0 0 0 11px var(--glow-good), 0 0 26px -4px var(--glow-good); }
+:root[data-state="correct"] .outcome-icon.ok { opacity: 1; transform: none; color: var(--good); }
+:root[data-state="correct"] .placard { box-shadow: 0 0 26px -2px var(--glow-good); }
+:root[data-state="correct"] .feedback { color: var(--good); }
+:root[data-state="correct"] .float-points { opacity: 1; }
+/* incorrect: the bell rings, the field gives one short shake, red edge */
+:root[data-state="incorrect"] .answer-field, :root[data-state="incorrect"] .answer-field:focus-visible { border-color: var(--bad); box-shadow: 0 0 0 7px var(--field), 0 0 0 11px var(--glow-bad); }
+:root[data-state="incorrect"] .outcome-icon.miss { opacity: 1; transform: none; color: var(--bad); }
+:root[data-state="incorrect"] .feedback { color: var(--bad); }
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-state="correct"] .float-points { animation: float-up 1s var(--ease-out) both; }
+  :root[data-state="correct"] .answer-field, :root[data-state="correct"] .answer-field:focus-visible { animation: light-up 0.7s ease-out; }
+  :root[data-state="incorrect"] .field-wrap { animation: shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+  :root[data-state="incorrect"] .bell svg { animation: ring 0.9s ease-out; transform-origin: 50% 8%; }
+}
+@keyframes float-up { from { opacity: 0; transform: translateY(10px); } 30% { opacity: 1; } to { opacity: 1; transform: translateY(-8px); } }
+@keyframes light-up { 0% { box-shadow: 0 0 0 7px var(--field), 0 0 0 7px var(--glow-good); } 40% { box-shadow: 0 0 0 7px var(--field), 0 0 0 14px var(--glow-good), 0 0 30px -4px var(--glow-good); } }
+@keyframes shake { 20% { transform: translateX(-7px); } 45% { transform: translateX(6px); } 70% { transform: translateX(-3px); } 100% { transform: none; } }
+@keyframes ring { 10% { transform: rotate(16deg); } 25% { transform: rotate(-14deg); } 40% { transform: rotate(10deg); } 55% { transform: rotate(-7deg); } 70% { transform: rotate(4deg); } 100% { transform: none; } }
+
+/* ---------------- race results: the winner card + C's lanes ---------------- */
+.results { max-width: 820px; margin: 0 auto; padding-top: 12px; }
+.winner { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; padding: 26px 28px; }
+.winner .rosette { width: 116px; height: 116px; filter: drop-shadow(0 8px 24px var(--glow-accent)); }
+@media (prefers-reduced-motion: no-preference) { .winner .rosette { animation: pin 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) both 0.2s; } }
+@keyframes pin { from { transform: scale(0.6) rotate(-25deg); opacity: 0; } }
+.winner .kicker { color: var(--kicker); font-weight: 700; margin: 0; }
+.winner h1 { font: 800 clamp(2.2rem, 5vw, 3.4rem)/1 var(--display); letter-spacing: -0.03em; margin: 4px 0 8px; color: var(--heading); }
+.winner p { margin: 0; color: var(--muted); }
+.lanes { list-style: none; margin: 18px 0 24px; padding: 8px 22px; }
+.lane { display: grid; grid-template-columns: 46px 150px 1fr 70px; align-items: center; gap: 16px; min-height: 82px; border-bottom: 1px solid var(--panel-edge); }
+.lane:last-child { border-bottom: 0; }
+.lane .pos { font: 800 1.9rem/1 var(--display); text-align: center; }
+.lane .pos::after { content: ""; display: block; margin: 6px auto 0; width: 22px; height: 8px; background: var(--panel-edge); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 60%, 0 100%); }
+.lane.p1 .pos::after { background: var(--ribbon-1); } .lane.p2 .pos::after { background: var(--ribbon-2); } .lane.p3 .pos::after { background: var(--ribbon-3); }
+.lane .name b { display: block; font-weight: 700; font-size: 1.08rem; }
+.lane .name span { color: var(--muted); font-size: 0.88rem; }
+.lane.you .name b::after { content: " (you)"; color: var(--you); }
+.track { position: relative; height: 52px; }
+.track::before { content: ""; position: absolute; left: 0; right: 16px; top: 50%; border-top: 2px dashed var(--edge); opacity: 0.8; }
+.track::after { content: ""; position: absolute; right: 0; top: 4px; bottom: 4px; width: 12px; border-radius: 2px; background: repeating-linear-gradient(0deg, var(--mark) 0 6px, var(--panel-solid) 6px 12px); }
+.token { position: absolute; top: 50%; width: 48px; height: 48px; margin: -24px 0 0 -24px; border-radius: var(--r-sm); display: grid; place-items: center; background: var(--panel-solid); border: 2px solid var(--text); color: var(--text); }
+.token svg { width: 30px; height: 30px; }
+:root[data-bee="1"] .token { width: 54px; height: 54px; margin: -27px 0 0 -27px; padding: 2px; }
+:root[data-bee="1"] .token svg { width: 46px; height: 46px; }
+.lane.p1 .token { border-color: var(--accent); box-shadow: 0 0 22px -2px var(--glow-accent); }
+.lane .pts { font: 800 1.5rem/1 var(--display); text-align: right; }
+@media (prefers-reduced-motion: no-preference) { .token { animation: fly 1s var(--ease-out) both 0.25s; } .lane:nth-child(2) .token { animation-delay: 0.32s; } .lane:nth-child(3) .token { animation-delay: 0.39s; } .lane:nth-child(4) .token { animation-delay: 0.46s; } }
+@keyframes fly { from { transform: translateX(-140px); opacity: 0; } }
+.results .actions { display: flex; gap: 12px; }
+
+/* avatar sheet (comparison page) */
+.sheet { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; }
+.sheet .token { position: static; margin: 0; width: 100%; height: auto; aspect-ratio: 1; }
+.sheet .token svg { width: 70%; height: 70%; }
+
+/* ---------------- phone ---------------- */
+@media (max-width: 760px) {
+  .home { grid-template-columns: 1fr; gap: 56px; padding-top: 56px; }
+  .hero { padding: 26px 22px 26px; }
+  .hero .mascot { width: 88px; height: 88px; top: -70px; right: 12px; }
+  .hero .actions .btn { flex: 1 1 100%; }
+  .rosette-float { width: 72px; height: 72px; top: -32px; right: -4px; }
+  .round-head { grid-template-columns: auto 1fr auto; margin-bottom: 14px; }
+  .placard b { font-size: 1.3rem; }
+  .clock { font-size: 2rem; }
+  .pronouncer { padding: 20px; }
+  .answer { padding: 16px; }
+  .answer-field { font-size: 1.8rem; min-height: 68px; }
+  .winner { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+  .lanes { padding: 4px 14px; }
+  .lane { grid-template-columns: 34px 1fr 52px; grid-template-areas: "pos name pts" "track track track"; row-gap: 2px; padding: 10px 0; }
+  .lane .pos { grid-area: pos; font-size: 1.5rem; } .lane .name { grid-area: name; } .lane .pts { grid-area: pts; font-size: 1.3rem; } .lane .track { grid-area: track; }
+  .results .actions .btn { flex: 1 1 100%; }
+  .sheet { grid-template-columns: repeat(4, 1fr); }
+}

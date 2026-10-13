@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spelling Bee | Medium, word 4 of 10</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <button class="link-back"><i data-icon="arrow-left"></i>Quit</button>
+      <button class="icon-btn" aria-label="Settings"><i data-icon="settings"></i></button>
+    </header>
+
+    <main class="round">
+      <p class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+      <div class="hud">
+        <div class="score"><b class="num">58</b><small>points<br />3 in a row</small></div>
+        <div class="progress" role="img" aria-label="Word 4 of 10">
+          <i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="clock"><b class="num">09</b><small>seconds</small></div>
+      </div>
+
+      <section class="prompt" aria-label="Your word">
+        <p class="definition">“A strong, regular repeated pattern of sound”</p>
+        <button class="hear"><i data-icon="volume-2"></i>Hear it again</button>
+      </section>
+
+      <form class="answer" onsubmit="return false">
+        <label for="guess">Spell it</label>
+        <div class="big-type" id="guess" role="textbox" aria-label="Spell it">rhyt<span class="caret"></span></div>
+        <div class="fuse" aria-hidden="true"><i></i></div>
+      </form>
+
+      <div class="round-foot"><span>Medium</span><button class="skip">Skip</button></div>
+    </main>
+  </div>
+  <script src="../_shared/icons.js"></script>
+</body>
+</html>

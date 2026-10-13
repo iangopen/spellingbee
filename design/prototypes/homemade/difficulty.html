@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#16130f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#faf3e3" media="(prefers-color-scheme: light)" />
+  <title>Spelling Bee | Choose a difficulty</title>
+  <script src="params.js"></script>
+  <link rel="stylesheet" href="honeycomb.css" />
+  <link rel="stylesheet" href="fonts.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="homemade.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="link-back" href="home.html" onclick="this.href=withParams('home.html')"><i data-icon="arrow-left"></i>Modes</a>
+      <button class="icon-btn" aria-label="Settings" data-ui="Settings button edge"><i data-icon="settings"></i></button>
+    </header>
+
+    <main class="tier-select enter">
+      <section class="panel tier-head" aria-labelledby="title">
+        <h1 id="title" tabindex="-1">Spelling Bee</h1>
+        <p class="subtitle">Hear it. Spell it. Beat the clock.</p>
+        <div class="mode-toggles">
+          <button class="mode-chip" aria-pressed="false" data-ui="Practice mode chip edge"><i data-icon="timer"></i>Practice mode</button>
+          <button class="mode-chip" aria-pressed="false" data-ui="Hide definition chip edge"><i data-icon="eye-off"></i>Hide definition</button>
+        </div>
+        <p class="mode-hint" id="hint" role="status" aria-live="polite">Timed, with a definition for every word.</p>
+      </section>
+
+      <div class="tier-stack" role="group" aria-label="Difficulty">
+        <span class="tier-wrap"><button class="tier-bar" data-tier="novice"><span class="tier-bar-main"><span class="tier-label">Novice</span><span class="tier-blurb">First words, short and simple</span></span><span class="tier-best num">Best 214</span></button></span>
+        <span class="tier-wrap"><button class="tier-bar" data-tier="easy"><span class="tier-bar-main"><span class="tier-label">Easy</span><span class="tier-blurb">Common everyday words</span></span><span class="tier-best num">Best 187</span></button></span>
+        <span class="tier-wrap"><button class="tier-bar" data-tier="building"><span class="tier-bar-main"><span class="tier-label">Building</span><span class="tier-blurb">Longer, still familiar</span></span><span class="tier-best num">Best 152</span></button></span>
+        <span class="tier-wrap"><button class="tier-bar" data-tier="medium" data-go><span class="tier-bar-main"><span class="tier-label">Medium</span><span class="tier-blurb">Trickier spellings</span></span><span class="tier-best num">Best 118</span></button></span>
+        <span class="tier-wrap"><button class="tier-bar" data-tier="advanced"><span class="tier-bar-main"><span class="tier-label">Advanced</span><span class="tier-blurb">Unusual letter patterns</span></span><span class="tier-best num">Best 64</span></button></span>
+        <span class="tier-wrap"><button class="tier-bar" data-tier="hard"><span class="tier-bar-main"><span class="tier-label">Hard</span><span class="tier-blurb">Multi-syllable words</span></span><span class="tier-best num">Best 0</span></button></span>
+        <span class="tier-wrap"><button class="tier-bar" data-tier="expert"><span class="tier-bar-main"><span class="tier-label">Expert</span><span class="tier-blurb">Competition-level</span></span><span class="tier-best num">Best 0</span></button></span>
+        <span class="tier-wrap"><button class="tier-bar" data-tier="master"><span class="tier-bar-main"><span class="tier-label">Master</span><span class="tier-blurb">Championship rarities</span></span><span class="tier-best num">Best 0</span></button></span>
+      </div>
+    </main>
+  </div>
+  <script src="honeycomb.js"></script>
+  <script src="homemade.js"></script>
+  <script src="art.js"></script>
+  <script src="../_shared/icons.js"></script>
+  <script>
+    // Prototype-only behaviour, same wording as the live DifficultySelect.
+    (function () {
+      const chips = [...document.querySelectorAll(".mode-chip")], hint = document.getElementById("hint");
+      const text = () => {
+        const [u, h] = chips.map((c) => c.getAttribute("aria-pressed") === "true");
+        hint.textContent = u && h ? "No clock, and no definition: audio only." : u ? "No clock. Take as long as you like on each word." : h ? "No definition shown: spell from the audio alone." : "Timed, with a definition for every word.";
+      };
+      chips.forEach((c) => c.addEventListener("click", () => { c.setAttribute("aria-pressed", String(c.getAttribute("aria-pressed") !== "true")); text(); }));
+      document.querySelectorAll(".tier-bar").forEach((b) => b.addEventListener("click", () => { location.href = withParams("round.html"); }));
+    })();
+  </script>
+</body>
+</html>

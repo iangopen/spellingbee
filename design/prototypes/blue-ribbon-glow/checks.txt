@@ -1,0 +1,11 @@
+Source colours scanned: 52 distinct literals in 12 files. Yellow/gold/amber: 0
+Screenshot pixels scanned: 35,182,160 in 52 screenshots. Yellow/gold/amber pixels: 0
+home (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, hexagon-clipped elements in content=0, honeycomb tiles outside the background=0
+home (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, hexagon-clipped elements in content=0, honeycomb tiles outside the background=0
+round (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, hexagon-clipped elements in content=0, honeycomb tiles outside the background=0
+round (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, hexagon-clipped elements in content=0, honeycomb tiles outside the background=0
+race-results (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, hexagon-clipped elements in content=0, honeycomb tiles outside the background=0
+race-results (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, hexagon-clipped elements in content=0, honeycomb tiles outside the background=0
+avatars (dark): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, hexagon-clipped elements in content=0, honeycomb tiles outside the background=0
+avatars (light): honeycomb text=0, aria-hidden=true, pointer-events=none, focusable inside=0, hexagon-clipped elements in content=0, honeycomb tiles outside the background=0
+Answers are typed into a standard text input on the round screen; there is no letter board or letter tiles on any screen.

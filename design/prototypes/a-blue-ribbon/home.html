@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f3f5fb" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0f1322" media="(prefers-color-scheme: dark)" />
+  <title>Spelling Bee | Hear the word. Spell it right.</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <span class="brand" aria-hidden="true"><i data-mark class="mark"></i></span>
+      <button class="icon-btn" aria-label="Settings"><i data-icon="settings"></i></button>
+    </header>
+
+    <main class="home">
+      <section>
+        <h1 tabindex="-1">Spelling Bee</h1>
+        <p class="lede">Hear the word, read the definition, spell it before the bell. Play solo or against friends.</p>
+        <div class="actions">
+          <button class="btn btn-primary"><i data-icon="user"></i>Play solo</button>
+          <button class="btn btn-secondary"><i data-icon="users"></i>Play with friends</button>
+        </div>
+      </section>
+
+      <aside class="bests" aria-labelledby="bests-h">
+        <i data-mark class="rosette-float"></i>
+        <h2 id="bests-h">Your best scores</h2>
+        <p>Timed games only. Practice runs don't count.</p>
+        <ol>
+          <li><span class="tier">Novice</span><span class="score num">214</span></li>
+          <li><span class="tier">Easy</span><span class="score num">187</span></li>
+          <li><span class="tier">Building</span><span class="score num">152</span></li>
+          <li><span class="tier">Medium</span><span class="score num">118</span></li>
+          <li><span class="tier">Advanced</span><span class="score num">64</span></li>
+          <li><span class="tier">Hard</span><span class="score none">Not played yet</span></li>
+          <li><span class="tier">Expert</span><span class="score none">Not played yet</span></li>
+          <li><span class="tier">Master</span><span class="score none">Not played yet</span></li>
+        </ol>
+      </aside>
+    </main>
+  </div>
+  <script src="../_shared/icons.js"></script>
+  <script src="mark.js"></script>
+</body>
+</html>

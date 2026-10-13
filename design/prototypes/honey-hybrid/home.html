@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#16130f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#faf3e3" media="(prefers-color-scheme: light)" />
+  <title>Spelling Bee | Hear it. Spell it. Beat the clock.</title>
+  <script src="params.js"></script>
+  <link rel="stylesheet" href="honeycomb.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <span class="brand"><i data-mark></i>Spelling Bee</span>
+      <button class="icon-btn" aria-label="Settings" data-ui="Settings button edge"><i data-icon="settings"></i></button>
+    </header>
+
+    <main class="home enter">
+      <section class="panel hero" aria-labelledby="title">
+        <span class="mascot"><i data-mascot></i></span>
+        <h1 id="title" tabindex="-1">Spelling Bee</h1>
+        <p class="tagline">Hear it. Spell it. Beat the clock.</p>
+        <p class="lede">Listen to the word, read the definition, and type it before time runs out. Play solo or race your friends.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="round.html" onclick="this.href=withParams('round.html')" data-spot-rest><i data-icon="user"></i>Play solo</a>
+          <a class="btn btn-secondary" href="race-results.html" onclick="this.href=withParams('race-results.html')" data-ui="Secondary button edge"><i data-icon="users"></i>Play with friends</a>
+        </div>
+      </section>
+
+      <aside class="panel bests" aria-labelledby="bests-h">
+        <i data-mark class="rosette-float"></i>
+        <h2 id="bests-h">Your best scores</h2>
+        <p>Timed games only. Practice runs don't count.</p>
+        <ol>
+          <li data-tier="novice"><span class="tier"><i class="swatch" aria-hidden="true"></i>Novice</span><span class="score num">214</span></li>
+          <li data-tier="easy"><span class="tier"><i class="swatch" aria-hidden="true"></i>Easy</span><span class="score num">187</span></li>
+          <li data-tier="building"><span class="tier"><i class="swatch" aria-hidden="true"></i>Building</span><span class="score num">152</span></li>
+          <li data-tier="medium"><span class="tier"><i class="swatch" aria-hidden="true"></i>Medium</span><span class="score num">118</span></li>
+          <li data-tier="advanced"><span class="tier"><i class="swatch" aria-hidden="true"></i>Advanced</span><span class="score num">64</span></li>
+          <li data-tier="hard"><span class="tier"><i class="swatch" aria-hidden="true"></i>Hard</span><span class="score none">Not played yet</span></li>
+          <li data-tier="expert"><span class="tier"><i class="swatch" aria-hidden="true"></i>Expert</span><span class="score none">Not played yet</span></li>
+          <li data-tier="master"><span class="tier"><i class="swatch" aria-hidden="true"></i>Master</span><span class="score none">Not played yet</span></li>
+        </ol>
+      </aside>
+    </main>
+  </div>
+  <script src="honeycomb.js"></script>
+  <script src="art.js"></script>
+  <script src="../_shared/icons.js"></script>
+</body>
+</html>

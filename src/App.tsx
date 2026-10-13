@@ -2,9 +2,13 @@ import { useEffect, useState, type ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import "./App.css";
 import { ModeSelect } from "./components/ModeSelect";
+import { HoneycombBackground } from "./components/HoneycombBackground";
+import { withViewTransition } from "./lib/viewTransition";
+import { WobbleFilters } from "./components/ui/WobbleFilters";
 import { SettingsPanel } from "./components/SettingsPanel";
 import { DifficultySelect } from "./components/DifficultySelect";
 import { RoundScreen } from "./components/RoundScreen";
+import { RaceResults } from "./components/RaceResults";
 import { ResultsScreen } from "./components/ResultsScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
 import { WaitingRoom } from "./components/WaitingRoom";
@@ -28,6 +32,8 @@ type Mode = "single" | "multi" | null;
 function Shell({ children, onBestsReset }: { children: ReactNode; onBestsReset?: () => void }) {
   return (
     <div className="app-shell">
+      <HoneycombBackground />
+      <WobbleFilters />
       <SettingsPanel onBestsReset={onBestsReset} />
       {children}
     </div>
@@ -57,12 +63,22 @@ function App() {
         // client back to the lobby rather than trapping them in the room.
       }
     }
-    mp.resetToMenu();
-    setMpRoom(null);
+    withViewTransition(() => {
+      mp.resetToMenu();
+      setMpRoom(null);
+    });
   }
 
+  // True only for the run that beat the PREVIOUS stored best. Decided here, at the
+  // one place that compares against it, so the results screen never infers it
+  // from `score >= best` (which also fired on ties, on practice runs and on races).
+  const [beatBest, setBeatBest] = useState(false);
+
   useEffect(() => {
-    if (state.status !== "finished" || !state.tier) return;
+    if (state.status !== "finished" || !state.tier) {
+      setBeatBest(false);
+      return;
+    }
     // Practice runs don't set best scores. Scoring is `10 + timeLeft` per word
     // and untimed holds timeLeft at 0, so a practice score isn't on the same
     // scale as a timed one — recording it would let an untimed run occupy the
@@ -71,6 +87,7 @@ function App() {
     if (state.untimed) return;
     const tier = state.tier;
     if (state.score > bests[tier]) {
+      setBeatBest(true);
       setBest(tier, state.score);
       setBests((prev) => ({ ...prev, [tier]: state.score }));
     }
@@ -79,7 +96,7 @@ function App() {
   if (mode === null) {
     return (
       <Shell onBestsReset={() => setBests(getAllBests())}>
-        <ModeSelect onSingle={() => setMode("single")} onMulti={() => setMode("multi")} />
+        <ModeSelect onSingle={() => withViewTransition(() => setMode("single"))} onMulti={() => withViewTransition(() => setMode("multi"))} bests={bests} />
       </Shell>
     );
   }
@@ -90,8 +107,8 @@ function App() {
       return (
         <Shell onBestsReset={() => setBests(getAllBests())}>
           <LobbyScreen
-            onExitToModes={() => setMode(null)}
-            onEnterRoom={(room, isHost) => setMpRoom({ room, isHost })}
+            onExitToModes={() => withViewTransition(() => setMode(null))}
+            onEnterRoom={(room, isHost) => withViewTransition(() => setMpRoom({ room, isHost }))}
           />
         </Shell>
       );
@@ -142,11 +159,11 @@ function App() {
           (mp.extras.mode === "elimination" ? (
             <EliminationResults extras={mp.extras} onLeave={handleLeaveRoom} />
           ) : (
-            <ResultsScreen
-              score={mp.state.score}
-              bestStreak={mp.state.bestStreak}
-              best={mp.state.score}
-              onLeaveRoom={handleLeaveRoom}
+            <RaceResults
+              players={mp.extras.players}
+              currentUserId={mp.extras.currentUserId}
+              tier={mp.state.tier}
+              onLeave={handleLeaveRoom}
             />
           ))}
 
@@ -162,11 +179,11 @@ function App() {
     <Shell onBestsReset={() => setBests(getAllBests())}>
       {state.status === "idle" && (
         <div className="sp-home">
-          <button className="back-link" onClick={() => setMode(null)}>
+          <button className="back-link" onClick={() => withViewTransition(() => setMode(null))}>
             <ArrowLeft size={15} aria-hidden />
             Modes
           </button>
-          <DifficultySelect bests={bests} onSelect={startGame} />
+          <DifficultySelect bests={bests} onSelect={(tier, options) => withViewTransition(() => startGame(tier, options))} />
         </div>
       )}
 
@@ -178,7 +195,7 @@ function App() {
           // Singleplayer only. resetToMenu drops straight back to idle, so the
           // run is discarded rather than finished — no best score is recorded,
           // which is the point of quitting.
-          onExit={resetToMenu}
+          onExit={() => withViewTransition(resetToMenu)}
         />
       )}
 
@@ -187,17 +204,21 @@ function App() {
           score={state.score}
           bestStreak={state.bestStreak}
           best={bests[state.tier]}
+          isNewBest={beatBest && !state.untimed}
+          practice={state.untimed}
           // Replay keeps the modifiers the finished game was played with, so
           // "Play again" repeats the same game rather than silently dropping
           // back to timed-with-definition.
           onReplay={() =>
             state.tier &&
-            startGame(state.tier, {
-              untimed: state.untimed,
-              hideDefinition: state.hideDefinition,
-            })
+            withViewTransition(() =>
+              startGame(state.tier!, {
+                untimed: state.untimed,
+                hideDefinition: state.hideDefinition,
+              })
+            )
           }
-          onMenu={resetToMenu}
+          onMenu={() => withViewTransition(resetToMenu)}
         />
       )}
     </Shell>

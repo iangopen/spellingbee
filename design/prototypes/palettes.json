@@ -1,0 +1,83 @@
+{
+  "A Blue Ribbon / light": { "pairs": [
+    ["text on bg", "#141a2e", "#f3f5fb", "text"],
+    ["text on surface", "#141a2e", "#fcfdff", "text"],
+    ["muted on bg", "#4f5873", "#f3f5fb", "text"],
+    ["muted on surface", "#4f5873", "#fcfdff", "text"],
+    ["accent text on bg", "#2346d8", "#f3f5fb", "text"],
+    ["on-accent on accent (buttons)", "#fcfdff", "#2346d8", "text"],
+    ["correct text on surface", "#17734b", "#fcfdff", "text"],
+    ["incorrect text on surface", "#b8322b", "#fcfdff", "text"],
+    ["control edge (inputs) on surface", "#7a83a0", "#fcfdff", "ui"],
+    ["focus ring on bg", "#2346d8", "#f3f5fb", "ui"],
+    ["timer fill vs track", "#2346d8", "#dde2f0", "ui"],
+    ["placard number on placard", "#141a2e", "#fcfdff", "large"]
+  ]},
+  "A Blue Ribbon / dark": { "pairs": [
+    ["text on bg", "#eef1f8", "#0f1322", "text"],
+    ["text on surface", "#eef1f8", "#181e33", "text"],
+    ["muted on bg", "#a0a8c2", "#0f1322", "text"],
+    ["muted on surface", "#a0a8c2", "#181e33", "text"],
+    ["accent text on bg", "#8aa2ff", "#0f1322", "text"],
+    ["on-accent on accent (buttons)", "#0b1024", "#8aa2ff", "text"],
+    ["correct text on surface", "#55d6a0", "#181e33", "text"],
+    ["incorrect text on surface", "#ff8078", "#181e33", "text"],
+    ["control edge (inputs) on surface", "#6b7494", "#181e33", "ui"],
+    ["focus ring on bg", "#8aa2ff", "#0f1322", "ui"],
+    ["timer fill vs track", "#8aa2ff", "#262e49", "ui"]
+  ]},
+  "B Clover Field / light": { "pairs": [
+    ["text on bg", "#1c281d", "#eff3ea", "text"],
+    ["text on surface", "#1c281d", "#fafcf6", "text"],
+    ["muted on bg", "#515f4c", "#eff3ea", "text"],
+    ["muted on surface", "#515f4c", "#fafcf6", "text"],
+    ["accent text on bg", "#a3275f", "#eff3ea", "text"],
+    ["on-accent on accent (buttons)", "#fff7fb", "#a3275f", "text"],
+    ["correct text on surface", "#26703f", "#fafcf6", "text"],
+    ["incorrect text on surface", "#a8401a", "#fafcf6", "text"],
+    ["control edge (inputs) on surface", "#7d8a76", "#fafcf6", "ui"],
+    ["focus ring on bg", "#a3275f", "#eff3ea", "ui"],
+    ["timer (stem) fill vs track", "#3c7a3f", "#d9e2d2", "ui"],
+    ["label mono on surface", "#515f4c", "#fafcf6", "text"]
+  ]},
+  "B Clover Field / dark": { "pairs": [
+    ["text on bg", "#e8efe2", "#0f160f", "text"],
+    ["text on surface", "#e8efe2", "#172117", "text"],
+    ["muted on bg", "#a2b39c", "#0f160f", "text"],
+    ["muted on surface", "#a2b39c", "#172117", "text"],
+    ["accent text on bg", "#f27db3", "#0f160f", "text"],
+    ["on-accent on accent (buttons)", "#2a0b19", "#f27db3", "text"],
+    ["correct text on surface", "#7fd79a", "#172117", "text"],
+    ["incorrect text on surface", "#ff9a72", "#172117", "text"],
+    ["control edge (inputs) on surface", "#6c7d66", "#172117", "ui"],
+    ["focus ring on bg", "#f27db3", "#0f160f", "ui"],
+    ["timer (stem) fill vs track", "#7fd79a", "#26332a", "ui"]
+  ]},
+  "C Bee Line / dark": { "pairs": [
+    ["text on bg", "#f3efe4", "#0e0e0c", "text"],
+    ["text on surface", "#f3efe4", "#1b1a17", "text"],
+    ["muted on bg", "#a6a293", "#0e0e0c", "text"],
+    ["muted on surface", "#a6a293", "#1b1a17", "text"],
+    ["accent text on bg", "#ff7a2f", "#0e0e0c", "text"],
+    ["on-accent on accent (buttons)", "#160700", "#ff7a2f", "text"],
+    ["correct text on surface", "#46dd8f", "#1b1a17", "text"],
+    ["incorrect text on surface", "#ff5c86", "#1b1a17", "text"],
+    ["control edge (inputs) on surface", "#77736a", "#1b1a17", "ui"],
+    ["focus ring on bg", "#ff7a2f", "#0e0e0c", "ui"],
+    ["timer fill vs track", "#ff7a2f", "#2b2925", "ui"],
+    ["stripe cream vs stripe ink", "#f3efe4", "#0e0e0c", "ui"]
+  ]},
+  "C Bee Line / light": { "pairs": [
+    ["text on bg", "#141310", "#f2eee3", "text"],
+    ["text on surface", "#141310", "#fbf9f3", "text"],
+    ["muted on bg", "#5b574c", "#f2eee3", "text"],
+    ["muted on surface", "#5b574c", "#fbf9f3", "text"],
+    ["accent text on bg", "#b8430a", "#f2eee3", "text"],
+    ["ink on accent fill (buttons)", "#140600", "#ff7a2f", "text"],
+    ["correct text on surface", "#16703f", "#fbf9f3", "text"],
+    ["incorrect text on surface", "#b3204a", "#fbf9f3", "text"],
+    ["control edge (inputs) on surface", "#141310", "#fbf9f3", "ui"],
+    ["focus ring on bg", "#b8430a", "#f2eee3", "ui"],
+    ["timer fill vs track", "#b8430a", "#dcd6c6", "ui"]
+  ]}
+}

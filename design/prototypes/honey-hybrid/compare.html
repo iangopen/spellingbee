@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en" data-v="a" data-bg="static" data-bee="1">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Honey hybrid: compare</title>
+  <script>
+    // Choices live in the URL (?theme=&screen=), so they survive reloads.
+    (function () {
+      const u = new URLSearchParams(location.search), r = document.documentElement;
+      r.dataset.theme = u.get("theme") === "light" ? "light" : "dark";
+    })();
+  </script>
+  <link rel="stylesheet" href="honeycomb.css" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .cmp { max-width: 1480px; margin: 0 auto; padding: 24px 20px 64px; }
+    .cmp h1 { font: 800 clamp(2rem, 4vw, 3rem)/1 var(--display); letter-spacing: -0.03em; margin: 0 0 8px; color: var(--heading); }
+    .cmp h2 { font: 800 1.5rem/1.1 var(--display); margin: 0 0 6px; }
+    .cmp h3 { font: 700 1.05rem var(--display); margin: 0 0 4px; }
+    .cmp p { margin: 0 0 12px; color: var(--muted); max-width: 78ch; }
+    .cmp a { color: var(--accent); }
+    .cmp section { padding: 22px 24px; margin-top: 22px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 18px 28px; margin-top: 14px; }
+    .controls fieldset { border: 0; padding: 0; margin: 0; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .controls legend { float: left; margin-right: 8px; font-weight: 700; }
+    .controls label { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: var(--r-pill); border: 1.5px solid var(--edge); cursor: pointer; }
+    .controls input { accent-color: var(--accent-fill); width: 18px; height: 18px; }
+    .five { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 18px; margin-top: 14px; }
+    .five .cell p { font-size: 0.92rem; margin-bottom: 8px; }
+    .phones { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 18px; }
+    .phones figure { margin: 0; width: 220px; }
+    .phones figcaption { font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
+    .frame { position: relative; width: 100%; aspect-ratio: 1280 / 800; overflow: hidden; border-radius: var(--r-md); box-shadow: inset 0 0 0 1px var(--panel-edge); background: var(--bg-bottom); }
+    .frame.phone { aspect-ratio: 390 / 844; }
+    .frame iframe { position: absolute; left: 0; top: 0; width: 1280px; height: 800px; border: 0; transform-origin: 0 0; }
+    .frame.phone iframe { width: 390px; height: 844px; }
+    .frame img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+    .tag { display: inline-block; font-size: 0.8rem; font-weight: 700; padding: 2px 10px; border-radius: var(--r-pill); border: 1.5px solid var(--edge); margin-left: 6px; vertical-align: 2px; }
+    .variant { display: grid; gap: 6px; }
+    .variant ul { margin: 4px 0 8px; padding-left: 1.2em; color: var(--text); max-width: 90ch; }
+    .variant li { margin: 3px 0; }
+    .checks { padding-left: 1.2em; margin: 8px 0 0; display: grid; gap: 6px; }
+    .shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 12px; }
+    .shots a { display: block; color: var(--text); text-decoration: none; font-size: 0.8rem; overflow-wrap: anywhere; }
+    .shots img { width: 100%; height: 130px; object-fit: cover; object-position: top; border-radius: var(--r-sm); display: block; margin-bottom: 4px; }
+    .shots-group h3 { margin-top: 18px; }
+    @media (max-width: 900px) { .grid3 { grid-template-columns: 1fr; } .five { grid-template-columns: 1fr; } .phones figure { width: calc(50% - 7px); } }
+  </style>
+</head>
+<body>
+  <main class="cmp">
+    <header class="panel" style="padding: 24px">
+      <h1>Honey hybrid</h1>
+      <p>The old live design's warm honey palette and character, with the Blue Ribbon glow direction's polish. Three hybrids to choose by eye, next to plain Blue Ribbon and the old design. Every hybrid and Blue Ribbon frame is the live prototype: tab and type in it. On the round screen, type <code>rhythm</code> and press Enter for the correct moment, or anything else to ring the bell.</p>
+      <form class="controls" id="controls">
+        <fieldset><legend>Theme</legend>
+          <label><input type="radio" name="theme" value="dark" /> Dark (default)</label>
+          <label><input type="radio" name="theme" value="light" /> Light</label>
+        </fieldset>
+        <fieldset><legend>Screen</legend>
+          <label><input type="radio" name="screen" value="home" /> Home</label>
+          <label><input type="radio" name="screen" value="round" /> Round, mid-answer</label>
+          <label><input type="radio" name="screen" value="race-results" /> Race results</label>
+        </fieldset>
+      </form>
+    </header>
+
+    <section class="panel" aria-labelledby="s1">
+      <h2 id="s1">1. All five, side by side</h2>
+      <p>The same screen in each design. Use the controls above to switch the screen and theme.</p>
+      <div class="five" id="five"></div>
+      <h3 style="margin-top:20px">Phone width</h3>
+      <div class="phones" id="phones"></div>
+    </section>
+
+    <section class="panel variant" aria-labelledby="va">
+      <h2 id="va">a. Hive <span class="tag">old palette throughout</span></h2>
+      <p>The old live site's colours kept almost exactly: charcoal <code>#16130f</code> and card <code>#211c15</code> in dark, cream <code>#faf3e3</code> in light, honey <code>#e8a63d</code> as the one accent. The glow is gentle, close to the old 7% wallpaper, so it reads as the old site grown up rather than a new look.</p>
+      <ul>
+        <li>The title is in honey again, with the old tagline: "Hear it. Spell it. Beat the clock."</li>
+        <li>The old difficulty ramp (sage, olive, amber, burnt orange, honey, rust) comes back as a swatch beside each tier.</li>
+        <li>"Hear it again" is the old honey-outlined pill. Place ribbons are gold, silver and bronze.</li>
+      </ul>
+      <div class="grid3"><div class="frame" data-src="home.html" data-q="v=a"></div><div class="frame" data-src="round.html" data-q="v=a"></div><div class="frame" data-src="race-results.html" data-q="v=a"></div></div>
+    </section>
+
+    <section class="panel variant" aria-labelledby="vb">
+      <h2 id="vb">b. Honey and ribbon <span class="tag">honey leads, a little blue</span></h2>
+      <p>Honey carries everything a player acts on: buttons, focus, the field, the timer. Ribbon blue appears only on the award marks, so it reads as the prize: the rosette's ribbon and centre ring, the first-place ribbon, the winner line, the "(you)" tag and the "Your word is" cue. The glow is a step richer than a.</p>
+      <div class="grid3"><div class="frame" data-src="home.html" data-q="v=b"></div><div class="frame" data-src="round.html" data-q="v=b"></div><div class="frame" data-src="race-results.html" data-q="v=b"></div></div>
+    </section>
+
+    <section class="panel variant" aria-labelledby="vc">
+      <h2 id="vc">c. Split <span class="tag">honey glow dark, old flat light</span></h2>
+      <p>Dark takes the full Blue Ribbon glow intensity, translated to amber: a deep cocoa black with a warm bloom and bright honey cell edges. Light is the old live site as it was: flat cream, the honeycomb at low alpha across the whole page, no bloom, no vignette and no moving light. Only the UI polish is new in light.</p>
+      <div class="grid3"><div class="frame" data-src="home.html" data-q="v=c"></div><div class="frame" data-src="round.html" data-q="v=c"></div><div class="frame" data-src="race-results.html" data-q="v=c"></div></div>
+    </section>
+
+    <section class="panel" aria-labelledby="s3">
+      <h2 id="s3">2. The answer moments in each hybrid</h2>
+      <p>Correct: the field lights up green, a tick appears, the placard glows and +14 floats up. Missed: the bell rings, the field gives one short shake, the edge turns red and the word is shown.</p>
+      <div class="grid3" id="moments"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="s4">
+      <h2 id="s4">3. Checks</h2>
+      <ul class="checks">
+        <li><b>Contrast over the glow, per variant:</b> every text element, control edge (including the answer field and the other input borders) and focus ring against the worst pixel behind it, with every cell lit to the shimmer's peak, both themes, both widths, and the playing, correct and missed states. 154 pairs per variant, 0 failing: <a href="contrast-a.md">a</a>, <a href="contrast-b.md">b</a>, <a href="contrast-c.md">c</a>.</li>
+        <li><b>Reduced motion:</b> 36 of 36 stills (3 variants x 3 screens x 2 widths x 2 themes) are pixel-identical to the static background: <a href="checks.txt">checks.txt</a>.</li>
+        <li><b>Distinct from NYT:</b> 0 lemon-yellow pixels in all 102 captures (the detector flags NYT's <code>#f7da21</code> and passes the old honey), 0 flat grey filled elements, and the honeycomb is background only on every page: <a href="checks.txt">checks.txt</a>. The reasoning is in <code>design/DIRECTIONS.md</code>.</li>
+      </ul>
+    </section>
+
+    <section class="panel" aria-labelledby="s5">
+      <h2 id="s5">4. All screenshots</h2>
+      <p>Static captures from <code>design/harness/shoot-hybrid.mjs</code>: every variant's 3 screens at 2 widths and 2 themes, the answer moments, keyboard focus and the reduced-motion stills. Select one to open it full size.</p>
+      <div id="shots"></div>
+    </section>
+  </main>
+  <script src="screens/index.js"></script>
+  <script>
+    (function () {
+      const u = new URLSearchParams(location.search);
+      const theme = document.documentElement.dataset.theme;
+      const screen = ["home", "round", "race-results"].includes(u.get("screen")) ? u.get("screen") : "home";
+      const form = document.getElementById("controls");
+      form.querySelector('input[name="theme"][value="' + theme + '"]').checked = true;
+      form.querySelector('input[name="screen"][value="' + screen + '"]').checked = true;
+      form.addEventListener("change", () => {
+        const q = new URLSearchParams();
+        q.set("theme", form.querySelector('input[name="theme"]:checked').value);
+        q.set("screen", form.querySelector('input[name="screen"]:checked').value);
+        location.search = q.toString();
+      });
+
+      // The five designs. The old design is the audit's screenshots of the live
+      // app (a static image); the others are live frames.
+      const OLD = { home: "home", round: "sp-round", "race-results": "race-results" };
+      const designs = [
+        { name: "Old design (live site today)", note: screen === "race-results" ? "Screenshot from design/audit/screens. Today's race results reuse the solo results screen (a known audit finding)." : "Screenshot from design/audit/screens.", img: (w) => `../../audit/screens/${OLD[screen]}--${w}--${theme}.png` },
+        { name: "Blue Ribbon (approved)", note: "Plain Blue Ribbon glow: shimmer, bee.", src: `../blue-ribbon-glow/${screen}.html`, q: "bg=shimmer&bee=1" },
+        { name: "a. Hive", note: "The old palette throughout, gentle glow.", src: `${screen}.html`, q: "v=a" },
+        { name: "b. Honey and ribbon", note: "Honey leads, ribbon blue on the award marks.", src: `${screen}.html`, q: "v=b" },
+        { name: "c. Split", note: "Honey glow in dark, the old flat palette in light.", src: `${screen}.html`, q: "v=c" },
+      ];
+      const frameHtml = (d, phone) => d.img
+        ? `<div class="frame${phone ? " phone" : ""}"><img src="${d.img(phone ? "phone" : "desktop")}" alt="${d.name}, ${screen}, ${theme}" /></div>`
+        : `<div class="frame${phone ? " phone" : ""}" data-src="${d.src}" data-q="${d.q}"></div>`;
+      document.getElementById("five").innerHTML = designs.map((d) => `<div class="cell"><h3>${d.name}</h3><p>${d.note}</p>${frameHtml(d, false)}</div>`).join("");
+      document.getElementById("phones").innerHTML = designs.map((d) => `<figure><figcaption>${d.name}</figcaption>${frameHtml(d, true)}</figure>`).join("");
+      document.getElementById("moments").innerHTML = ["a", "b", "c"].map((v) =>
+        `<div class="cell"><h3>${v}: correct</h3><div class="frame" data-src="round.html" data-q="v=${v}&state=correct"></div><h3 style="margin-top:10px">${v}: missed</h3><div class="frame" data-src="round.html" data-q="v=${v}&state=incorrect"></div></div>`).join("");
+
+      // Live frames: each iframe is the real prototype, scaled to fit its box.
+      const fit = new ResizeObserver((entries) => entries.forEach((e) => {
+        const fr = e.target.querySelector("iframe");
+        const base = e.target.classList.contains("phone") ? 390 : 1280;
+        if (fr) fr.style.transform = "scale(" + e.contentRect.width / base + ")";
+      }));
+      document.querySelectorAll(".frame[data-src]").forEach((f) => {
+        const q = new URLSearchParams(f.dataset.q);
+        q.set("theme", theme);
+        const fr = document.createElement("iframe");
+        fr.loading = "lazy";
+        fr.title = f.dataset.src.replace(".html", "") + " " + f.dataset.q;
+        fr.src = f.dataset.src + "?" + q.toString();
+        f.append(fr);
+        fit.observe(f);
+      });
+
+      // Screenshot gallery, grouped by variant (the list is written by shoot-hybrid.mjs).
+      const all = window.SCREENS || [];
+      document.getElementById("shots").innerHTML = ["a", "b", "c"].map((v) =>
+        `<div class="shots-group"><h3>Variant ${v}</h3><div class="shots">` +
+        all.filter((n) => n.startsWith(v + "--")).map((n) => '<a href="screens/' + n + '.jpg"><img loading="lazy" src="screens/' + n + '.jpg" alt="" />' + n + "</a>").join("") +
+        "</div></div>").join("");
+    })();
+  </script>
+  <script src="honeycomb.js"></script>
+</body>
+</html>

@@ -1,15 +1,3 @@
-import {
-  Bug,
-  Clover,
-  Crown,
-  Droplet,
-  Feather,
-  Flower2,
-  Hexagon,
-  Zap,
-  type LucideIcon,
-} from "lucide-react";
-
 // The avatar preset set — the ONE place the client writes this list down.
 //
 // It mirrors `public.avatar_keys()` from migration 0012, which the
@@ -25,9 +13,9 @@ import {
 // discipline as Session 15's tier de-duplication — one list, and a check that
 // nothing has drifted from it.
 //
-// Icons are flat lucide glyphs, matching Session 12's visual language (no
-// emoji, no photos, no uploads). Each is a bee-yard object so the set reads as
-// one family rather than eight unrelated pictograms.
+// The art for each key is drawn in lib/beeArt.ts (bee contestants, redesign
+// stage 3): no emoji, no photos, no uploads. This file stays the one list of KEYS
+// and labels, so the coupling to the database CHECK has a single home.
 
 export type AvatarKey =
   | "bee"
@@ -54,15 +42,15 @@ export const AVATAR_KEYS: readonly AvatarKey[] = [
 /** Matches the column default in 0012, so an un-picked avatar agrees with the DB. */
 export const DEFAULT_AVATAR: AvatarKey = "bee";
 
-export const AVATAR_META: Record<AvatarKey, { label: string; Icon: LucideIcon }> = {
-  bee: { label: "Bee", Icon: Bug },
-  queen: { label: "Queen", Icon: Crown },
-  drone: { label: "Drone", Icon: Feather },
-  hive: { label: "Hive", Icon: Hexagon },
-  honey: { label: "Honey", Icon: Droplet },
-  blossom: { label: "Blossom", Icon: Flower2 },
-  clover: { label: "Clover", Icon: Clover },
-  wasp: { label: "Wasp", Icon: Zap },
+export const AVATAR_META: Record<AvatarKey, { label: string }> = {
+  bee: { label: "Bee" },
+  queen: { label: "Queen" },
+  drone: { label: "Drone" },
+  hive: { label: "Hive" },
+  honey: { label: "Honey" },
+  blossom: { label: "Blossom" },
+  clover: { label: "Clover" },
+  wasp: { label: "Wasp" },
 };
 
 export const AVATARS = AVATAR_KEYS.map((id) => ({ id, ...AVATAR_META[id] }));
