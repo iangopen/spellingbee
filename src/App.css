@@ -1222,3 +1222,25 @@
 }
 @keyframes vt-fade-out { to { opacity: 0; } }
 @keyframes vt-rise { from { opacity: 0; transform: translateY(10px); } }
+
+/* ?debug=speech only (SpeechDebug, loaded lazily). A plain panel pinned to the
+   bottom so the round stays usable above it. */
+.speech-debug {
+  position: fixed; left: 8px; right: 8px; bottom: 8px; z-index: 30; padding: 10px; max-width: 720px; margin: 0 auto;
+}
+.speech-debug-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; color: var(--text); }
+.speech-debug-log {
+  width: 100%; box-sizing: border-box; border: 1.5px solid var(--edge); border-radius: var(--hm-r-field);
+  background: var(--field); color: var(--text); font: 400 0.72rem/1.35 ui-monospace, Consolas, monospace; white-space: pre; resize: vertical;
+}
+/* Room under the last row of the page, so nothing has to sit beneath the panel. */
+.app-shell.has-speech-debug { padding-bottom: 260px; }
+/* Phone width: three log lines and a slim header, so the panel stays clear of the
+   answer field and Skip (scroll the log; Copy takes all of it). */
+@media (max-width: 600px) {
+  .speech-debug { padding: 6px 8px; }
+  .speech-debug-head { margin-bottom: 4px; gap: 6px; }
+  .speech-debug-head .btn { min-height: 36px; }
+  .speech-debug-log { height: calc(3 * 1.35 * 0.72rem + 8px); resize: none; }
+  .app-shell.has-speech-debug { padding-bottom: 150px; }
+}

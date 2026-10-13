@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useState, type ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import "./App.css";
 import { ModeSelect } from "./components/ModeSelect";
@@ -26,17 +26,27 @@ import { leaveRoom, type RoomInfo } from "./lib/rooms";
 // finished states are unchanged.
 type Mode = "single" | "multi" | null;
 
+// ?debug=speech shows the speech log (SpeechDebug). Lazy, so the normal page never
+// downloads it; decided once per load from the address.
+const SpeechDebug = lazy(() => import("./components/SpeechDebug"));
+const speechDebug = new URLSearchParams(window.location.search).get("debug") === "speech";
+
 // Presentational wrapper around what used to be a bare <div className="app-shell">.
 // It exists so the settings panel is mounted once for every screen — mode select,
 // lobby, waiting room, round and results — instead of being pasted into each of
 // App's four return branches and drifting apart later.
 function Shell({ children, onBestsReset }: { children: ReactNode; onBestsReset?: () => void }) {
   return (
-    <div className="app-shell">
+    <div className={`app-shell${speechDebug ? " has-speech-debug" : ""}`}>
       <HoneycombBackground />
       <WobbleFilters />
       <SettingsPanel onBestsReset={onBestsReset} />
       {children}
+      {speechDebug && (
+        <Suspense fallback={null}>
+          <SpeechDebug />
+        </Suspense>
+      )}
     </div>
   );
 }
