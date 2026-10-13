@@ -1,11 +1,17 @@
 // Runs every browser check against the finished app and prints one table, so "all the
 // browser checks pass" is a single command, with how many scripts ran against how many exist.
 //
-//   PW_MODULE=<playwright/index.mjs> node design/harness/run-checks.mjs
+//   PW_MODULE=<playwright/index.mjs> [SB_APP_PORT=4273] [SB_HARNESS_PORT=5199] node design/harness/run-checks.mjs
 //
 // It builds the app AND the harness, serves both as static production builds with
-// `vite preview` on 127.0.0.1 (the app on :4173, the harness, i.e. the real screens with
+// `vite preview` on 127.0.0.1 (the app on :4273, the harness, i.e. the real screens with
 // mocked state, on :5199), runs each script, and stops both servers.
+//
+// Ports (2026-10-13). The app used to be on 4173, vite preview's default, which other
+// projects on this laptop also use for their previews. Both ports are now set by SB_APP_PORT
+// and SB_HARNESS_PORT, the app's default is the less common 4273, and each port is checked by
+// binding it before anything starts: a port that is merely bound by another project (whose
+// server answers 404 at our path) used to slip past the old "is it already answering" test.
 //
 // Why static builds on 127.0.0.1 (2026-10-07). One batch run had two scripts crash with only
 // "Node.js v24.14.1" to show for it. Found by loading one screen repeatedly: the harness DEV
@@ -23,6 +29,7 @@
 import { spawn, spawnSync } from "node:child_process";
 import { createWriteStream, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
 import http from "node:http";
+import net from "node:net";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -35,8 +42,10 @@ const run = (cmd, args, env = {}) => spawnSync(cmd, args, { encoding: "utf8", sh
 const last = (s, n = 1) => s.trim().split("\n").slice(-n).join(" | ");
 const firstError = (s) => s.split("\n").find((l) => /(^|\s)(FAIL|Error|error:|Timeout|net::ERR_)/.test(l))?.trim();
 
-const APP = "http://127.0.0.1:4173/spellingbee/";
-const HARNESS = "http://127.0.0.1:5199/";
+const APP_PORT = Number(process.env.SB_APP_PORT ?? 4273);
+const HARNESS_PORT = Number(process.env.SB_HARNESS_PORT ?? 5199);
+const APP = `http://127.0.0.1:${APP_PORT}/spellingbee/`;
+const HARNESS = `http://127.0.0.1:${HARNESS_PORT}/`;
 // Relative to the harness config's `root` (design/harness). Not an absolute path: with
 // `shell: true` on Windows an argument is split at spaces, and this repo lives under
 // "github projects", so an absolute --outDir became two arguments and the build failed.
@@ -54,7 +63,21 @@ function answers(url) {
     req.on("error", () => done(false));
   });
 }
-for (const url of [APP, HARNESS]) if (await answers(url)) { console.error(`${url} is already being served by something else; stop it first (this script starts its own servers).`); process.exit(2); }
+// Free means we can bind it ourselves, right now, on the address vite preview will use.
+function portFree(port) {
+  return new Promise((done) => {
+    const probe = net.createServer();
+    probe.once("error", () => done(false));
+    probe.once("listening", () => probe.close(() => done(true)));
+    probe.listen(port, "127.0.0.1");
+  });
+}
+for (const [name, port, envVar] of [["app", APP_PORT, "SB_APP_PORT"], ["harness", HARNESS_PORT, "SB_HARNESS_PORT"]]) {
+  if (!(await portFree(port))) {
+    console.error(`port ${port} (the ${name} preview) is already in use, probably by another project's preview. Stop it, or pick another port with ${envVar}=<port>. Nothing was built or started.`);
+    process.exit(2);
+  }
+}
 
 console.log("building the app and the harness...");
 const build = run("npm", ["run", "build"]);
@@ -72,8 +95,8 @@ function serve(name, args) {
   return s;
 }
 const servers = [
-  serve("app", ["vite", "preview", "--host", "127.0.0.1", "--port", "4173", "--strictPort"]),
-  serve("harness", ["vite", "preview", "--config", "design/harness/vite.config.ts", "--outDir", HARNESS_DIST, "--host", "127.0.0.1", "--port", "5199", "--strictPort"]),
+  serve("app", ["vite", "preview", "--host", "127.0.0.1", "--port", String(APP_PORT), "--strictPort"]),
+  serve("harness", ["vite", "preview", "--config", "design/harness/vite.config.ts", "--outDir", HARNESS_DIST, "--host", "127.0.0.1", "--port", String(HARNESS_PORT), "--strictPort"]),
 ];
 let stopped = false;
 const stop = () => { if (stopped) return; stopped = true; for (const s of servers) { if (win) spawnSync("taskkill", ["/pid", String(s.pid), "/T", "/F"]); else s.kill(); } };

@@ -15,10 +15,10 @@
 // Real phone SPEECH cannot be tested here: emulation changes the viewport and input, not
 // the speech engine (this uses a fake one to learn the word).
 //
-//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:4173/spellingbee/] [SHOTS=<dir>] node design/harness/check-touch-autosubmit.mjs
+//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:4273/spellingbee/] [SHOTS=<dir>] node design/harness/check-touch-autosubmit.mjs
 import { pathToFileURL } from "node:url";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
-const APP = process.env.APP_URL ?? "http://127.0.0.1:4173/spellingbee/";
+const APP = process.env.APP_URL ?? `http://127.0.0.1:${process.env.SB_APP_PORT ?? 4273}/spellingbee/`;
 const SHOTS = process.env.SHOTS;
 const TOUCH_QUERY = "(pointer: coarse) and (hover: none)";
 

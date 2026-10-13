@@ -16,11 +16,11 @@
 //   lib/tts.ts unlockSpeech, for iOS). It is checked on its own and left out of the
 //   word counts below, which are about the announcements.
 //
-//   npm run build && npx vite preview --port 4173      (in another terminal)
-//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:4173/spellingbee/] node design/harness/check-real-app.mjs
+//   npm run build && npx vite preview --host 127.0.0.1 --port 4273      (in another terminal)
+//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:4273/spellingbee/] node design/harness/check-real-app.mjs
 import { pathToFileURL } from "node:url";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
-const APP = process.env.APP_URL ?? "http://127.0.0.1:4173/spellingbee/";
+const APP = process.env.APP_URL ?? `http://127.0.0.1:${process.env.SB_APP_PORT ?? 4273}/spellingbee/`;
 const ORIGIN = new URL(APP).origin;
 
 const b = await chromium.launch();

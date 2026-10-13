@@ -5,11 +5,11 @@
 // order shows up as text, then asserts the important facts.
 // Multiplayer is not entered: it would sign a guest in on the live Supabase project.
 //
-//   npm run build && npx vite preview --port 4173
-//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:4173/spellingbee/] node design/harness/keyboard-real-app.mjs
+//   npm run build && npx vite preview --host 127.0.0.1 --port 4273
+//   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:4273/spellingbee/] node design/harness/keyboard-real-app.mjs
 import { pathToFileURL } from "node:url";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
-const APP = process.env.APP_URL ?? "http://127.0.0.1:4173/spellingbee/";
+const APP = process.env.APP_URL ?? `http://127.0.0.1:${process.env.SB_APP_PORT ?? 4273}/spellingbee/`;
 const b = await chromium.launch();
 const p = await (await b.newContext({ viewport: { width: 1000, height: 900 } })).newPage();
 const errors = [];
