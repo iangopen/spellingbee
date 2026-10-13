@@ -10,6 +10,18 @@ No code and no migrations were written. Every statement about current behaviour 
 comes from. Paths without a branch are on `main`; paths marked *(redesign)* are on
 `redesign/spelling-bee` and were read with `git show`, not checked out.
 
+**Updated 2026-10-13 (Ian's decisions, docs only).** The redesign (2026-10-12) and the phone
+singleplayer fixes (2026-10-13) are live on `main`, so *(redesign)* paths are now on `main` too.
+- **Hourglass is the first mode to build** (D37). The build plan (§8) is reordered: the timing
+  core first, then Hourglass, then the real-player tuning, then the rest. Stage numbers throughout
+  this spec are the new ones; §8 ends with the old-to-new table.
+- **Avatars: 8 bee colours and 8 cosmetics** (D17, changed from 8 colours and 10 hats), chosen with
+  skribbl-style arrow pickers. The art and the two candidate cosmetic sets are prototyped on branch
+  `design/avatar-maker` (`design/prototypes/avatar-maker/`); **Ian's pick is pending**, and §2 takes
+  the picked lists when he chooses.
+- **Display precision** has its own decision row (D38): what changes if the charges are shown more
+  finely than 0.1 s, or the 200 ms dead band goes.
+
 The three new modes get original names:
 
 | # | Ian's idea | Name | One line |
@@ -181,16 +193,25 @@ is the redesign's own bee *(redesign)* `beeArt.ts`, drawn for this project.
 ```
             ┌─────────────┐
             │   (bee in   │
-            │  top hat)   │
+            │   a crown)  │
             └─────────────┘
-   [ ◀ ]    Colour: Plum  (5 of 8)    [ ▶ ]
-   [ ◀ ]    Hat: Top hat  (6 of 10)   [ ▶ ]
-            [ Surprise me ]
-     "Plum bee in a top hat"
+   [ ◀ ]    Colour: Blue  (3 of 8)       [ ▶ ]
+   [ ◀ ]    Cosmetic: Crown  (4 of 8)    [ ▶ ]
+            [ Surprise me ]   Name [______]
+     "Blue bee wearing a crown"
 ```
 
 The old 8-choice radiogroup and its distinct bee types (wasp body, big-eyed drone) are removed.
-Every avatar is the same bee, customised by **colour** and **hat**.
+Every avatar is the same bee, customised by **colour** and **cosmetic** (Ian, 2026-10-13: 8 of
+each; the 2026-10-04 draft said hats, 10 of them). A cosmetic is anything worn or held: a hat,
+glasses, a scarf, a pencil.
+
+**Prototype (2026-10-13, pick pending):** branch `design/avatar-maker`,
+`design/prototypes/avatar-maker/index.html` (opens from disk). It draws the bees with `beeArt.ts`'s
+own jittered blobs, seeded like the mascot, so colour 0 with no cosmetic IS the mascot, unchanged.
+It offers **two cosmetic sets** for Ian to pick from, one playful and one spelling-themed, the
+8-colour list chosen for colour-blind separation, the 64-combination contrast table, and the
+mapping from the legacy keys. When Ian picks, the lists below are replaced by the picked ones.
 
 ### 2.2 Data model
 
@@ -199,23 +220,24 @@ Two small integers per player, both indexes into fixed lists:
 | Column (`room_players`) | Type | Default | Range |
 |---|---|---|---|
 | `avatar_color` | `smallint not null` | 0 (Honey) | 0 to `colors − 1` |
-| `avatar_hat` | `smallint not null` | 0 (No hat) | 0 to `hats − 1` |
+| `avatar_cosmetic` | `smallint not null` | 0 (none) | 0 to `cosmetics − 1` |
 
 There is one definition, an immutable SQL function in the shape of `avatar_keys()`:
 
 ```sql
 create function public.avatar_options() returns jsonb language sql immutable
-as $$ select jsonb_build_object('colors', 8, 'hats', 10) $$;
+as $$ select jsonb_build_object('colors', 8, 'cosmetics', 8) $$;
 ```
 
 The CHECKs read it:
-`check (avatar_color between 0 and (avatar_options()->>'colors')::int - 1)` and the same for hats.
+`check (avatar_color between 0 and (avatar_options()->>'colors')::int - 1)` and the same for cosmetics.
 
 **Indexes are append-only.** A value is never reordered or reused. A retired item stays in the
 list and is drawn as a fallback, so a stored index always means the same thing. That is the price
 of ints over keys. It buys a compact row, trivial CHECKs and arrow arithmetic with no lookup.
 
-Starting lists (names are spoken, see §2.5):
+Starting lists from the 2026-10-04 draft, **superseded** by the prototype's lists once Ian picks
+(names are spoken, see §2.5). Kept here only so the history reads:
 
 | # | Colour (token pair, both palettes) | Hat |
 |---|---|---|
@@ -235,19 +257,21 @@ Starting lists (names are spoken, see §2.5):
 - Each body colour must reach **3:1 against `--bee-line`** (the outline) in both themes, so the
   shape reads.
 - Colour is never the only way to tell players apart, because every avatar sits next to a name.
-- Hats are new fixed path data in `beeArt.ts` (the same hand-placed style, no runtime jitter),
-  drawn to sit above the head inside the existing `12 4 76 90` viewBox. The two flower-and-clover
-  style accessories that exist today are redrawn as hats 3 and 8, so no art is lost.
-- `avatarSvg(color, hat)` replaces `avatarSvg(key)`. It is still memoised, and still a string built
-  only from constants.
+- Cosmetics are drawn in `beeArt.ts`'s own style (2026-10-13; the draft predates the redesign's
+  return to jittered blobs): round parts are `blobPath` blobs, the rest is fixed path data, all
+  inside the existing `12 4 76 90` viewBox, tokens only. Every maker bee uses the mascot's seed
+  (`hash("bee")`), so the body outline is the mascot's and colour 0 with no cosmetic is the mascot
+  exactly; `ui.test.tsx`'s digests pin both.
+- `avatarSvg(color, cosmetic)` replaces `avatarSvg(key)`. It is still memoised, and still a string
+  built only from constants.
 
 ### 2.3 Server-side validation
 
 - **Range:** enforced by the two CHECKs above. There is no edge function: avatars aren't a game rule
   (the same reasoning as `rooms.ts:210-224`).
 - **Column grants (new migration):**
-  - `grant insert (room_id, player_id, display_name, avatar, avatar_color, avatar_hat)`
-  - `grant update (display_name, avatar, avatar_color, avatar_hat)`
+  - `grant insert (room_id, player_id, display_name, avatar, avatar_color, avatar_cosmetic)`
+  - `grant update (display_name, avatar, avatar_color, avatar_cosmetic)`
 
   Both are revoked and re-granted, never widened table-wide. This touches the 0016 rule "never widen
   these grants". The two columns are cosmetic, like `avatar`, and the change is flagged in
@@ -256,7 +280,7 @@ Starting lists (names are spoken, see §2.5):
   columns.
 - `avatar_options()` is revoked from `public` and `anon` and granted to `authenticated`. The
   `grants.test.mjs` list becomes 14 names.
-- **Client copy:** `src/lib/avatars.ts` exports `AVATAR_COLORS` and `AVATAR_HATS` (name lists).
+- **Client copy:** `src/lib/avatars.ts` exports `AVATAR_COLORS` and `AVATAR_COSMETICS` (name lists).
   `test:db` reads those array lengths and fails if they differ from `avatar_options()`, the same
   pattern as `PLAYER_CAP` (`rooms.ts:55-59`). `coerceAvatarPart(n, max)` falls back to 0 for an
   unknown index, like `coerceAvatar`.
@@ -268,7 +292,10 @@ the new columns. The plan:
 
 1. **Migration A (additive):**
    - Add both columns with defaults.
-   - Backfill them from the existing `avatar` key with a fixed mapping:
+   - Backfill them from the existing `avatar` key with a fixed mapping. **The table below is the
+     2026-10-04 draft's and is superseded:** the prototype proposes the mapping for each candidate
+     cosmetic set (`design/prototypes/avatar-maker/README.md` on `design/avatar-maker`), and the
+     picked set's mapping replaces it. The mechanism (backfill, sync trigger, "parts win") stands.
 
      | old key | colour | hat |
      |---|---|---|
@@ -285,7 +312,7 @@ the new columns. The plan:
      - If the row's `avatar` changed and the parts did NOT (an old client), derive the parts from
        the mapping.
      - If the parts changed and `avatar` did not (a new client), derive `avatar` as the nearest
-       legacy key: hat Paper crown → `queen`, Flower → `blossom`, Headphones → `drone`, Beanie →
+       legacy key (draft lists): hat Paper crown → `queen`, Flower → `blossom`, Headphones → `drone`, Beanie →
        `hive`; else colour Slate → `wasp`, Amber → `honey`; else `bee`.
      - If both changed, the parts win.
 
@@ -304,7 +331,7 @@ the new columns. The plan:
    This doesn't block anything.
 
 **localStorage:**
-- New keys `spellingbee:avatar:color` and `spellingbee:avatar:hat`.
+- New keys `spellingbee:avatar:color` and `spellingbee:avatar:cosmetic`.
 - On the first read, when they are missing, they are derived from the legacy `spellingbee:avatar`
   key with the same mapping.
 - The legacy key is left in place (harmless, and rollback-friendly).
@@ -316,16 +343,18 @@ Structure (one `AvatarMaker` component, used in the lobby and the waiting room):
 
 - `<fieldset>` with `<legend>` "Your bee".
 - Per row: `<div role="group" aria-labelledby="row-label">` containing:
-  - `<button aria-label="Previous colour">` (lucide `ChevronLeft`, aria-hidden)
-  - `<span id="row-label">Colour</span>`, then a value `<span>` "Plum, 5 of 8"
-  - `<button aria-label="Next colour">`
-- A "Surprise me" `<Button>` (random colour and hat, never the current pair).
+  - `<button aria-label="Previous bee colour, 3 of 8">` (lucide `ChevronLeft`, aria-hidden); the
+    name carries the current position so a screen reader hears where it is
+  - `<span id="row-label">Colour</span>`, then a value `<span>` "Blue, 3 of 8"
+  - `<button aria-label="Next bee colour, 3 of 8">`
+- A "Surprise me" `<Button>` (random colour and cosmetic, never the current pair), and the name
+  field next to it.
 
 Keys:
 
 | Key | Effect |
 |---|---|
-| Tab / Shift+Tab | Moves through: Colour prev, Colour next, Hat prev, Hat next, Surprise me. Every control is a real button. |
+| Tab / Shift+Tab | Moves through: Colour prev, Colour next, Cosmetic prev, Cosmetic next, Surprise me, Name. Every control is a real button. |
 | Enter / Space on an arrow | Steps one item. Wraps at both ends (8 → 1, 1 → 8), as skribbl does. |
 | ← / → while either button in a row has focus | Same as prev/next, so a keyboard player can sit on one button and arrow through. Focus does NOT move. |
 | Home / End in a row | First or last item |
@@ -336,23 +365,24 @@ There is deliberately no ↑/↓ binding, so a row never traps vertical page scr
   is measured with `elementFromPoint` anyway, per the redesign rule.
 - **Focus ring:** the one `ui.css` focus rule; never a per-component outline.
 
-**Spoken description:** one function, `describeAvatar(color, hat)` in `lib/avatars.ts`:
-- "Plum bee in a top hat", "Honey bee" (no hat), "Sky bee with headphones".
-- Per-hat preposition table, so the phrases read naturally.
+**Spoken description:** one function, `describeAvatar(color, cosmetic)` in `lib/avatars.ts`:
+- "Blue bee wearing a crown", "Honey bee" (no cosmetic), "Teal bee holding a pencil".
+- A per-cosmetic phrase table ("wearing a crown", "holding a pencil"), so the phrases read
+  naturally.
 
 Where it is used:
 - **Preview:** a polite live region under the preview carries the description. It changes once per
   step: one short phrase per key press, never per animation frame.
-- **Waiting-room roster:** "Sam, host, plum bee in a top hat" (the avatar art stays `aria-hidden`).
+- **Waiting-room roster:** "Sam, host, blue bee wearing a crown" (the avatar art stays `aria-hidden`).
 - **In-game tokens and lanes:** name only. The description isn't repeated every turn.
 - **`AvatarBadge` `title`:** the description, replacing the old key label.
 
-**Motion:** a hat change may do a 150 ms hop. Its resting state is the drawn avatar, so the global
+**Motion:** a cosmetic change may do a 150 ms hop. Its resting state is the drawn avatar, so the global
 reduced-motion block removes it with no information lost.
 
 **Where it lives:**
 - The lobby's "You" panel, replacing `AvatarPicker`.
-- The waiting room, replacing `AvatarPicker` (it writes through `updateAvatar(roomId, {color, hat})`,
+- The waiting room, replacing `AvatarPicker` (it writes through `updateAvatar(roomId, {color, cosmetic})`,
   optimistic as today, *(redesign)* `WaitingRoom.tsx`).
 - Not in-game: the picker would steal focus from play.
 
@@ -416,7 +446,7 @@ feedback window, then advances, exactly as Race does today.
 |---|---|
 | Two correct answers with the same adjusted time | The earlier `round_attempts.created_at` wins. Resolution runs once, inside `close_round_tx` under the room lock, with the `ended_at IS NULL` conditional update (the `0006:304-320` pattern), so exactly one winner is recorded however many clients and sweepers ask. |
 | Second correct answer arrives inside the 250 ms settle window with a bigger latency credit | It can win: the comparison is on adjusted time. That is the purpose of the window. |
-| A correct answer that would have won on adjusted time arrives after the window (for example a cold-landed answer with a boot credit, §4.5.4) | The round stands as awarded and is never re-awarded. The late row is marked `settled_late` for the stage 7 measurement. |
+| A correct answer that would have won on adjusted time arrives after the window (for example a cold-landed answer with a boot credit, §4.5.4) | The round stands as awarded and is never re-awarded. The late row is marked `settled_late` for the stage 12 measurement. |
 | Correct but below the human floor (§4.4) | Refused as `too_fast` **before** the word is compared, so it reveals nothing. The attempt is NOT used up; the player may resubmit. |
 | Wrong answer | Attempt used. "Not quite — wait for the next word." The word is not revealed until the round ends (the hardening #13 rule in `announce.ts`). |
 | Nobody answers before the deadline | Void round. It uses up a regular slot; in sudden death it repeats. |
@@ -447,6 +477,10 @@ feedback window, then advances, exactly as Race does today.
 
 ### 3.2 Hourglass (mode `hourglass`)
 
+**The first mode to build (Ian, 2026-10-13, D37).** In one sentence: each round, every player
+loses the gap between their time and the fastest correct time from their stock of seconds, and the
+stock is their lives: run out and you are out.
+
 **Rules**
 1. Everyone starts with a bank of **10.0 s** (`hourglass_params().start_bank_ms = 10000`).
 2. Each round, every standing player gets the same word at the same reveal and has one attempt.
@@ -457,7 +491,7 @@ feedback window, then advances, exactly as Race does today.
    - correct at time t: `t − F` (the fastest pays 0);
    - wrong, missing or timed out: `min(L − F, miss_cap)`, where L is the round limit and
      `miss_cap` is **4.0 s** (decided by Ian on 2026-10-04 in place of "the full round time", to be
-     tuned with real players in stage 12; D7).
+     tuned with real players in stage 7; D7).
    - Then the fairness rounding from §4.7 is applied: differences under the **dead band (200 ms)**
      are charged 0, and every charge is rounded to the nearest **100 ms**.
 5. **If nobody answers correctly, nobody is charged** (Ian's rule). The round is void.
@@ -578,7 +612,8 @@ expected error is under 20 ms. One sample is what ships today (`serverClock.ts:3
 | Random lead-in per client (`tts.ts:344-348`) | up to ~0.5 s | **Removed.** Timed modes speak the word only, at the reveal. The lead-in is shown as text during the countdown. |
 | `useAnnouncedWord`'s 200 ms paint delay (`useAnnouncedWord.ts:40`) | 200 ms, the same everywhere | Removed for scheduled reveals: the word renders before the reveal, so audio starts at the reveal instant. |
 | Speech rate setting, 0.5 to 1.4 (`tts.ts:16-18`) | ~0.1 to 0.4 s on one word | **Kept** (D11). It is an accessibility setting, open to everyone, and the definition is on screen from the reveal, so typing can start before the audio ends. |
-| Voice engine start-up (local vs cloud voices) | ~0 to 0.5 s, device dependent | **Not compensated** (see §4.6). Measured in the Dash real-player test (stage 7). The Settings voice list may later mark local voices "best for timed modes". |
+| Voice engine start-up (local vs cloud voices) | ~0 to 0.5 s, device dependent | **Not compensated** (see §4.6). Measured in the first real-player test (stage 7, Hourglass). The Settings voice list may later mark local voices "best for timed modes". |
+| iOS drops a first `speak()` that isn't inside a tap (found 2026-10-13 on `main`; singleplayer fixed with `unlockSpeech()`) | the whole word, on an iPhone that never tapped "start" | **Unlocked at each player's own join or ready tap** (stage 2), before any timed mode ships. |
 | `cancel()` settle (`tts.ts:255-283`) | 0 or 60 ms | Nothing is speaking at a reveal (the countdown is silent), so the 0 ms path is taken. |
 
 ### 4.4 Who measures elapsed time, and the bounds
@@ -628,7 +663,7 @@ What changes in the spec:
 - **Use the query parameter,** not the header. `callEdge` (`src/lib/rooms.ts:286-322`) calls `fetch`
   directly, and a new custom header would need adding to the functions' CORS allow-list. A query
   parameter needs no CORS change. Preflights aren't billed in any case (Supabase usage docs).
-- **The project's region** is read once from the dashboard (Project Settings → General) in stage 6
+- **The project's region** is read once from the dashboard (Project Settings → General) in stage 4
   and stored as `VITE_SUPABASE_FN_REGION`. That isn't a secret; it is like the URL.
 - If a future plan change ever removed pinning, the fallback is to **turn the latency credit off**
   (cap 0, one constant). Answers are then still stamped at edge entry, which is option B alone, and
@@ -717,7 +752,7 @@ so it needs no pinning. §4.5.1 has the arithmetic.
    - `credit = min(median / 2, CAP)`, with **CAP = 70 ms** (re-picked from 100 in the fourth pass:
      the budget below gained two rows it had been missing).
    - Plus, for an answer that landed on a freshly booted worker, the **boot credit** of §4.5.4
-     (the server-measured boot, at most 500 ms), only if stage 6 validates the measurement.
+     (the server-measured boot, at most 500 ms), only if stage 4 validates the measurement.
    - **With fewer than 3 samples, the credit is 0.**
    - No client value is involved anywhere: the submit request is unchanged
      (`{room_id, round_num, guess}`).
@@ -765,7 +800,7 @@ The table now has a column per case. "Warm" assumes the two fixes in §4.5.4: th
 | Edge stamp jitter and edge-vs-DB clock skew, one pinned region | 10 | 10 | 10 | Different machines, NTP-synced. Stage 7 measures it as the spread of `commit_lag_ms` (§4.5.4). |
 | Path difference, echo route vs answer route | 10 | 10 | 10 | §4.5.3: the echo's extra PostgREST and commit time. It runs the credit slightly high, the same way for everyone. |
 | **CORS preflight (new)** | **0** | 0 | 0 | Removed by `Access-Control-Max-Age` plus the warm-up priming the cache (§4.5.4). Without the fix: one full extra round trip, 20–400 ms. |
-| **Worker boot before the stamp (new)** | **0** | ≤ 20 (measurement error, the stage 6 acceptance limit) | 42 avg / 86 P95 / **460 P99** | Supabase's published boot times (§4.5.4) |
+| **Worker boot before the stamp (new)** | **0** | ≤ 20 (measurement error, the stage 4 acceptance limit) | 42 avg / 86 P95 / **460 P99** | Supabase's published boot times (§4.5.4) |
 | **Total** | **170** | **190** | 212 / 256 / **630** | |
 | **Dead band** | **200** (margin 30) | **200** (margin 10) | **exceeded** | |
 
@@ -782,7 +817,7 @@ margin needs `CAP + 100 ≤ 200 − 30`, so **CAP ≤ 70**.
 worker. Covering the P99 boot would mean ignoring gaps of 0.6 s in every Hourglass round, to absorb
 an event that hits a small share of answers. Instead:
 - the warm-up makes cold landings rare;
-- the boot credit, if stage 6 validates it, removes most of the cost when one happens anyway;
+- the boot credit, if stage 4 validates it, removes most of the cost when one happens anyway;
 - stage 7 measures how often it happens.
 
 If the boot measurement fails validation, a cold-landed answer keeps its boot time. That is
@@ -921,7 +956,7 @@ exactly as it would without §4.5 (the server-stamped, scheduled-reveal timing o
 - `private.runtime_flags (key text primary key, value jsonb, updated_at timestamptz)` is created by
   the migration with its starting rows: `echo_enabled` true, `live_feed` true,
   `feed_budget_msgs_per_s` 40 (§5.3), `multiplayer_open` true, and (fourth pass) `warmup_enabled`
-  true and `boot_credit` false (switched on only after stage 6 validates the boot measurement,
+  true and `boot_credit` false (switched on only after stage 4 validates the boot measurement,
   §4.5.4).
 - Only SQL reads it. Clients never do, and anon and `authenticated` get 42501 on it.
 - Ian flips a flag with one statement in the dashboard's SQL editor:
@@ -1042,12 +1077,12 @@ more than twice the dead band.
 - An idle function boots on its first call.
 - How requests are spread across workers is not documented. The architecture page says both that
   "Isolates can remain active for a period … to handle subsequent requests" and that "A new V8
-  isolate is spun up for each invocation". Stage 6 measures which is true (the `edge_cold` rate
+  isolate is spun up for each invocation". Stage 4 measures which is true (the `edge_cold` rate
   below).
 
 **The fix, in four parts.**
 
-1. **Cache the preflight** (stage 1, because it also fixes today's race and Elimination). Add
+1. **Cache the preflight** (**done:** live on `main` since `64f65f3`, 2026-10-04, because it also fixed today's race and Elimination). Add
    `Access-Control-Max-Age: 7200` to `corsHeaders` (`_shared/mod.ts:20-24`).
    - MDN documents the caps: Chromium 76+ at 2 h, Firefox at 24 h, and the default without the
      header is 5 s. Safari's cap isn't documented there; part 2 covers it, because a warm-up
@@ -1076,18 +1111,18 @@ more than twice the dead band.
      that is about `(2.6 s + answer time) / 150 s`, roughly 5% for a 5 s answer. That is why part 3
      exists.
 
-3. **Detect a cold landing on the server, and credit the boot** (stage 6).
+3. **Detect a cold landing on the server, and credit the boot** (stage 4).
    - `submit-round` keeps a module-level counter. Module state lives for one worker, so the
      worker's first request is reliably `edge_cold = true`.
    - On that request it also takes `edge_boot_ms = Date.now() − performance.timeOrigin` at handler
-     entry. This assumes the runtime sets its time origin when the worker starts, which stage 6
+     entry. This assumes the runtime sets its time origin when the worker starts, which stage 4
      verifies.
    - Both go to SQL as parameters from the edge code, never from the client. They are stored on the
      player's `round_scores` row.
    - **Boot credit**, if `runtime_flags.boot_credit` is true: on a cold request only, the adjusted
      time also subtracts `min(edge_boot_ms, 500)`. 500 covers the published P99 of 460 ms. It is
      part of the adjusted time, so it is compared with the human floor too.
-   - **Validation, before it is switched on** (stage 6):
+   - **Validation, before it is switched on** (stage 4):
      - force at least 20 cold boots (deploy, or wait out 150 s idle);
      - compare each `edge_boot_ms` with the boot time in that worker's `booted` event (Dashboard →
        Edge Functions → Logs, per Supabase's "Edge Function takes too long to respond" guide);
@@ -1122,9 +1157,9 @@ more than twice the dead band.
     minute (60 / 3.3 = 18.2), so §4.5.1's echo limits are unchanged.
 - **A cold-landed B** whose boot credit would have won, but which arrives after the window, loses
   the round. The round is never re-awarded (one winner, the conditional update), and B's row is
-  marked `settled_late` for stage 7. This is a documented residual, not a silent one.
+  marked `settled_late` for stage 12. This is a documented residual, not a silent one.
 - **Optional, engineering:** checking the JWT inside the edge function with the project's signing
-  keys, instead of the Auth round trip, would shrink the lag. Stage 6 may measure it; this spec
+  keys, instead of the Auth round trip, would shrink the lag. Stage 4 may measure it; this spec
   doesn't require it.
 
 #### 4.5.5 Flood exposure of the database echo (added 2026-10-04, fourth pass)
@@ -1151,7 +1186,7 @@ protects.
   - An anon token is refused by Postgres at the permission check, which still takes a transaction.
 - **On the way out:** about 200 B of egress.
 - **Size:** of the order of a millisecond or a few of database time and pool-connection time per
-  call. This is an estimate, not a measurement. Stage 6's concurrency package measures it.
+  call. This is an estimate, not a measurement. Stage 4's concurrency package measures it.
 
 **A fix found in this pass: the limit check's lock must not wait.**
 - `lock_for` is `pg_advisory_xact_lock` (`0019:79-85`), which **blocks** until the lock is free.
@@ -1216,10 +1251,10 @@ protects.
 | Edge auth plus edge→DB | Counted | **Removed** (stamp at entry, pinned region) |
 | Upload latency, player → edge | Counted | **Credited up to 70 ms** by server-measured echoes (§4.5). Beyond that, still counted. |
 | CORS preflight before the answer (§1.6 item 5) | Counted on most answers: one extra round trip | **Removed** (`Access-Control-Max-Age`, plus the warm-up priming the cache, §4.5.4) |
-| Cold worker boot | Counted (and today the cold worker's new connections to Auth and PostgREST too) | **Made rare** by the warm-up; **credited** (server-measured, at most 500 ms) if stage 6 validates the measurement; recorded either way (§4.5.4) |
+| Cold worker boot | Counted (and today the cold worker's new connections to Auth and PostgREST too) | **Made rare** by the warm-up; **credited** (server-measured, at most 500 ms) if stage 4 validates the measurement; recorded either way (§4.5.4) |
 | Token refresh before sending | Possible on any answer | **Removed:** refreshed in the pre-start window (§4.5.4) |
 | Clock-sync error | One sample | 5-sample min-RTT, under 20 ms typical |
-| Voice start-up | Counted | Still counted. Measured in stage 7 (Dash test); the Hourglass dead band absorbs small cases. |
+| Voice start-up | Counted | Still counted. Measured in stage 7 (the Hourglass test); the Hourglass dead band absorbs small cases. |
 
 ### 4.7 Hourglass subtracts small differences: how it stays fair
 
@@ -1237,7 +1272,7 @@ Hourglass is the mode where 0.1 s matters, because charges add up. Five rules:
 5. **Miss cap:** a miss costs at most `miss_cap` (4 s), so one network hiccup that turns into a
    timeout can't end your game on its own (D7).
 
-These are all `hourglass_params()` tunables. The Hourglass real-player test (stage 12) logs the
+These are all `hourglass_params()` tunables. The Hourglass real-player test (stage 7) logs the
 distribution of `t − F` and of `credit_ms` between players on different devices (server-side, in
 `round_scores`). It then tunes `miss_cap` and confirms the 200 ms band before Hourglass leaves its
 feature flag.
@@ -1253,7 +1288,7 @@ arrival can have the lower adjusted time.
   with the conditional-update pattern from `0006:304-320`.
 - The cost is 250 ms of extra wait before the feedback appears, inside the existing 1.1 s window.
 - An answer that would have won but arrives after the window doesn't re-award the round. It is
-  marked `settled_late` and counted in stage 7.
+  marked `settled_late` and counted in stage 12.
 - The residual (voice start-up, delay beyond the cap) decides only genuinely close rounds. That is
   documented, not hidden (D12).
 
@@ -1422,7 +1457,7 @@ their streak is already 0, so an 8-player round produces about 88 delivered mess
 second**. Two big rooms changing round in the same second can already approach 100 today, before any
 feed. **Rule for the new engines:** update only rows whose values actually change
 (`… and streak <> 0`). That brings an 8-player Dash round transition to about 4 changes × 8 = 32
-messages. Stage 6 measures it.
+messages. Stage 11 measures it.
 
 **2. Manual: the runtime flag, no deploy.**
 - `update private.runtime_flags set value = 'false' where key = 'live_feed';` stops new rooms
@@ -1439,7 +1474,7 @@ messages. Stage 6 measures it.
 Until then, step 2 has already stopped every honest client.
 
 - If real use grows, move to Pro (500/s) or raise the throttle to 400 ms (20/s at N = 8).
-- The Spotlight test (stage 10) reads the actual counts from the Supabase dashboard's Realtime usage
+- The Spotlight test (stage 15) reads the actual counts from the Supabase dashboard's Realtime usage
   report rather than trusting these estimates.
 ### 5.4 Screen readers
 
@@ -1466,7 +1501,7 @@ Add under **Multiplayer**:
 
 > In Spotlight, what you type on your turn is shown live to the other players in your room as you type it, including mistakes you then delete. It travels through Supabase Realtime and is not stored. Your final answer is stored like any other guess.
 
-**And, in the Dash commit (stage 6/7), because the echo stores network timings briefly:**
+**And, in the timing-core commit (stage 4), because the echo stores network timings briefly:**
 
 > In Dash and Hourglass, the game measures how long a message takes to reach the server and back before each word, so a slower connection isn't penalised. These measurements are linked to your guest ID and deleted within 10 minutes.
 
@@ -1498,10 +1533,10 @@ Also bump "Last checked against the code". Nothing else changes:
 | # | Name | Contents | Compatible with the deployed client because |
 |---|---|---|---|
 | — | `word_start` (stage 3) | Race: `start_game_tx` and `advance_round_tx` set `round_started_at = now() + preroll_ms`, and `submit_answer_tx` refuses an answer before it (`round_not_started`), so a negative elapsed can never score. Elimination: the opening turn also gets the preroll (later turns already start in the future, `0012:856-867`). `preroll_ms()` constant (1500), revoked from anon. | The client from stage 3 shows "Get ready" for a future start. It ships **before** this migration, so a client never meets a future start it can't display. The old client would merely show a full, still bar for 1.5 s. |
-| — | `echo_credit` (stage 6) | `public.echo(p_room_id)` RPC (granted to `authenticated` only, SECURITY DEFINER, `search_path` pinned); `private.echo_samples` and `private.echo_quota`; `purge_echo_samples()` plus a 10-minute cron job (expired quota rows go in the existing daily job); the credit is computed **inside** the submit transactions (median of samples, in an exception block that falls back to 0); `round_scores.credit_ms`; `timing_params()` gains `latency_cap_ms` (**70**, fourth pass), `echo_min_samples` (3), `boot_credit_cap_ms` (500) and `settle_window_ms` (**250**); `abuse_limits()` gains the five echo limits (§4.5.1) and `max_games_started_per_host_per_day` (**30**, fourth pass); `private.runtime_flags` with its six starting rows (§4.5.2); the non-waiting `try_lock_for(kind, id)` helper the echo uses (§4.5.5), revoked from every client role like `lock_for`; `rooms.feed_on boolean not null default false`. `purge_anonymous_users` adds `echo_samples.player_id` and `echo_quota.player_id` to its checks. | New objects only. `rooms.feed_on` has a default and isn't in the client INSERT grant (`0017`). |
+| — | `echo_credit` (stage 4) | `public.echo(p_room_id)` RPC (granted to `authenticated` only, SECURITY DEFINER, `search_path` pinned); `private.echo_samples` and `private.echo_quota`; `purge_echo_samples()` plus a 10-minute cron job (expired quota rows go in the existing daily job); the credit is computed **inside** the submit transactions (median of samples, in an exception block that falls back to 0); `round_scores.credit_ms`; `timing_params()` gains `latency_cap_ms` (**70**, fourth pass), `echo_min_samples` (3), `boot_credit_cap_ms` (500) and `settle_window_ms` (**250**); `abuse_limits()` gains the five echo limits (§4.5.1) and `max_games_started_per_host_per_day` (**30**, fourth pass); `private.runtime_flags` with its six starting rows (§4.5.2); the non-waiting `try_lock_for(kind, id)` helper the echo uses (§4.5.5), revoked from every client role like `lock_for`; `rooms.feed_on boolean not null default false`. `purge_anonymous_users` adds `echo_samples.player_id` and `echo_quota.player_id` to its checks. | New objects only. `rooms.feed_on` has a default and isn't in the client INSERT grant (`0017`). |
 | 0021 | `avatar_parts` | `avatar_options()`; `room_players.avatar_color` and `avatar_hat` plus CHECKs; backfill from `avatar`; the legacy sync trigger (§2.4); column grants re-issued with the two columns | The old client names only legacy columns; the trigger fills the parts. |
 | 0022 | `mode_schema` | Widen the `rooms.mode` CHECK to add `dash`, `hourglass` and `spotlight`. Add `room_players.round_wins int not null default 0`, `time_bank_ms int` (null until start) and `contending boolean not null default true`. Add `rooms.phase text` (`regular` / `sudden_death`, null otherwise). Add the `round_scores` table. Add `dash_params()`, `hourglass_params()`, `spotlight_params()` and `timing_params()`. **Extend the 0016 backstop trigger** to reject client rows with non-default `round_wins`, `time_bank_ms` or `contending`. | Purely additive. The old client never creates the new modes (its lobby offers Race and Elimination only), and the column grants are unchanged, so it cannot set the new columns. |
-| 0023 | `timing_core` | `p_received_at` overloads of the submit functions; `floor_ms()`; the `too_fast` path; nothing for `timeout-turn`: `timeout_turn_tx` already takes an optional caller and is already granted to `service_role` (`0012:1052-1057,1152-1157`), so stage 1 needs no migration. The old signatures stay until the old edge functions are redeployed. | The old edge functions call the old signatures, which are unchanged. |
+| 0023 | `timing_core` | `p_received_at` overloads of the submit functions; `floor_ms()`; the `too_fast` path; nothing for `timeout-turn`: `timeout_turn_tx` already takes an optional caller and is already granted to `service_role` (`0012:1052-1057,1152-1157`), so stage 8 needs no migration. The old signatures stay until the old edge functions are redeployed. | The old edge functions call the old signatures, which are unchanged. |
 | 0024 | `dash_engine` | `start_dash_tx`, `submit_dash_tx`, `close_round_tx` (the single resolution path for Dash rounds: winner bookkeeping, end checks, sudden death), `sweep_expired_dash_rounds()` plus a 5 s cron job | New functions only. Mode-guarded. |
 | 0025 | `hourglass_engine` | `start_hourglass_tx`, `submit_hourglass_tx`, `close_hourglass_round_tx` (charges, knockouts, end), a sweeper and its cron job | Same |
 | 0026 | `spotlight_engine` | `spotlight_round_seconds()`. `apply_turn_outcome` gets **one** call-site change: the next turn's length comes from `next_turn_seconds(room, remaining, streak)`, which returns `decayed_round_seconds` for `elimination` (unchanged) and `spotlight_round_seconds` for `spotlight`. The 0012 mode guards widen to `mode in ('elimination','spotlight')`. `sweep_expired_turns` widens its `mode = 'elimination'` filter the same way. | Elimination's behaviour is byte-identical: `test:db` replays 0012's decay table against the new path. |
@@ -1509,8 +1544,10 @@ Also bump "Last checked against the code". Nothing else changes:
 
 **Migration numbers** follow the order in which stages ship (§8, revised 2026-10-04). The table is in
 topic order, and the numbers in it are from the first draft. The real sequence will be:
-`word_start`, `avatar_parts`, `mode_schema` + `timing_core` + `echo_credit` + `dash_engine`,
-`spotlight_engine` + `typing_channel`, (`hourglass_engine`), then `retire_old_modes`. Each takes the
+`word_start`, `mode_schema` (Hourglass's part) + `timing_core` + `echo_credit`, `hourglass_engine`,
+`avatar_parts`, `dash_engine` (with Dash's columns from `mode_schema`: `round_wins`, `contending`,
+`rooms.phase`, `dash_params()`), `spotlight_engine` + `typing_channel`, then `retire_old_modes`
+(order revised 2026-10-13, D37). Each takes the
 next free number when its stage is built.
 
 **Why the engines are separate functions and not branches:** Dash and Hourglass both resolve a
@@ -1545,13 +1582,13 @@ number, so a branch at that one number is the smaller change.
 
 | Function | Calls | Notes |
 |---|---|---|
-| `timeout-turn` (stage 1) | `timeout_turn_tx(room, round, caller)` | Closes the known Elimination gap and serves Spotlight. Any member may nudge; SQL re-derives the deadline. |
+| `timeout-turn` (stage 8) | `timeout_turn_tx(room, round, caller)` | Closes the known Elimination gap and serves Spotlight. Any member may nudge; SQL re-derives the deadline. |
 | `start-match` | `start_dash_tx` / `start_hourglass_tx` / `start_elimination_game_tx` | Routes on the room's mode **inside SQL** (`start_match_tx`), so the edge function stays auth plus HTTP. |
 | `submit-round` | `submit_dash_tx` / `submit_hourglass_tx` | Stamps `received_at` as the first line of the handler. Fourth pass (§4.5.4): passes the worker's `edge_cold` flag and `edge_boot_ms` to SQL; answers a `{"warm": true}` body with 204 after the token check, without calling the database. |
 | `close-round` | `close_round_tx` / `close_hourglass_round_tx` | The client fast path, like `advance-round`. |
 | `submit-turn` (existing) | redeployed to pass `p_received_at` | |
 | (no `echo` edge function) | — | **Deliberately not an edge function** (third pass, §4.5): every edge invocation is billed even when rejected, so a public echo there would let any guest spend the monthly quota. The echo is the `public.echo()` database RPC. |
-| `submit-round` (stage 6) | as above | Sends nothing new. The credit is computed in SQL from the stored samples. |
+| `submit-round` (stage 4) | as above | Sends nothing new. The credit is computed in SQL from the stored samples. |
 
 Every one returns only `{ok:false, error:"internal_error"}` on a 500 (hardening #17,
 `_shared/mod.ts`).
@@ -1865,7 +1902,7 @@ Engine extras arrive through `MultiplayerExtras`; `GameState` / `GameEngineApi` 
   - all 8 avatar colours in both themes.
 - **The merge gate stays 0 failing pairs.**
 - `unused-selectors.mjs` and `unused-tokens.mjs` stay at 0.
-- `check-reduced-motion.mjs` covers the countdown, the feed caret, bank bars and the hat hop.
+- `check-reduced-motion.mjs` covers the countdown, the feed caret, bank bars and the cosmetic hop.
 
 **Network:** the redesign's "no off-origin request" check is unchanged for singleplayer.
 Multiplayer adds no host: Broadcast uses the same Supabase Realtime socket.
@@ -1881,44 +1918,80 @@ New modes stay behind a client flag (`?modes=next`, read once) until their UI st
 The flag hides UI only. The server accepts a new mode as soon as its engine migration is applied,
 which is safe because the engine is complete and mode-guarded.
 
-**Revised 2026-10-04 (Ian's review).** The fixes that stand alone come first, then avatars, then
-Dash, then Spotlight. Hourglass is last and **optional**, and the old-mode cleanup closes the
-project.
+**Revised 2026-10-13 (Ian): Hourglass is the first mode to build** (D37). It was last and
+optional. Hourglass charges every player the gap between their time and the fastest correct time,
+round after round, and those gaps are tenths of a second, so it cannot ship before the whole timing
+core does. Dash and Spotlight follow it. The Elimination fast path and the avatars don't depend on
+the timing core and could move earlier without changing anything else; they sit after Hourglass so
+the first mode isn't held up. The real-player tuning stays **after** Hourglass is built (stage 7).
+The 2026-10-04 order and its numbers are in the table at the end of this section; every stage
+number elsewhere in this spec uses the new numbers.
+
+**What must come before Hourglass, and why:**
+
+| Piece | Stage | Without it |
+|---|---|---|
+| **Multi-sample clock sync** (5 `server_now()` samples, min RTT, re-sync every 10 rounds) | 1 | A reveal shared across devices is only as good as the clocks that agree on it. One sample (today) can be off by half a round trip, which a player then pays as charge. |
+| **Unlocking speech at each player's own join or ready tap** | 2 | iOS drops a first `speak()` that isn't inside a tap. In multiplayer the word is spoken at a server-chosen moment and the players other than the host never tapped "start", so an iPhone player may not hear the word at all and pays a miss (CLAUDE.md on `main`, open item since 2026-10-13). |
+| **The word start that doesn't depend on the device** (scheduled reveal, "Get ready", word only) | 3 | Each player's zero is when their own device heard about the round, so download latency and the spoken lead-in become charge (§4.2, §4.3, §4.7 rule 1). |
+| **The echo and the latency credit** (server-measured, capped at 70 ms), with edge stamps and region pinning | 4 | A slower connection pays its upload latency every round, and in Hourglass that adds up (§4.4, §4.5). |
+| **The warm-ups** (and the cold-start handling: `edge_cold`, the boot measurement and its validation) | 4 | A cold worker can add up to about 0.5 s to one player's answer, two and a half dead bands, at random (§4.5.4). |
+
+Stage 4 also carries what Hourglass can't run without: the `rooms.mode` CHECK gains `hourglass`
+(only; `dash` and `spotlight` are added by their own engine stages), `room_players.time_bank_ms`,
+`round_scores`, `timing_params()` / `hourglass_params()`, the human floor, and the `start-match`,
+`submit-round` and `close-round` edge functions routing Hourglass only.
 
 | # | Stage | Sessions | Ships | Who tests |
 |---|---|---|---|---|
-| 0 | **Merge the redesign** (Ian) | 0 | the redesign | (already listed in CLAUDE.md) |
-| | ***Fixes that stand alone (they improve today's Race and Elimination)*** | | | |
-| 1 | **Elimination timeout fast path:** a `timeout-turn` edge function plus the client nudge in `useMultiplayerGame` (replacing the early return at `:604-625`). No migration: `timeout_turn_tx` already takes an optional caller (`0012:1052-1057`). **Also** `Access-Control-Max-Age: 7200` in `_shared/mod.ts`'s CORS headers, redeploying every function (§1.6 item 5, §4.5.4 part 1). | 1 | expired turns end in ~150 ms instead of up to ~5 s; race answers stop paying a preflight round trip | Ian alone, two browsers (Chrome + Edge are two guest identities): let a turn expire and watch it advance. |
-| 2 | **Multi-sample clock sync:** 5 `server_now()` samples, keep the min-RTT one, re-sync every 10 rounds (`serverClock.ts` only). Done **before** stage 3, which depends on it: a word start shared across devices is only as good as the clocks that agree on it. | 0.5 | a steadier countdown | Unit tests only |
+| 0 | **Merge the redesign** (Ian) | 0 | the redesign | Done 2026-10-12 |
+| | ***Timing core (everything Hourglass needs)*** | | | |
+| 1 | **Multi-sample clock sync:** 5 `server_now()` samples, keep the min-RTT one, re-sync every 10 rounds (`serverClock.ts` only). Done **before** stage 3, which depends on it. | 0.5 | a steadier countdown | Unit tests only |
+| 2 | **Speech unlock in multiplayer:** `unlockSpeech()` (already on `main` for singleplayer) called synchronously inside each player's own taps: Create room, Join room, the host's Start, and a "Ready" button in the waiting room for a player who arrived without a tap (a reload). Client only. | 0.5 | race and elimination words heard on iPhones that never tapped "start" | Ian with an iPhone and a desktop browser: join from the iPhone, the first word is heard |
 | 3 | **Word start that doesn't depend on the device:** the `word_start` migration (scheduled reveal for Race and Elimination's opening turn), the "Get ready" countdown, a word-only announcement at the reveal, and no spoken lead-in in multiplayer. The speech-rate setting stays. **Ship the client before the migration** (§6.2). | 2 | every player hears the word at the same server moment | Ian alone, two browsers side by side (one on a slow voice, one fast): the word starts together. |
-| | ***Avatars*** | | | |
-| 4 | `avatar_parts` migration: schema, sync trigger, backfill, rollback, plus the §6.5 range and no-game-state tests | 1 | nothing visible | test:db |
-| 5 | Avatar maker UI, hats art, 8 colour tokens, localStorage migration, contrast gate at 0, keyboard pass | 2 | the new picker | Ian: a taste check on screenshots plus a keyboard pass |
+| 4 | **Timing core (server):** `mode_schema` (Hourglass's part, above), `timing_core`, `echo_credit` migrations; the `start-match`, `submit-round` and `close-round` edge functions; the `echo` database RPC with its limits and the runtime flags (§4.5.1–4.5.2); region pinning (`forceFunctionRegion`); edge stamps; human floor; test:db plus concurrency. The warm-up handling, the `edge_cold` / `edge_boot_ms` / `commit_lag_ms` columns, the non-waiting `try_lock_for`, and the **boot-measurement validation** of §4.5.4 part 3 (20+ forced cold boots against the dashboard's `booted` events; `boot_credit` is switched on only if every one is within 20 ms). It also records how often a request lands cold over 20 back-to-back calls, which settles whether workers are reused at all. | 3 | nothing visible | Tests, plus Ian alone for the boot validation (a deploy, then waits of over 150 s) |
+| | ***Hourglass*** | | | |
+| 5 | `hourglass_engine` migration (`start_hourglass_tx`, `submit_hourglass_tx`, `close_hourglass_round_tx`, sweeper and cron job) plus tests, including the guaranteed survivor (§3.2 rule 8) | 2 | nothing visible | Tests only |
+| 6 | **Hourglass UI behind `?modes=next`:** Get ready, bank bars, the charge line per player, `HourglassResults`, `keyboard-hourglass.mjs`, the contrast and reduced-motion gates; the `?diag=1` answer-time panel for stage 7 | 2 | Hourglass (flagged) | Ian alone, two browsers |
+| 7 | **Real-player tuning:** the answer-time error measurement below; **tune `miss_cap` (4 s to start), confirm the 200 ms band and the 70 ms cap**, and settle the warm-up rule; then Hourglass appears in the lobby next to Race and Elimination | 1, plus the playtest | **Hourglass live** | **Real players, essential:** 3+ people on mixed devices, at least one phone on mobile data and one iPhone. Do the charges feel fair? |
+| | **⏸ Stopping point A: Hourglass live**, next to Race and Elimination (D1 still holds: Dash later replaces Race and Spotlight replaces Elimination). | | | |
+| | ***Stand-alone fix and avatars*** | | | |
+| 8 | **Elimination timeout fast path:** a `timeout-turn` edge function plus the client nudge in `useMultiplayerGame` (replacing the early return at `:604-625`). No migration: `timeout_turn_tx` already takes an optional caller (`0012:1052-1057`). The CORS half of the old stage 1 (`Access-Control-Max-Age: 7200`) is **already live** (`64f65f3`, 2026-10-04). | 0.5 | expired turns end in ~150 ms instead of up to ~5 s | Ian alone, two browsers (Chrome + Edge are two guest identities): let a turn expire and watch it advance. |
+| 9 | `avatar_parts` migration: schema, sync trigger, backfill, rollback, plus the §6.5 range and no-game-state tests | 1 | nothing visible | test:db |
+| 10 | Avatar maker UI from the picked prototype (`design/avatar-maker`), cosmetics art, 8 colour tokens, localStorage migration, contrast gate at 0, keyboard pass | 2 | the new picker | Ian: a taste check (the prototype is it) plus a keyboard pass |
 | | ***Dash*** | | | |
-| 6 | **Dash engine plus timing core:** `mode_schema`, `timing_core`, `echo_credit` and `dash_engine` migrations; the `start-match`, `submit-round` and `close-round` edge functions; the `echo` database RPC with its limits and the runtime flags (§4.5.1–4.5.2); feed admission columns; region pinning (`forceFunctionRegion`); edge stamps; human floor; Dash sweeper; test:db plus concurrency. **Fourth pass:** the warm-up handling, the `edge_cold` / `edge_boot_ms` / `commit_lag_ms` columns, the non-waiting `try_lock_for`, and the **boot-measurement validation** of §4.5.4 part 3 (20+ forced cold boots against the dashboard's `booted` events; `boot_credit` is switched on only if every one is within 20 ms). It also records how often a request lands cold over 20 back-to-back calls, which settles whether workers are reused at all. | 3 | nothing visible | Tests, plus Ian alone for the boot validation (a deploy, then waits of over 150 s) |
-| 7 | Dash UI behind `?modes=next`: Get ready, pips, sudden death, `DashResults`; **the answer-time error measurement below** | 2 | Dash (flagged) | **Real players:** 3–4 people, at least one phone on mobile data. Log `credit_ms`, `t − F` and voice start-up per device, **plus answer-time error, cold and warm (below)**. |
-| 8 | Dash replaces Race in the lobby (flag off for Dash) | 0.5 | Dash live | — |
-| | **⏸ Stopping point A: a good game.** Dash for everyone, plus Elimination (with the fast timeout) and the avatar maker. Nothing below is needed for the site to be complete. | | | |
+| 11 | **Dash engine on the timing core:** `dash_engine` migration (adds `dash` to the mode CHECK, `round_wins`, `contending`, `rooms.phase`, `dash_params()`), `close_round_tx` with the 250 ms settle window, sudden death, Dash sweeper; `start-match` / `submit-round` / `close-round` route Dash; test:db plus concurrency | 1.5 | nothing visible | Tests only |
+| 12 | Dash UI behind `?modes=next`: pips, sudden death, `DashResults`; a Dash playtest for what only Dash uses (`commit_lag_ms` against the settle window, `settled_late`) | 2 | Dash (flagged) | **Real players:** 3–4 people, at least one phone on mobile data |
+| 13 | Dash replaces Race in the lobby (flag off for Dash) | 0.5 | Dash live | — |
+| | **⏸ Stopping point B: Hourglass and Dash live**, with the new avatars and the fast Elimination timeout. | | | |
 | | ***Spotlight*** | | | |
-| 9 | `spotlight_engine` plus `typing_channel` migrations and tests | 2 | nothing visible | Tests only |
-| 10 | Spotlight UI plus the live feed, **PRIVACY.md in the same commit**; then Spotlight replaces Elimination in the lobby | 2.5 | Spotlight live | **Ian with NVDA** (checklist below) **and real players:** 3+ people. Read the Realtime peak messages per second in the dashboard. |
-| | **⏸ Stopping point B: the full game Ian described, minus the optional mode.** Dash and Spotlight live, with the new avatars. Skip to stage 13 if Hourglass isn't wanted. | | | |
-| | ***Hourglass (optional)*** | | | |
-| 11 | `hourglass_engine` migration plus tests | 2 | nothing visible | Tests only |
-| 12 | Hourglass UI behind the flag; **tune `miss_cap` (4 s to start) and confirm the 200 ms band** from logged `t − F` and `credit_ms`; then switch it on | 2 | Hourglass live | **Real players, essential:** 3+ people on mixed devices. Do the charges feel fair? |
+| 14 | `spotlight_engine` plus `typing_channel` migrations and tests | 2 | nothing visible | Tests only |
+| 15 | Spotlight UI plus the live feed, **PRIVACY.md in the same commit**; then Spotlight replaces Elimination in the lobby | 2.5 | Spotlight live | **Ian with NVDA** (checklist below) **and real players:** 3+ people. Read the Realtime peak messages per second in the dashboard. |
 | | ***Cleanup*** | | | |
-| 13 | **Old-mode removal**, at least 30 days after stage 10, so retention has deleted every Race/Elimination room and every cached old bundle has reloaded. Details below. | 1.5 | cleanup | test:db (rollback), and Ian's quick smoke test of both live modes |
+| 16 | **Old-mode removal**, at least 30 days after stage 15, so retention has deleted every Race/Elimination room and every cached old bundle has reloaded. Details below. | 1.5 | cleanup | test:db (rollback), and Ian's quick smoke test of the live modes |
 
-**Sessions:**
-- to stopping point A: 1 + 0.5 + 2 + 1 + 2 + 3 + 2 + 0.5 = **12**;
-- to stopping point B: 12 + 2 + 2.5 = **16.5**;
-- with Hourglass: 16.5 + 4 = **20.5**;
-- with the cleanup: **about 18 without Hourglass, about 22 with it**.
+**Sessions, honestly:**
+- **To Hourglass live (stopping point A): 0.5 + 0.5 + 2 + 3 + 2 + 2 + 1 = 11 sessions, and
+  realistically 11 to 15.**
+  - Stage 4 is the biggest and least certain piece. None of the fourth-pass timing work has been
+    built, and two of its measurements can change the plan rather than just pass: if the boot
+    measurement fails validation, `boot_credit` stays off (a decision, not more work); if workers
+    turn out never to be reused, the warm-up rule has to be rethought (§4.5.4). Allow up to 4.5.
+  - Stage 7 needs 3+ real people on mixed devices at one time. That is calendar time, not
+    sessions. If the answer-time spread misses its 130 ms target, the cap is lowered and the
+    playtest repeated: about 1 more session and a second playtest.
+  - The 2026-10-04 plan had Hourglass at 4 sessions because Dash had already paid for the timing
+    core. Moving Hourglass first moves that timing work (stages 1–4, 6 sessions) in front of it,
+    and adds the speech unlock (0.5) and an explicit tuning session (1).
+- To stopping point B: 11 + 0.5 + 1 + 2 + 1.5 + 2 + 0.5 = **18.5**.
+- With Spotlight and the cleanup: 18.5 + 2 + 2.5 + 1.5 = **about 24.5** (it was about 22). The
+  difference: +0.5 speech unlock, +1 tuning session, +1.5 for a Dash engine stage of its own (the
+  old 3-session "Dash engine plus timing core" was optimistic for both), −0.5 because the CORS
+  cache is already live.
 
-**Stage 7: measuring answer-time error, cold and warm (added 2026-10-04, fourth pass).** The aim
-is to set the dead band, the credit cap and the settle window from data instead of from the planning
-figures in §4.5.
+**Stage 7: measuring answer-time error, cold and warm (added 2026-10-04, fourth pass; moved from
+the Dash test to the Hourglass test 2026-10-13).** The aim is to set the dead band, the credit cap
+and the warm-up rule from data instead of from the planning figures in §4.5.
 
 - **What "answer-time error" is.** For each answer: `e = adjusted server time − the player's own
   reveal-to-Enter time`.
@@ -1927,14 +2000,14 @@ figures in §4.5.
   - It is only ever a diagnostic. It is shown in a `?diag=1` panel the tester copies out as JSON, is
     **never sent to the server**, and plays no part in scoring.
   - The server columns come from `round_scores` (`credit_ms`, `boot_credit_ms`, `edge_cold`,
-    `edge_boot_ms`, `commit_lag_ms`, `settled_late`).
+    `edge_boot_ms`, `commit_lag_ms`).
   - Because the dead band compares players with each other, what matters is the **spread** of `e`
     across devices, not its mean.
 - **Devices:** at least a wired or Wi-Fi laptop, a second laptop or desktop on another network, and
   a phone on mobile data (Ian's own devices are enough if fewer testers are available).
 - **Cold against warm, as an A/B on the runtime flag:**
-  - about 10 Dash games, alternating `warmup_enabled` true and false per game, flipped in the SQL
-    editor between games and noted in `docs/history.md`;
+  - about 10 Hourglass games, alternating `warmup_enabled` true and false per game, flipped in the
+    SQL editor between games and noted in `docs/history.md`;
   - at least one game starts after the function has been idle for over 150 s, so round 1 is
     genuinely cold;
   - `edge_cold` on each answer says which answers landed cold, whatever the flag.
@@ -1942,17 +2015,19 @@ figures in §4.5.
 
   | Measure | Target | If it misses |
   |---|---|---|
-  | Spread of `e`, warm answers (P95 − P5 across all devices) | **≤ 130 ms** (band 200 − CAP 70) | Lower the cap first (down to 50). If that is still not enough, the band has to grow, and that is Ian's call (D7b). |
+  | Spread of `e`, warm answers (P95 − P5 across all devices) | **≤ 130 ms** (band 200 − CAP 70) | Lower the cap first (down to 50). If that is still not enough, the band has to grow, and that is Ian's call (D7b, D38). |
   | Spread of `e`, cold-landed answers with `boot_credit` on | ≤ 130 ms, the same | Switch `boot_credit` off and treat cold landings as residual. |
   | Share of answers landing cold, with warm-ups on | **≤ 2%** (1 in 50) | Keep warm-ups and report it. If warm-ups on and off give about the same share after round 1, warm before round 1 only (§4.5.1's fallback column). |
-  | `commit_lag_ms`, P99 − P1 | **≤ 170 ms** (so window 250 ≥ 70 + 10 + spread) | Raise `settle_window_ms` to cover it, up to 400 ms, or measure local JWT verification (§4.5.4). |
-  | `settled_late` rounds | **0** in warm rounds | The window is too short; as above. |
+  | `commit_lag_ms`, P99 − P1 | recorded here; **≤ 170 ms** is Dash's target (stage 12) | Hourglass doesn't use the settle window; the Dash stage acts on it. |
 
+- **Also logged for `miss_cap`:** the distribution of `t − F` per round and how many rounds end
+  with someone at 0 or below, so `miss_cap` (4 s) can be tuned and the 200 ms band confirmed
+  (§4.7).
 - **Output:** a short table in `docs/history.md` with the measured figures, and the values chosen
-  for `latency_cap_ms`, `settle_window_ms`, `boot_credit` and the warm-up rule. Stage 12 repeats the
-  spread measurement for Hourglass before its band is confirmed.
+  for `latency_cap_ms`, `boot_credit`, the warm-up rule and `miss_cap`. Stage 12 repeats
+  `commit_lag_ms` and adds `settled_late` for Dash's settle window.
 
-**Stage 13, the cleanup, in detail.** A `retire_old_modes` migration, with its own rollback section.
+**Stage 16, the cleanup, in detail.** A `retire_old_modes` migration, with its own rollback section.
 1. A NOT VALID CHECK so new rooms can't be `race` or `elimination`. Old rows are gone by then; NOT
    VALID just avoids a pointless scan.
 2. Drop the race engine: `start_game_tx`, `submit_answer_tx`, `advance_round_tx` and
@@ -1968,10 +2043,29 @@ figures in §4.5.
    screens.
 7. Update the function list in `grants.test.mjs`, and `rollback.test.mjs`.
 
-**Real players are still needed in stages 7 (Dash), 10 (Spotlight) and 12 (Hourglass, optional).**
-Everything else is test suites, Ian alone with two browsers, or Ian with NVDA.
+**Real players are needed in stages 7 (Hourglass, essential), 12 (Dash) and 15 (Spotlight).**
+Everything else is test suites, Ian alone with two browsers or an iPhone, or Ian with NVDA.
 
-### 8.1 Stage 10: Ian's own screen-reader test with NVDA
+**Stage numbers before 2026-10-13.** `docs/history.md` and the earlier decisions page cite these.
+
+| Old (2026-10-04) | What | New |
+|---|---|---|
+| 1 | Elimination fast path + CORS cache | 8 (the CORS cache is already live) |
+| 2 | Clock sync | 1 |
+| 3 | Word start | 3 |
+| 4 | `avatar_parts` | 9 |
+| 5 | Avatar maker UI | 10 |
+| 6 | Dash engine plus timing core | split: timing core 4, Dash engine 11 |
+| 7 | Dash UI and the answer-time measurement | split: measurement 7 (Hourglass), Dash UI 12 |
+| 8 | Dash replaces Race | 13 |
+| 9 | Spotlight engine | 14 |
+| 10 | Spotlight UI | 15 |
+| 11 | Hourglass engine | 5 |
+| 12 | Hourglass UI and tuning | 6 and 7 |
+| 13 | Cleanup | 16 |
+| — | Speech unlock in multiplayer (new) | 2 |
+
+### 8.1 Stage 15: Ian's own screen-reader test with NVDA
 
 NVDA is free and open source, from NV Access.
 
@@ -2049,10 +2143,10 @@ question.
 | **C2** | Spotlight's feed is **a new client write path (Broadcast) that the 0019 abuse limits don't cover**. A flood past 100 msg/s gets the project's Realtime connections disconnected, including `postgres_changes` (§5.3). | Accepted. Own-topic sends, members only, the 250 ms throttle, **automatic feed admission within a 40 msg/s budget**, and a runtime kill switch that needs no deploy (§5.3.1); Pro if it binds. | Resolved 2026-10-04 (default) |
 | **C3** | The live feed **sends every keystroke, including deleted mistakes, to other players**. | The PRIVACY.md text in §5.6, in the same commit as the feed. Nothing is stored. | Resolved 2026-10-04 (default) |
 | **C4** | **The client must hold the word to speak it**, so a scripted client can answer just above the human floor. | The floor stops instant bots and nothing more, and the spec says so (§4.4). | Resolved 2026-10-04 (default) |
-| **C5** | A miss costing the full round time ends nearly every Hourglass game. | **A miss costs at most 4 s, to be tuned with real players (stage 12).** | **Resolved 2026-10-04 (Ian)** |
+| **C5** | A miss costing the full round time ends nearly every Hourglass game. | **A miss costs at most 4 s, to be tuned with real players (stage 7).** | **Resolved 2026-10-04 (Ian)** |
 | **C6** | Spotlight had no end condition without lives. | **Spotlight keeps lives.** | **Resolved 2026-10-04 (Ian)** |
 | **C7** | Speech rate, lead-ins and voice start-up make "fastest" partly a device property. | **No spoken lead-in: every round starts with the countdown, then the word alone at the same server moment on every device. The speech-rate setting stays.** Upload latency is credited up to 100 ms by server-measured echoes (§4.5). Voice start-up is measured in stage 7. | **Resolved 2026-10-04 (Ian)** |
-| **C8** | Old cached clients mislabel a new-mode room as "Race", then fail safely with `wrong_mode`. | Accepted. A reload fixes it, and the guards prevent corruption. Stage 13 removes the old modes after 30+ days. | Resolved 2026-10-04 (default) |
+| **C8** | Old cached clients mislabel a new-mode room as "Race", then fail safely with `wrong_mode`. | Accepted. A reload fixes it, and the guards prevent corruption. Stage 16 removes the old modes after 30+ days. | Resolved 2026-10-04 (default) |
 | **C9** (new) | The latency credit lets a hostile client that delays its echoes claim up to the cap every round. | Cap **70 ms** (fourth pass; it was 100), under the 200 ms dead band with a 30 ms margin once upload jitter, preflights and cold starts are in the budget (§4.5). At most 0.1 s per Hourglass round, and only rounds closer than 70 ms in Dash. | Resolved 2026-10-04 (this review; cap re-picked in the fourth pass under D7b's rule) |
 | **C10** (new, third pass) | **The monthly Edge Function quota is shared by every game, and anyone signed in can spend it.** Supabase bills every invocation whatever the response, so no check inside a function stops a script calling the answer endpoints. Running out can bring 402s for the whole project until the next cycle. This is pre-existing (`submit-answer` has always been exposed); the spec doesn't widen it, because the echo is moved off Edge Functions (D26). | Accept on Free, with the per-host daily game cap (D30), the weekly usage check and estimate query, and the response ladder (§6.6). The alternative is Pro: a 2,000,000 quota and paid overage instead of a shutdown. | Resolved 2026-10-04 (default) |
 
@@ -2060,13 +2154,13 @@ question.
 
 | # | Question | Decision | Why | Status |
 |---|---|---|---|---|
-| D1 | Do Race and Elimination stay? | **Dash replaces Race and Spotlight replaces Elimination in the lobby. The old modes are removed in the last cleanup stage (stage 13)**, at least 30 days after Spotlight ships. | Three modes, without breaking cached clients. | **Ian** |
+| D1 | Do Race and Elimination stay? | **Dash replaces Race and Spotlight replaces Elimination in the lobby. The old modes are removed in the last cleanup stage (stage 16)**, at least 30 days after Spotlight ships. | Three modes, without breaking cached clients. | **Ian** |
 | D2 | Mode names | Dash, Hourglass, Spotlight | Original and descriptive | Default |
 | D3 | Player range | 2 to 8 in all three (`player_cap()`) | The cap already exists. | Default (Ian's earlier answer) |
 | D4 | Dash sudden death: who plays? | **Only the tied leaders**; others watch with no input. | A non-leader winning a sudden-death round would change nothing. | **Ian** |
 | D5 | Does a void Dash round use up one of the five? | **Yes.** After five, the leader wins. | Bounded at 5 regular rounds. | **Ian** |
 | D6 | Dash sudden-death cap | **10 rounds, then a draw** | Bounded. A draw is honest. | **Ian** |
-| D7 | Hourglass miss cost | **`min(L − F, 4 s)`, tuned with real players in stage 12** | One miss no longer ends the game. | **Ian** |
+| D7 | Hourglass miss cost | **`min(L − F, 4 s)`, tuned with real players in stage 7** | One miss no longer ends the game. | **Ian** |
 | D7b | Hourglass dead band | **200 ms stays.** The latency cap is chosen to fit under it (§4.5). | | **Ian** |
 | D8 | Spotlight lives | **Keep lives**, 1–9, default 3 | It reuses the verified engine and gives Spotlight an end. | **Ian** |
 | D9 | Spotlight clock | × 0.94 per correct turn, a 6 s floor, a full reset on any miss or timeout, no player-count trigger | One sentence a player can learn | Default |
@@ -2077,11 +2171,11 @@ question.
 | D14 | Presence for "left the game"? | No | It is client-asserted. Timeouts handle leaving. | Default |
 | D15 | Feed content | Letters | The spectacle is the point; C3 covers privacy. | Default |
 | D16 | Feed throttle | 250 ms; 400 ms if the Realtime cap binds | 32 msg/s at 8 players | Default |
-| D17 | Avatar model | Two append-only smallint indexes (8 colours, 10 hats) | A range CHECK, asserted against the client | Default |
+| D17 | Avatar model | **Changed 2026-10-13:** two append-only smallint indexes, **8 colours and 8 cosmetics** (was 8 colours and 10 hats), picked with skribbl-style arrows. Which 8 cosmetics: **pick pending** between the prototype's playful and spelling-themed sets (§2.1) | A range CHECK, asserted against the client | **Ian** (the counts) / pick pending (the set) |
 | D18 | "Surprise me" button | Yes | Cheap, and keyboard reachable | Default |
-| D19 | Legacy `avatar` column after the cleanup | Keep the column; drop the sync trigger in stage 13 | No user benefit in dropping it | Engineering |
+| D19 | Legacy `avatar` column after the cleanup | Keep the column; drop the sync trigger in stage 16 | No user benefit in dropping it | Engineering |
 | D20 | Pin edge functions to the DB region? | **Yes, required.** Verified against Supabase's docs on 2026-10-04: regional invocation via `forceFunctionRegion` / `x-region` / supabase-js `region`, with no plan restriction documented (§4.4.1). Uses the query parameter, which needs no CORS change. | Echo and answer stamps must share one clock pool. | Resolved (this review) |
-| D21 | Plan tier | Stay on Free. Move to Pro only if the Realtime cap (stage 10) or Edge invocations (§4.5 table) bind. | The estimates fit Free at hobby scale. | Default |
+| D21 | Plan tier | Stay on Free. Move to Pro only if the Realtime cap (stage 15) or Edge invocations (§4.5 table) bind. | The estimates fit Free at hobby scale. | Default |
 | D22 | Hourglass round cap | 30 rounds, then the most time left wins | Bounded games | Default |
 | D23 | Live speed for watchers | Yes, labelled "live", replaced by the official time | Ian asked for "how fast". | Default |
 | D24 (new) | Latency credit | **Server-measured echoes:** 6 chained calls (5 samples) before each reveal; the median RTT; credit `min(median/2, 70 ms)` (100 until the fourth pass, D32); 0 with fewer than 3 samples. Used by Dash and Hourglass, not Spotlight. **Third pass:** the echo is a database RPC, not an edge function (D26), and a failed echo only ever zeroes the credit (§4.5.2). | A slower connection isn't charged for network delay, and the exposure stays inside the dead band. | Resolved (this review) |
@@ -2094,6 +2188,49 @@ question.
 | D32 (new, fourth pass) | Latency credit cap | **70 ms** (was 100) | D7b fixed the band at 200 ms and made the cap the number that moves. Counting upload jitter (30 ms) leaves room for 70 with the old 30 ms margin (§4.5). Stage 7 can lower it further from data. | Engineering (follows D7b) |
 | D33 (new, fourth pass) | Dash settle window | **250 ms** after the first correct arrival at the database (was 150) | The old window left out the spread in edge-to-database time, so a faster answer could arrive after the award. 70 + 10 + 150 = 230 (§4.5.4). Costs 100 ms more of the feedback pause. | Default |
 | D34 (new, fourth pass) | Warm-up before each round | One warm-up call per player per Dash or Hourglass round, switchable by `warmup_enabled`; never retried, never waited for | Makes a cold worker, which can add up to ~0.5 s to one player's time, rare. Costs 79% more invocations per 8-player game. Stage 7 decides between every round and round 1 only (§4.5.4). | Default |
-| D35 (new, fourth pass) | Crediting a cold start | The server measures a cold worker's boot and subtracts it, capped at 500 ms, **only if stage 6 validates the measurement** (`boot_credit` flag); otherwise it is recorded and not credited | A player whose answer lands on a booting worker isn't charged for the boot. A client can't send or inflate the value (§4.5.4). | Default |
-| D36 (new, fourth pass) | Plumbing found in the fourth pass | `Access-Control-Max-Age: 7200` on every function (stage 1); the echo's non-waiting `try_lock_for`; token refresh moved out of the answer path | Each removes a delay or a pool-pinning risk that no player chooses (§4.5.3–4.5.5) | Engineering |
-| D25 (new) | Build order | Fixes that stand alone, then avatars, Dash, Spotlight, Hourglass (optional), cleanup. Stopping points after Dash and after Spotlight. Clock sync before the word start it supports. | Ian's order. The one swap is explained in §8. | **Ian** (the order) / this review (the swap) |
+| D35 (new, fourth pass) | Crediting a cold start | The server measures a cold worker's boot and subtracts it, capped at 500 ms, **only if stage 4 validates the measurement** (`boot_credit` flag); otherwise it is recorded and not credited | A player whose answer lands on a booting worker isn't charged for the boot. A client can't send or inflate the value (§4.5.4). | Default |
+| D36 (new, fourth pass) | Plumbing found in the fourth pass | `Access-Control-Max-Age: 7200` on every function (live since `64f65f3`); the echo's non-waiting `try_lock_for`; token refresh moved out of the answer path | Each removes a delay or a pool-pinning risk that no player chooses (§4.5.3–4.5.5) | Engineering |
+| D25 (new) | Build order | **Superseded by D37 (2026-10-13).** Was: fixes that stand alone, then avatars, Dash, Spotlight, Hourglass (optional), cleanup. Stopping points after Dash and after Spotlight. Clock sync before the word start it supports. | Ian's order. The one swap is explained in §8. | **Ian** (the order) / this review (the swap) |
+| D37 (2026-10-13) | Build order, revised | **Hourglass first.** The timing core (clock sync, the speech unlock at each player's own tap, the device-independent word start, the echo and latency credit, the warm-ups), then the Hourglass engine and UI, then the real-player tuning, then the Elimination fast path, avatars, Dash, Spotlight and the cleanup (§8). About 11 sessions to Hourglass live, realistically 11 to 15. | Ian wants Hourglass first. It needs the whole timing core, because its charges are tenths of a second that add up. | **Ian** |
+| D38 (2026-10-13) | Display precision of Hourglass charges | **Stays: charges rounded to 0.1 s, gaps under 200 ms charged 0.** What changes with the alternatives is set out below the table. | The measurement can't support more: the budget allows up to 130 ms of timing error between two players' devices, plus up to 70 ms a hostile client can claim (§4.5, stage 7's targets), so a hundredths digit would be noise. | Default (the band is Ian's D7b) |
+
+### 9.3 D38 in detail: finer numbers, or no dead band (2026-10-13)
+
+Today's rule (§4.7 rules 3 and 4): a gap `t − F` under **200 ms** is charged 0, and every charge is
+rounded to the nearest **100 ms** and shown to one decimal ("−0.4 s"). Banks are stored as integer
+milliseconds either way, so neither alternative needs a schema change. Both are `hourglass_params()`
+values (`dead_band_ms`, `quantum_ms`) plus the display format, so either can be changed later in one
+small migration without touching stored rows.
+
+**If you want finer numbers (charges to 0.01 s, or the exact milliseconds):**
+- What changes on screen: "−0.43 s" instead of "−0.4 s", on the per-round line and in the round
+  table. Banks show two decimals.
+- What doesn't get better: the measurement. Two players' times can differ by up to about 130 ms
+  for reasons that aren't typing (network jitter, edge clocks, voice start-up; §4.5 and stage 7's
+  targets), so the second decimal changes from one replay of the same performance to the next. The
+  screen would claim a precision the game doesn't have, which is the one thing §4.7 rule 4 exists
+  to avoid.
+- The total sand lost hardly changes: rounding to 100 ms is unbiased, so over 30 rounds it moves a
+  bank by a few tenths at most.
+- A middle way that costs nothing: keep the 0.1 s charges and show the exact milliseconds only in
+  the collapsed round table on the results screen, labelled "measured". Players who want the detail
+  get it; the game itself stays at the precision it can defend.
+
+**If you want no dead band (every gap charged):**
+- Near-equal players bleed sand on noise. Two players who really are tied would each lose 0.1 to
+  0.2 s in rounds they didn't lose, decided by whose connection jittered, so games between equals
+  get shorter and partly random.
+- The latency credit's cheating exposure stops being absorbed. The 70 ms cap was chosen to fit
+  under the 200 ms band (D7b, D32): a client that delays its echoes gains at most 70 ms, which the
+  band turns into nothing. With no band, that 70 ms becomes a real charge to everyone else, every
+  round. To stay fair the credit would have to go (slower connections then pay their upload time)
+  or its cap drop towards 0.
+- Cold starts and voice start-up, which aren't compensated or are only partly, would land on
+  whichever player they hit, as charge.
+- Ties for "fastest" become rare, so nearly every round charges someone.
+- Smaller band rather than none: a band of `measured spread + cap` is defensible. If stage 7
+  measures the warm spread well under 130 ms (say 60 ms), the band can drop to about 130 ms with
+  the same fairness. That is decided from the stage 7 table, not now.
+
+**Recommendation:** keep 200 ms and 0.1 s for launch; if you want more detail, the exact
+milliseconds in the results table; revisit the band with stage 7's numbers.
