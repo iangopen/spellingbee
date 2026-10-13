@@ -60,7 +60,19 @@ Vite's minimum; not engine-strict) and `node-version: 22` in the workflow.
   `useMultiplayerGame` or any game-state hook inside a presentational component.
 - Answer checking lives behind one function boundary in the engine hook
   (`checkAnswer`); never inline the comparison elsewhere. It is the seam where
-  multiplayer swaps local comparison for the server.
+  multiplayer swaps local comparison for the server. The comparison itself is
+  `guessMatches` in `src/lib/answer.ts` (trim, case-insensitive); `checkAnswer`
+  calls it, and so does touch auto-submit, which only decides WHEN to submit.
+- **Touch auto-submit (singleplayer only, 2026-10-13):** on a device matching
+  `(pointer: coarse) and (hover: none)` (`lib/touch.ts`, never the user agent),
+  RoundScreen submits the moment `guessMatches` says the typed text is the word:
+  never a partial or wrong word, a trailing space still counts, nothing while an
+  IME composition is open (it checks again on `compositionend`), Enter still
+  works. It goes through the same `submit()` as Enter, so the response time,
+  submit tick, verdict and `role="status"` text are identical. Only singleplayer
+  passes `autoSubmit` to RoundScreen; the race and elimination screens never do.
+  Settings shows "Submit automatically when correct" on touch devices only, on by
+  default (`spellingbee:autoSubmit`, null = default on).
 - `WordEntry` is `id, word, tier, definition, partOfSpeech?`. Extend the
   interface (and this file) rather than bolting fields onto individual words.
 - **Speech** goes through `src/lib/tts.ts` only, never `window.speechSynthesis`.
@@ -68,6 +80,20 @@ Vite's minimum; not engine-strict) and `node-version: 22` in the workflow.
   something is speaking or queued, then wait `CANCEL_SETTLE_MS`. The old
   cancel-then-speak in one tick clipped the lead-in in desktop Chrome; don't
   "simplify" it back (`tts.test.ts` pins it).
+- **Phone speech (2026-10-13):** `unlockSpeech()` speaks one silent utterance
+  (empty, volume 0) SYNCHRONOUSLY inside singleplayer's start taps (tier bar,
+  Play again), once per page, because iOS drops a first speak() that isn't in a
+  gesture and every announcement starts from a timer. The first announcement
+  WAITS for that utterance to end (at most `UNLOCK_WAIT_MS`, 1.5 s) instead of
+  cancelling it. Every utterance goes through `speakTracked`: if it hasn't
+  started after `START_TIMEOUT_MS` (1 s) and nothing is speaking, cancel, settle,
+  speak it again, ONCE. `loadVoices()` no longer keeps an empty list forever
+  after its 3 s wait times out (Android). Never call unlockSpeech from a timer or
+  effect; it is useless outside a tap.
+- **Speech debug log:** `?debug=speech` mounts `SpeechDebug` (lazy chunk, never
+  downloaded otherwise): engine flags, voice count, every utterance's
+  speak/start/end/error/retry with timestamps, Copy log. tts.ts exposes only
+  `setSpeechTrace`/`speechStatus` for it; it stores and sends nothing.
 - `DEFAULT_VOICE_NAME` ("Google UK English Male") is a hard default checked in
   `pickAutoVoice` BEFORE the quality heuristic. Never turn it into a score
   bonus. Priority: saved override > this voice > heuristic. `DEFAULT_VOICE_RATE`
@@ -301,8 +327,11 @@ npx supabase functions deploy --use-api --project-ref wjorfdfpbgyykbhxydqj
 - Browser checks, one command: `PW_MODULE=<playwright/index.mjs> node
   design/harness/run-checks.mjs` (Playwright is never a repo dependency; install
   it outside the repo). It builds and serves static builds on `127.0.0.1` (never
-  `localhost`) and runs contrast, tier bars, tier focus, settings dialog, keyboard
-  passes, reduced motion (zero tolerance), network, layering, hover flash and the
+  `localhost`): the app on `SB_APP_PORT` (default 4273, NOT vite's 4173, which
+  other projects here use), the harness on `SB_HARNESS_PORT` (default 5199). It
+  refuses to start if either port is taken. It runs contrast, tier bars, tier focus, settings dialog, keyboard
+  passes, reduced motion (zero tolerance), network, layering, hover flash, touch
+  auto-submit (`check-touch-autosubmit.mjs`, phone emulation) and the
   unused-selector/token checks. `check-glow.mjs` is the Blue Ribbon check and
   fails honey by design. Use viewport captures, never `fullPage`, for pixel diffs.
 - On this laptop memory is tight: read `(Get-Counter '\Memory\Available
@@ -351,6 +380,16 @@ Everything below is live unless marked open.
   system spec.
 
 ### Open
+- Ian: phone speech on a real phone (emulation can't test it). Steps: open the
+  live site, play a singleplayer word; if it is silent, reopen with
+  `?debug=speech`, play one word, tap Copy log and paste it back.
+- Follow-up, multiplayer timing-core stage (not done): in multiplayer the word
+  is spoken at a server-chosen moment and players other than the host never
+  tapped to start, so iPhones may drop it. Unlock at each player's own join or
+  ready tap (`unlockSpeech()` inside that tap).
+- Touch auto-submit on Android with Gboard: Gboard composes a word until space
+  or a suggestion is tapped, and auto-submit waits for the composition to end,
+  so there it may fire only on the space. Check on a real Android phone.
 - Ian: the shimmer on a real mid-range phone, on the live site. If it stutters,
   the static-glow fallback is one rule at the end of `src/honeycomb.css`:
   `.bg-light { display: none; }` (the glow and cells stay; only the moving band
