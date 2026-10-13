@@ -356,6 +356,11 @@ Everything below is live unless marked open.
   request on the site's own origin, the Privacy link, the README screenshots and
   the About text. Saved data from before the redesign (best scores, display
   name, voice and sound settings, a light theme, reduce motion) loads unchanged.
+- **Phone singleplayer (2026-10-13):** touch auto-submit, the speech unlock /
+  late-voices / retry fixes and the `?debug=speech` log are LIVE (main
+  `897a55a`, deploy run 38461151873; live bundle `index-Dp6w6GCi.js` = the tested
+  build; one live word: 7 requests, all to the site's own origin). Whether a real
+  phone now speaks the first word is NOT yet known (see Open).
 - Docs: README, PRIVACY.md (last checked 2026-09-29), LICENSE (MIT, Ian Gopen).
   `design/README.md` maps the design folder; `design/PHASE3.md` is the design
   system spec. The design images (prototype screenshots, baselines, stage
