@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spelling Bee | Avatar silhouette contrast</title>
+  <link rel="stylesheet" href="../homemade/fonts.css" />
+  <link rel="stylesheet" href="maker.css" />
+  <style>
+    .page { max-width: 1100px; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.85rem; font-variant-numeric: tabular-nums; margin: 0 0 18px; }
+    caption { text-align: left; color: var(--muted); padding: 4px 0; }
+    th, td { border: 1px solid var(--panel-edge); padding: 4px 6px; text-align: center; }
+    th[scope="row"] { text-align: left; }
+    td.fail { color: var(--text); font-weight: 700; outline: 2px solid var(--life); outline-offset: -2px; }
+    .wrap { overflow-x: auto; }
+    .bgs { color: var(--muted); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1 class="page-title">Silhouette contrast</h1>
+    <p class="lede">Every avatar, both cosmetic sets, both themes, against the token disc, the panel
+      and the panel at the honeycomb's peak. Each cell is the WORST edge point of the bee's silhouette
+      (3:1 needed, WCAG 1.4.11). Failures are outlined and marked ✗. Method: <code>contrast.js</code>.</p>
+    <p id="status" role="status">Measuring…</p>
+    <div class="panel wrap" id="out"></div>
+    <p><a href="index.html">Back to the maker</a> · <a href="compare.html">Comparison page</a></p>
+  </main>
+  <script src="bee-art.js"></script>
+  <script src="contrast.js"></script>
+</body>
+</html>
