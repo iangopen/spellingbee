@@ -37,6 +37,11 @@ function patch(h, uid, roomId, playerId, body) {
 
 const row = (h, roomId, playerId) =>
   h.sql("select to_jsonb(rp) as r from room_players rp where room_id = $1 and player_id = $2", [roomId, playerId]).then((r) => r[0]?.r);
+// The room's game state outside room_players: changing your bee is never a game event.
+const roomState = async (h, roomId) => ({
+  room: (await h.sql("select to_jsonb(r) as r from rooms r where id = $1", [roomId]))[0].r,
+  rounds: (await h.sql("select to_jsonb(rr) as r from round_results rr where room_id = $1 order by round_num", [roomId])).map((x) => x.r),
+});
 const without = (r, ...keys) => Object.fromEntries(Object.entries(r).filter(([k]) => !keys.includes(k)));
 
 describe("0021 avatar parts", () => {
@@ -206,8 +211,9 @@ describe("0021 avatar parts", () => {
     ["elimination mid-game", eliminationMidGame],
   ];
 
-  it.each(SETUPS)("%s: changing the bee leaves every other column of the row identical", async (_name, setup) => {
+  it.each(SETUPS)("%s: changing the bee leaves every other column of the row, and the room's rooms/round_results, identical", async (_name, setup) => {
     const { id, host, guest } = await setup();
+    const roomBefore = await roomState(h, id);
     for (const who of [host, guest]) {
       const before = await row(h, id, who);
       // the new client: numbers only
@@ -221,6 +227,8 @@ describe("0021 avatar parts", () => {
       expect(without(after, "avatar", "avatar_color", "avatar_cosmetic")).toEqual(without(before, "avatar", "avatar_color", "avatar_cosmetic"));
       expect(after).toMatchObject({ avatar: "drone", ...{ avatar_color: 4, avatar_cosmetic: 5 } });
     }
+    // rooms and round_results for this room are untouched too (spec §6.5)
+    expect(await roomState(h, id)).toEqual(roomBefore);
     // the game state is really mid-game where it should be (so "identical" means something)
     const state = await h.sql("select status from rooms where id = $1", [id]);
     expect(state[0].status).toBe(_name.includes("mid-game") ? "active" : "lobby");
