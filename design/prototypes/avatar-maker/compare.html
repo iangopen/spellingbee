@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spelling Bee | Avatar maker: compare and pick</title>
+  <link rel="stylesheet" href="../homemade/fonts.css" />
+  <link rel="stylesheet" href="maker.css" />
+  <style>
+    .shots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .shots.phone { grid-template-columns: repeat(2, minmax(0, 300px)); }
+    figure { margin: 0; display: grid; gap: 6px; align-content: start; }
+    figure img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--panel-edge); }
+    figcaption { font-size: 0.85rem; color: var(--muted); }
+    .pick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+    .pick ul { margin: 8px 0 0; padding-left: 1.2em; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+    th, td { border: 1px solid var(--panel-edge); padding: 6px 8px; text-align: left; vertical-align: middle; }
+    td .art-box { width: 40px; height: 40px; vertical-align: middle; }
+    .wrap { overflow-x: auto; }
+    code { font-size: 0.9em; }
+    @media (max-width: 760px) { .shots, .pick { grid-template-columns: minmax(0, 1fr); } .shots.phone { grid-template-columns: minmax(0, 1fr); } }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="av-halo" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="1" result="grown" />
+      <feFlood style="flood-color: var(--av-halo)" />
+      <feComposite in2="grown" operator="in" result="edge" />
+      <feMerge><feMergeNode in="edge" /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter>
+  </svg>
+  <div class="proto-bar" role="region" aria-label="Prototype controls">
+    <strong>Compare</strong>
+    <fieldset>
+      <legend>Page theme</legend>
+      <label><input type="radio" name="theme" value="dark" checked /> Dark</label>
+      <label><input type="radio" name="theme" value="light" /> Light</label>
+    </fieldset>
+    <a href="index.html">Open the maker</a>
+    <a href="contrast.html">Contrast table (live)</a>
+  </div>
+
+  <main class="page">
+    <header>
+      <h1 class="page-title">Avatar maker: pick a cosmetic set</h1>
+      <p class="lede">8 bee colours and 8 cosmetics, chosen with arrows (skribbl's interaction pattern only;
+        the bees are the app's own mascot drawing). Colour 0 with no cosmetic IS the mascot, byte for byte.
+        The colours are fixed; <b>the one choice left is the cosmetic set</b>. Screenshots: dark and light, desktop
+        (1280 px) and phone (390 px).</p>
+    </header>
+
+    <section class="panel" aria-labelledby="pick-h">
+      <h2 id="pick-h">The choice</h2>
+      <div class="pick">
+        <div>
+          <h3>Playful</h3>
+          <p>None, Crown, Party hat, Flower, Sunglasses, Headphones, Bow tie, Honey pot.</p>
+          <ul>
+            <li>Keeps two legacy accessories byte for byte (the queen's crown, the blossom).</li>
+            <li>Every legacy avatar maps to its own distinct bee.</li>
+            <li>Bolder shapes: each reads at 30 px.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Spelling-themed</h3>
+          <p>None, Graduation cap, Pencil, Reading glasses, Quill, Book, Letter block, Headphones.</p>
+          <ul>
+            <li>On theme for a spelling game.</li>
+            <li>Reading glasses and the quill are the subtlest at 30 px.</li>
+            <li>No match for the hive and honey avatars: <code>honey</code> becomes the plain honey bee.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="cos-h">
+      <h2 id="cos-h">All 8 cosmetics, each set</h2>
+      <h3>Playful</h3>
+      <div class="shots">
+        <figure><img src="screenshots/dark-desktop-cosmetics-playful.png" alt="Playful set, dark, desktop: the honey bee wearing each of the 8 cosmetics" /><figcaption>Dark, desktop</figcaption></figure>
+        <figure><img src="screenshots/light-desktop-cosmetics-playful.png" alt="Playful set, light, desktop" /><figcaption>Light, desktop</figcaption></figure>
+      </div>
+      <div class="shots phone">
+        <figure><img src="screenshots/dark-phone-cosmetics-playful.png" alt="Playful set, dark, phone" /><figcaption>Dark, phone</figcaption></figure>
+        <figure><img src="screenshots/light-phone-cosmetics-playful.png" alt="Playful set, light, phone" /><figcaption>Light, phone</figcaption></figure>
+      </div>
+      <h3>Spelling-themed</h3>
+      <div class="shots">
+        <figure><img src="screenshots/dark-desktop-cosmetics-spelling.png" alt="Spelling-themed set, dark, desktop" /><figcaption>Dark, desktop</figcaption></figure>
+        <figure><img src="screenshots/light-desktop-cosmetics-spelling.png" alt="Spelling-themed set, light, desktop" /><figcaption>Light, desktop</figcaption></figure>
+      </div>
+      <div class="shots phone">
+        <figure><img src="screenshots/dark-phone-cosmetics-spelling.png" alt="Spelling-themed set, dark, phone" /><figcaption>Dark, phone</figcaption></figure>
+        <figure><img src="screenshots/light-phone-cosmetics-spelling.png" alt="Spelling-themed set, light, phone" /><figcaption>Light, phone</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="maker-h">
+      <h2 id="maker-h">The maker</h2>
+      <div class="shots">
+        <figure><img src="screenshots/dark-desktop-maker.png" alt="The maker, dark, desktop: a blue bee wearing a crown, colour and cosmetic arrows, Surprise me and the name field" /><figcaption>Dark, desktop</figcaption></figure>
+        <figure><img src="screenshots/light-desktop-maker.png" alt="The maker, light, desktop" /><figcaption>Light, desktop</figcaption></figure>
+      </div>
+      <div class="shots phone">
+        <figure><img src="screenshots/dark-phone-maker.png" alt="The maker, dark, phone" /><figcaption>Dark, phone</figcaption></figure>
+        <figure><img src="screenshots/light-phone-maker.png" alt="The maker, light, phone" /><figcaption>Light, phone</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="col-h">
+      <h2 id="col-h">All 8 colours</h2>
+      <p class="hint">Honey, Red, Rose, Purple, Blue, Aqua, Green, Grey. Every pair is at least 11.7 CIEDE2000 apart
+        under normal vision and simulated protanopia, deuteranopia and tritanopia (README).</p>
+      <div class="shots">
+        <figure><img src="screenshots/dark-desktop-colors.png" alt="The 8 colours, dark, desktop" /><figcaption>Dark, desktop</figcaption></figure>
+        <figure><img src="screenshots/light-desktop-colors.png" alt="The 8 colours, light, desktop" /><figcaption>Light, desktop</figcaption></figure>
+      </div>
+      <div class="shots phone">
+        <figure><img src="screenshots/dark-phone-colors.png" alt="The 8 colours, dark, phone" /><figcaption>Dark, phone</figcaption></figure>
+        <figure><img src="screenshots/light-phone-colors.png" alt="The 8 colours, light, phone" /><figcaption>Light, phone</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="tok-h">
+      <h2 id="tok-h">On the small tokens: lobby, waiting room, scoreboard</h2>
+      <p class="hint">In the dark theme every token draws a 1 px sticker edge (<code>--av-halo</code>), the contrast fix below.</p>
+      <div class="shots">
+        <figure><img src="screenshots/dark-desktop-tokens.png" alt="Tokens, dark, desktop: lobby tile, waiting-room roster, race lanes and turn tokens" /><figcaption>Dark, desktop</figcaption></figure>
+        <figure><img src="screenshots/light-desktop-tokens.png" alt="Tokens, light, desktop" /><figcaption>Light, desktop</figcaption></figure>
+      </div>
+      <div class="shots phone">
+        <figure><img src="screenshots/dark-phone-tokens.png" alt="Tokens, dark, phone" /><figcaption>Dark, phone</figcaption></figure>
+        <figure><img src="screenshots/light-phone-tokens.png" alt="Tokens, light, phone" /><figcaption>Light, phone</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="con-h">
+      <h2 id="con-h">Contrast: all 64 combinations, both sets, both themes</h2>
+      <p><b>First run: 128 failures</b>, every dark-theme avatar including the mascot's own colours (worst 1.06:1).
+        The cocoa stripes run into the cocoa outline, and on a dark panel that stretch of edge disappears. No disc colour
+        can fix it (it would need to be lighter than the outline and darker than every body at once).
+        <b>Fix: a 1 px sticker edge on dark-theme tokens</b> (<code>--av-halo</code> #9d8d70, an SVG dilate filter), which
+        leaves the drawing and the mascot untouched. <b>After: 0 failures</b>; every dark avatar's edge is 4.27:1 at its
+        worst (the honeycomb's peak), every light one 14.32:1.
+        Full tables: <a href="contrast.md">contrast.md</a> (after), <a href="contrast-before.md">contrast-before.md</a>,
+        or <a href="contrast.html">run it live</a>.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="map-h">
+      <h2 id="map-h">Existing avatars: how the old keys map</h2>
+      <p class="hint">Proposed backfill (old key → colour, cosmetic) for each set. The old client keeps writing the key; a
+        sync trigger derives the parts. A new client writes the parts, and the trigger derives the nearest key so old
+        clients still draw something sensible. Details in the README.</p>
+      <div class="wrap"><table id="map"></table></div>
+    </section>
+  </main>
+
+  <script src="bee-art.js"></script>
+  <script>
+    (function () {
+      const { makerSvg, describe, CLIP_ID } = window.BeeMaker;
+      // old key -> [colour, cosmetic] per set (README, "Legacy mapping")
+      const MAP = {
+        bee: { playful: [0, 0], spelling: [0, 0] },
+        queen: { playful: [0, 1], spelling: [0, 1] },
+        drone: { playful: [4, 5], spelling: [4, 7] },
+        hive: { playful: [7, 7], spelling: [1, 0] },
+        honey: { playful: [0, 7], spelling: [0, 0] },
+        blossom: { playful: [2, 3], spelling: [2, 0] },
+        clover: { playful: [6, 3], spelling: [6, 0] },
+        wasp: { playful: [7, 0], spelling: [7, 0] },
+      };
+      let uid = 0;
+      const art = (c, k, set) => `<span class="art-box halo"><span class="art" aria-hidden="true">${makerSvg(c, k, set).split(CLIP_ID).join("m" + uid++)}</span></span>`;
+      let h = "<thead><tr><th scope='col'>Old key</th><th scope='col'>Playful</th><th scope='col'>Spelling-themed</th></tr></thead><tbody>";
+      for (const [key, m] of Object.entries(MAP)) {
+        h += `<tr><th scope="row"><code>${key}</code></th>` + ["playful", "spelling"].map((s) => `<td>${art(...m[s], s)} ${describe(...m[s], s)}</td>`).join("") + "</tr>";
+      }
+      document.getElementById("map").innerHTML = h + "</tbody>";
+      const root = document.documentElement;
+      for (const r of document.querySelectorAll('input[name="theme"]')) r.addEventListener("change", () => { if (r.value === "light") root.dataset.theme = "light"; else delete root.dataset.theme; });
+    })();
+  </script>
+</body>
+</html>
