@@ -10,7 +10,7 @@
 --     report as an error. The error rolls the whole transaction back: the guests,
 --     the room, every write. Nothing survives, so nothing needs cleaning up.
 --   * So the expected output is an ERROR whose message is the report:
---       AVATAR VERIFY: 34 PASS, 0 FAIL (everything rolled back; ...)
+--       AVATAR VERIFY: 45 PASS, 0 FAIL (everything rolled back; ...)
 --     "0 FAIL" is a pass. Any FAIL line names the check and what it saw.
 --   * The live-data check at the top is read-only: every existing row's key must
 --     match its numbers (the sync trigger's invariant).
@@ -129,20 +129,31 @@ begin
     select * from (values
       ('insert colour -1', v_other, 'avatar_color', '-1', 'insert', '23514'),
       ('insert colour 8', v_other, 'avatar_color', '8', 'insert', '23514'),
-      ('insert cosmetic 14', v_other, 'avatar_cosmetic', '14', 'insert', '23514'),
       ('insert colour 32767', v_other, 'avatar_color', '32767', 'insert', '23514'),
       ('insert colour null', v_other, 'avatar_color', 'null', 'insert', '23502'),
-      ('insert cosmetic 2.5', v_other, 'avatar_cosmetic', '2.5', 'insert', '22P02'),
+      ('insert colour 2.5', v_other, 'avatar_color', '2.5', 'insert', '22P02'),
       ('insert colour "blue"', v_other, 'avatar_color', '"blue"', 'insert', '22P02'),
+      ('insert cosmetic -1', v_other, 'avatar_cosmetic', '-1', 'insert', '23514'),
+      ('insert cosmetic 14', v_other, 'avatar_cosmetic', '14', 'insert', '23514'),
+      ('insert cosmetic 32767', v_other, 'avatar_cosmetic', '32767', 'insert', '23514'),
+      ('insert cosmetic null', v_other, 'avatar_cosmetic', 'null', 'insert', '23502'),
+      ('insert cosmetic 2.5', v_other, 'avatar_cosmetic', '2.5', 'insert', '22P02'),
+      ('insert cosmetic "blue"', v_other, 'avatar_cosmetic', '"blue"', 'insert', '22P02'),
       ('insert with score', v_other, 'score', '50', 'insert', '42501'),
       ('insert with lives', v_other, 'lives', '9', 'insert', '42501'),
       ('insert with turn_order', v_other, 'turn_order', '0', 'insert', '42501'),
       ('update colour -1', v_host, 'avatar_color', '-1', 'update', '23514'),
-      ('update cosmetic 14', v_host, 'avatar_cosmetic', '14', 'update', '23514'),
+      ('update colour 8', v_host, 'avatar_color', '8', 'update', '23514'),
       ('update colour 32767', v_host, 'avatar_color', '32767', 'update', '23514'),
       ('update colour null', v_host, 'avatar_color', 'null', 'update', '23502'),
-      ('update cosmetic 2.5', v_host, 'avatar_cosmetic', '2.5', 'update', '22P02'),
+      ('update colour 2.5', v_host, 'avatar_color', '2.5', 'update', '22P02'),
       ('update colour "blue"', v_host, 'avatar_color', '"blue"', 'update', '22P02'),
+      ('update cosmetic -1', v_host, 'avatar_cosmetic', '-1', 'update', '23514'),
+      ('update cosmetic 14', v_host, 'avatar_cosmetic', '14', 'update', '23514'),
+      ('update cosmetic 32767', v_host, 'avatar_cosmetic', '32767', 'update', '23514'),
+      ('update cosmetic null', v_host, 'avatar_cosmetic', 'null', 'update', '23502'),
+      ('update cosmetic 2.5', v_host, 'avatar_cosmetic', '2.5', 'update', '22P02'),
+      ('update cosmetic "blue"', v_host, 'avatar_cosmetic', '"blue"', 'update', '22P02'),
       ('update score', v_host, 'score', '50', 'update', '42501'),
       ('update streak', v_host, 'streak', '3', 'update', '42501'),
       ('update is_eliminated', v_host, 'is_eliminated', 'true', 'update', '42501')
@@ -160,10 +171,11 @@ begin
         execute format('update public.room_players set %1$I = (select %1$I from json_populate_record(null::public.room_players, %2$L::json)) where player_id = %3$L',
                        t.col, format('{"%s":%s}', t.col, t.val), v_host);
       end if;
-      execute 'reset role';
-      v_state := 'ok';
+      -- It went through, which is wrong. Undo it (raising rolls this block back), so one
+      -- wrong success can't leave a row behind and break every check after it.
+      raise exception 'AVATAR_VERIFY_UNDO';
     exception when others then
-      v_state := sqlstate;
+      v_state := case when sqlerrm = 'AVATAR_VERIFY_UNDO' then 'ok' else sqlstate end;
     end;
     select to_jsonb(rp) into v_after from public.room_players rp where player_id = v_host;
     select count(*) into v_n from public.room_players where player_id = v_other;

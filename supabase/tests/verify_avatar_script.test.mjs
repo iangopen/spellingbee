@@ -38,7 +38,8 @@ describe("verify_avatar.sql", () => {
       const msg = await run(h);
       expect(msg).toMatch(/^AVATAR VERIFY: \d+ PASS, 0 FAIL/);
       const pass = Number(msg.match(/(\d+) PASS/)[1]);
-      expect(pass).toBeGreaterThanOrEqual(30);
+      // the count Ian is told to expect (CLAUDE.md, verify_avatar.sql's header)
+      expect(pass).toBe(45);
       expect(msg.split("\n").filter((l) => l.startsWith("PASS ")).length).toBe(pass);
       expect(msg).toContain("PASS live rows: every key matches its numbers");
       expect(await counts(h)).toEqual(before);
