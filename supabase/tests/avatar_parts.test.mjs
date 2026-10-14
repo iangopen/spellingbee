@@ -11,6 +11,9 @@ import { freshDb, migrationSql } from "./harness.mjs";
 import { AVATAR_KEYS } from "../../src/lib/avatars.ts";
 import { AVATAR_COLORS, AVATAR_COSMETICS, keyFromParts, partsFromKey } from "../../src/lib/avatarParts.ts";
 
+const TOP_COLOR = AVATAR_COLORS.length - 1; // 7
+const TOP_COSMETIC = AVATAR_COSMETICS.length - 1; // 13
+
 const GAME_COLUMNS = ["score", "streak", "lives", "turn_order", "is_eliminated", "connected_at"];
 
 /** POST /room_players with a JSON body, as the signed-in `uid`. */
@@ -77,7 +80,9 @@ describe("0021 avatar parts", () => {
     ['"blue"', "blue", "22P02"],
     ['"3" as a string of digits is NOT bad', "3", null],
   ];
-  const resolve = (col, v) => (v === "END" ? (col === "avatar_color" ? 8 : 14) : v);
+  // "one past the end" is the list length, so a range that disagrees with avatarParts.ts in
+  // either direction fails here or in the boundary test below.
+  const resolve = (col, v) => (v === "END" ? (col === "avatar_color" ? AVATAR_COLORS : AVATAR_COSMETICS).length : v);
 
   for (const col of ["avatar_color", "avatar_cosmetic"]) {
     it.each(BAD)(`insert: ${col} = %s is rejected (%#)`, async (_label, raw, code) => {
@@ -107,12 +112,12 @@ describe("0021 avatar parts", () => {
     });
   }
 
-  it("the top of each range is accepted (colour 7, cosmetic 13), so the ranges are not narrower than the lists", async () => {
+  it(`the top of each range is accepted (colour ${TOP_COLOR}, cosmetic ${TOP_COSMETIC}), so the ranges are not narrower than the lists`, async () => {
     const host = await h.user();
     const { id } = await h.room(host);
     const u = await h.user();
-    expect((await post(h, u, { room_id: id, player_id: u, display_name: "x", avatar_color: 7, avatar_cosmetic: 13 })).error).toBeUndefined();
-    expect(await row(h, id, u)).toMatchObject({ avatar_color: 7, avatar_cosmetic: 13 });
+    expect((await post(h, u, { room_id: id, player_id: u, display_name: "x", avatar_color: TOP_COLOR, avatar_cosmetic: TOP_COSMETIC })).error).toBeUndefined();
+    expect(await row(h, id, u)).toMatchObject({ avatar_color: TOP_COLOR, avatar_cosmetic: TOP_COSMETIC });
   });
 
   // ------------------------------------------------------------------ grants
