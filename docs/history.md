@@ -650,6 +650,87 @@ in the same tick, word on its end, nothing else for 20 s.
   and resumed later; one check ran after a 2272 MB reading because the reading
   and the run were chained in one command (it passed).
 
+## 2026-10-14: avatar parts, database side (branch feature/avatar-db, not applied)
+
+**Brief (Ian).** Build only the database side of the approved avatar maker, plus a data-only
+module. It must work with the deployed client. No UI, nothing applied to production.
+
+**Picks:**
+- **Cosmetics:** "make all of both playful and spelling themed". That is 14 cosmetics with
+  None as 0: the playful set keeps its prototype indices 0–7, the spelling-themed items follow
+  at 8–13, and Headphones is the same item in both. The cosmetic CHECK is therefore 0–13, not
+  the brief's 0–7. The colour CHECK stays 0–7.
+- **Display precision:** exact milliseconds only in the Hourglass results table.
+
+**How avatars work today** (read on main `447214b`):
+- `avatar_keys()` is defined in `0012_elimination_engine.sql:73-93`.
+- `room_players.avatar` is `text not null default 'bee' check (avatar = any(avatar_keys()))`
+  (`0012:343-345`).
+- The UPDATE grant is `(display_name, avatar)` (`0012:359`). The INSERT grant is `(room_id,
+  player_id, display_name, avatar)` (`0016:32-33`), and the backstop trigger is INSERT-only on
+  four game columns (`0016:44-68`).
+- RLS pins insert and update to the caller's own row (`0002:149-163`).
+- **The deployed client:**
+  - inserts the key only: `rooms.ts:119-121` (create) and `:178-180` (join);
+  - updates the key only: `:225-230`;
+  - reads an explicit column list: `PLAYER_COLUMNS`, `:52-53`.
+
+**What was built:**
+- **`supabase/migrations/0021_avatar_parts.sql`:**
+  - the two smallint columns with range CHECKs;
+  - the backfill from the key;
+  - `room_players_avatar_sync` (security invoker, `search_path ''`, assigns only the three
+    avatar fields);
+  - grants widened by exactly the two columns, with the widening stated in the file;
+  - the 0016 backstop extended to every game column on INSERT and UPDATE (plus `room_id` /
+    `player_id` on UPDATE).
+- **`supabase/rollback/0021_down.sql`**, with `avatar_parts_rollback.test.mjs`: the catalog
+  returns to exactly 0001–0020 (columns and their grants, constraints, triggers, functions and
+  their ACLs, policies). The snapshot moved to `tests/catalog.mjs`, and the 0016–0020 rollback
+  test now stops at 0020.
+- **`supabase/tests/avatar_parts.test.mjs`** (70 tests, writes in PostgREST's shapes):
+  - bad values on insert and update (−1, past the end, 32767, null, 2.5, strings);
+  - the exact grants;
+  - game columns refused with or without the new columns;
+  - the backstop refusing on its own when the grants are widened table-wide;
+  - a bee change leaving every other column identical in race and elimination, lobby and
+    mid-game;
+  - another player's row untouched;
+  - the old-key client path end to end;
+  - all 8 keys round-trip, and all 112 pairs agree with the TS module;
+  - one trigger firing at depth 1;
+  - the backfill of rows that existed before 0021.
+- **`src/lib/avatarParts.ts`** with 30 unit tests. Nothing imports it, so the built bundle is
+  `index-Dp6w6GCi.js`, identical to live.
+- **`supabase/scripts/verify_avatar.sql`:** one DO statement acting as throwaway guests
+  through a transaction-local role and claims. It runs 34 checks and ends by raising its report,
+  which rolls everything back.
+  - Tested in PGlite (`verify_avatar_script.test.mjs`): 34 PASS / 0 FAIL with nothing kept,
+    FAILs on a weakened migration, and a clean stop on a 0020 database.
+  - It doesn't use an explicit BEGIN/ROLLBACK, so an error can't leave the editor's pooled
+    connection in an aborted transaction.
+
+**Weakened-migration runs** (`SB_MIGRATION_OVERRIDE`, a new harness hook), avatar suite:
+
+| Weakening | Result |
+|---|---|
+| No CHECKs | 13 failures (every range test and the schema test) |
+| No sync trigger | 14 failures (the mapping, the old-client path, the identical-row tests) |
+| 0016 backstop unchanged | 6 failures (the backstop-alone tests) |
+| Table-wide grants | 1 failure (the exact-grants test). The game-column tests still passed, because the widened backstop refused them: defence in depth working. |
+
+**Gates:**
+- `npm test`: 174 passed.
+- `npm run test:db`: 175 passed (10 files).
+- Lint: 0 errors (the known 11 warnings).
+- Build: passes.
+- Memory was read before each heavy step; the lowest reading was 2,432 MB (floor 2,000).
+
+PRIVACY.md is unchanged: it already says the game stores your avatar and that room players see
+it, and colour and cosmetic are that avatar.
+
+**Open:** Ian applies 0021 (CLAUDE.md, Open, has the steps). The picker UI comes next.
+
 ## Archived CLAUDE.md (2026-10-12, before the trim)
 
 CLAUDE.md had grown to 1,437 lines (95 kB), re-read at every session. On 2026-10-12, before
