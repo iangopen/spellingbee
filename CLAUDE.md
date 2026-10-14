@@ -207,6 +207,11 @@ tier) has its own rules in `src/data/words/CLAUDE.md` and `supabase/CLAUDE.md`.
   (the list now holds more than hats), and there is no `avatar_options()`; the
   range CHECKs plus `avatarParts.ts` replace it, so the guest's function list
   stays at 13. Update the spec on `plan/multiplayer-modes` to match.
+  The count N = 14 (indices 0-13) is reconciled across the branch: the CHECK,
+  `avatarParts.ts`, the trigger's mapping, the backfill, the tests (their range
+  edges come from the module's list lengths) and `verify_avatar.sql` (45 checks,
+  pinned by its test). For the picker: the cosmetic counter reads "n of 14", not
+  the prototype's "n of 8", and token rendering covers 8 x 14 = 112 pairs, not 64.
 - Client: elimination has its own `TurnScreen`, not a mode flag in RoundScreen.
   The guess input is ABSENT (not disabled) for non-holders. `isMyTurn` derives
   from server facts only, never the clock. The knockout overlay is latched and
@@ -425,7 +430,7 @@ Everything below is live unless marked open.
   `npx supabase db push --dry-run` (must list exactly `0021_avatar_parts.sql`),
   then `npx supabase db push`; then paste `supabase/scripts/verify_avatar.sql`
   into the SQL editor and run it (its expected ending is an ERROR reading
-  "AVATAR VERIFY: 34 PASS, 0 FAIL"; it keeps nothing); then play one multiplayer
+  "AVATAR VERIFY: 45 PASS, 0 FAIL"; it keeps nothing); then play one multiplayer
   lobby with the live (old) client and change avatar. Rollback: run
   `supabase/rollback/0021_down.sql` in the SQL editor, then
   `npx supabase migration repair --status reverted 0021`. Safe to apply before

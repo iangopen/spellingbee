@@ -751,6 +751,40 @@ it, and colour and cosmetic are that avatar.
 - **Gates after the follow-up:** `test:db` 175 passed; `npm test` 174 passed; lint exit 0
   (11 warnings); build passes, still `index-Dp6w6GCi.js`.
 
+**Cosmetic count reconciled (same day).** Ian asked to make the whole branch agree on one N
+before 0021 is applied. N = 14 (None + 13), the recorded D17 pick; the brief's choice slot was
+left blank.
+- **Audit:**
+  - The CHECK is 0–13.
+  - `avatarParts.ts` holds 14 cosmetics, matching the prototype's `bee-art.js` names and
+    phrases item for item.
+  - The mapping sends the 8 old keys to playful indices only.
+  - The unit tests pin 14, and the rollback has no range.
+- **Mismatches found:**
+  - `verify_avatar.sql` tried only some bad values per column (no cosmetic −1, 32767, null
+    or string; no colour 2.5; no update with colour 8).
+  - The database tests hard-coded the "one past the end" values (8, 14) and the top of each
+    range, instead of reading the module's list lengths.
+  - A statement that wrongly succeeded in the verify script kept its row and broke every check
+    after it: 24 FAILs for one real fault.
+- **Fixes:**
+  - The verify script now tries all six bad values for both columns, on insert and on update.
+  - Each attempt now always undoes itself, so a wrong success fails only its own check.
+  - The verify script now runs 45 checks, and its test pins 45.
+  - The database tests now take the range edges from `avatarParts.ts`.
+- **Wrong ranges shown failing:**
+  - Cosmetic CHECK 0–7 (the 8-cosmetic version): 9 failures. They are the schema test, the
+    top-of-range test, the 112 pairs, the four identical-row cases, the loop test and the
+    verify test (43 PASS, 2 FAIL: the range check and a bee change to cosmetic 12).
+  - Cosmetic CHECK 0–14: 4 failures. They are the schema test, "one past the end" on insert
+    and on update, and the verify test (42 PASS, 3 FAIL: the range check and the two
+    cosmetic-14 refusals).
+- **Gates, one at a time, memory read before each:** `test:db` 175 passed; `npm test` 174
+  passed; lint exit 0 (11 warnings); build passes, `index-Dp6w6GCi.js`. The lowest memory
+  reading was 5,674 MB.
+- The spec on `plan/multiplayer-modes` still says `avatar_hat` with 10 items. It is not on
+  this branch and was left alone (CLAUDE.md notes it).
+
 **Open:** Ian applies 0021 (CLAUDE.md, Open, has the steps). The picker UI comes next.
 
 ## Archived CLAUDE.md (2026-10-12, before the trim)
