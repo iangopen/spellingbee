@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spelling Bee | Avatar maker prototype</title>
+  <link rel="stylesheet" href="../homemade/fonts.css" />
+  <link rel="stylesheet" href="maker.css" />
+</head>
+<body>
+  <!-- The token halo filter (defined once per page, like the app's WobbleFilters). -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="av-halo" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="1" result="grown" />
+      <feFlood style="flood-color: var(--av-halo)" />
+      <feComposite in2="grown" operator="in" result="edge" />
+      <feMerge><feMergeNode in="edge" /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter>
+  </svg>
+  <!-- Prototype-only controls: not part of the proposed UI. -->
+  <div class="proto-bar" role="region" aria-label="Prototype controls">
+    <strong>Prototype</strong>
+    <fieldset>
+      <legend>Theme</legend>
+      <label><input type="radio" name="theme" value="dark" checked /> Dark</label>
+      <label><input type="radio" name="theme" value="light" /> Light</label>
+    </fieldset>
+    <fieldset>
+      <legend>Cosmetic set</legend>
+      <label><input type="radio" name="set" value="playful" checked /> Playful</label>
+      <label><input type="radio" name="set" value="spelling" /> Spelling-themed</label>
+    </fieldset>
+    <label><input type="checkbox" id="reduce" /> Reduce motion</label>
+    <a href="compare.html">Comparison page</a>
+    <a href="contrast.html">Contrast table</a>
+  </div>
+
+  <main class="page">
+    <header>
+      <h1 class="page-title">Make your bee</h1>
+      <p class="lede">Arrows step through 8 colours and 8 things to wear. Your name is what tells
+        players apart; colour and cosmetic are two extra cues.</p>
+    </header>
+
+    <div class="two-col">
+      <!-- THE MAKER: what the lobby's "You" panel and the waiting room would show. -->
+      <section class="panel maker" id="maker-panel" aria-labelledby="maker-h">
+        <h2 id="maker-h">Your bee</h2>
+        <div class="preview" id="preview" role="img" aria-labelledby="desc"></div>
+        <p class="desc" id="desc" aria-live="polite"></p>
+
+        <div class="picker-row" role="group" aria-labelledby="color-label" data-row="color">
+          <button type="button" class="arrow" data-dir="-1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div class="row-text">
+            <span class="row-label" id="color-label">Colour</span>
+            <span class="row-value" data-value></span>
+            <span class="row-count" data-count></span>
+          </div>
+          <button type="button" class="arrow" data-dir="1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <div class="picker-row" role="group" aria-labelledby="cosmetic-label" data-row="cosmetic">
+          <button type="button" class="arrow" data-dir="-1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div class="row-text">
+            <span class="row-label" id="cosmetic-label">Cosmetic</span>
+            <span class="row-value" data-value></span>
+            <span class="row-count" data-count></span>
+          </div>
+          <button type="button" class="arrow" data-dir="1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <div class="maker-actions">
+          <button type="button" class="btn btn-secondary" id="surprise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m18 14 4 4-4 4"/><path d="m18 2 4 4-4 4"/><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-7.6a4 4 0 0 1 3.3-1.7H22"/><path d="M2 6h1.972a4 4 0 0 1 3.289 1.725l.554.813"/><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"/></svg>
+            Surprise me
+          </button>
+          <div>
+            <label class="field-label" for="name">Your name</label>
+            <input class="text-input" id="name" maxlength="24" autocomplete="nickname" value="Sam" aria-describedby="name-hint" />
+          </div>
+        </div>
+        <p class="hint" id="name-hint">1 to 24 characters. Everyone sees your name next to your bee.</p>
+      </section>
+
+      <!-- THE TOKENS: the same avatar at the sizes the app draws it. -->
+      <section class="token-panels" id="tokens" aria-labelledby="tokens-h">
+        <h2 id="tokens-h" class="sr-only">Your bee on the small tokens</h2>
+        <div class="panel" id="tok-lobby">
+          <h3>Lobby: You (48 px tile)</h3>
+          <div class="you-row"><span class="mini-tile" data-you-art="36"></span><b data-you-name></b></div>
+        </div>
+        <div class="panel player-list" id="tok-waiting">
+          <h3>Waiting room: Players (30 px)</h3>
+          <ul id="roster"></ul>
+        </div>
+        <div class="panel" id="tok-score">
+          <h3>Scoreboard: race lanes (46 px) and turn tokens (34 px)</h3>
+          <ol class="lanes" id="lanes"></ol>
+          <ul class="ptokens" id="ptokens" aria-label="Turn order"></ul>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel" id="colors" aria-labelledby="colors-h">
+      <h2 id="colors-h">All 8 colours</h2>
+      <ul class="sheet" id="color-sheet"></ul>
+    </section>
+    <section class="panel" id="cosmetics-playful" aria-labelledby="cp-h">
+      <h2 id="cp-h">Playful: all 8 cosmetics</h2>
+      <ul class="sheet" data-sheet="playful"></ul>
+    </section>
+    <section class="panel" id="cosmetics-spelling" aria-labelledby="cs-h">
+      <h2 id="cs-h">Spelling-themed: all 8 cosmetics</h2>
+      <ul class="sheet" data-sheet="spelling"></ul>
+    </section>
+  </main>
+
+  <script src="bee-art.js"></script>
+  <script src="maker.js"></script>
+</body>
+</html>

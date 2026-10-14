@@ -1,0 +1,219 @@
+/* Avatar maker prototype (2026-10-13). The tokens are copied from src/index.css (both
+   palettes, the values as of main 447214b) plus the eight proposed avatar body tokens
+   --av-1 ... --av-7 (--av-0 is --bee-body itself). The component styles mirror src/ui.css
+   (the one focus rule, Panel, Button, TextInput) and src/App.css (the 48px avatar tile, the
+   waiting-room row, the race token, the turn-screen disc), so what you see is what the app
+   would show. Every colour is a token; nothing below is a literal colour. */
+
+:root {
+  color-scheme: dark;
+  --bg-top: #16130f; --bg-bottom: #0f0c08;
+  --panel: rgba(33, 28, 21, 0.88); --panel-solid: #211c15; --panel-edge: rgba(232, 166, 61, 0.18);
+  --scrim: rgba(16, 13, 9, 0.76); --raised: rgba(232, 166, 61, 0.13); --field: #16130f;
+  --text: #f5efe3; --muted: #b3a68f;
+  --accent: #e8a63d; --accent-fill: #e8a63d; --on-accent: #1a1610; --heading: #f2bd62;
+  --kicker: #a3b5ff; --you: #a3b5ff;
+  --edge: #9d8d70; --ring: #f5c46e; --focus-moat: #16130f; --glow-soft: rgba(232, 166, 61, 0.3);
+  --glow-accent: rgba(232, 166, 61, 0.5);
+  --mark: #e8a63d; --mark-2: #8aa2ff; --ribbon-1: #8aa2ff; --ribbon-2: #cfc6b6; --ribbon-3: #c9713a;
+  --bee-body: #f0b24c; --bee-stripe: #2a2013; --bee-wing: rgba(255, 246, 228, 0.75); --bee-line: #1a1410; --bee-cheek: #ff9fb2;
+  --bee-eye: #fffdf8; --bee-leaf: #6fd49e;
+  --sketch: rgba(244, 196, 110, 0.66); --ink-shadow: rgba(6, 4, 1, 0.75); --paper-shadow: 0 14px 30px -18px rgba(0, 0, 0, 0.75);
+  --btn-sheen: rgba(255, 244, 220, 0.14);
+  --life: #d9645c; --out: #6f6455;
+  /* proposed: the seven new bee colours (pick-colors.mjs); the same value in both palettes */
+  --av-1: #c85b32; --av-2: #a8669a; --av-3: #796ce0; --av-4: #5aa0d0; --av-5: #64d1d7; --av-6: #83aa84; --av-7: #867e7f;
+  /* proposed: the sticker edge round a dark-theme token (see .halo). The bee's outline and
+     stripes are cocoa, which a dark panel swallows; this is >= 4.3:1 against every dark
+     background, so the silhouette reads whatever the body colour (contrast.md). */
+  --av-halo: #9d8d70;
+  /* prototype chrome only (the page's own controls bar), not proposed for the app */
+  --proto-band: rgba(138, 162, 255, 0.12);
+
+  --display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --body: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --hand: 'Caveat Brush', 'Bricolage Grotesque', cursive;
+  --hm-r-panel: 28px 21px 26px 19px / 21px 27px 19px 25px;
+  --hm-r-btn: 15px 19px 16px 18px / 18px 15px 19px 16px;
+  --hm-r-field: 14px 17px 15px 16px / 16px 14px 17px 15px;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg-top: #faf3e3; --bg-bottom: #f4e8cc;
+  --panel: rgba(255, 252, 245, 0.92); --panel-solid: #fffcf5; --panel-edge: rgba(154, 98, 16, 0.16);
+  --scrim: rgba(250, 243, 227, 0.84); --raised: rgba(201, 135, 30, 0.13); --field: #fffdf8;
+  --text: #2c2419; --muted: #6b5a42;
+  --accent: #8f5a0e; --accent-fill: #e09a2c; --on-accent: #2b2115; --heading: #8f5a0e;
+  --kicker: #2346d8; --you: #2346d8;
+  --edge: #7f6a48; --ring: #7a4a08; --focus-moat: #fffdf8; --glow-soft: rgba(224, 154, 44, 0.3);
+  --glow-accent: rgba(224, 154, 44, 0.45);
+  --mark: #e09a2c; --mark-2: #2346d8; --ribbon-1: #2346d8; --ribbon-2: #8f887c; --ribbon-3: #b0602a;
+  --bee-body: #eaa640; --bee-stripe: #2c2419; --bee-wing: rgba(255, 255, 255, 0.85); --bee-line: #2c2419; --bee-cheek: #ff9fb2;
+  --bee-eye: #fffdf8; --bee-leaf: #4fae7c;
+  --sketch: rgba(122, 75, 8, 0.6); --ink-shadow: rgba(122, 75, 8, 0.2); --paper-shadow: 0 12px 26px -16px rgba(120, 80, 20, 0.45);
+  --btn-sheen: rgba(255, 244, 220, 0.14);
+  --life: #b4423a; --out: #9a8b74;
+  --av-1: #c85b32; --av-2: #a8669a; --av-3: #796ce0; --av-4: #5aa0d0; --av-5: #64d1d7; --av-6: #83aa84; --av-7: #867e7f;
+  --av-halo: transparent; /* light theme: the cocoa outline already reads at 14:1 */
+  --proto-band: rgba(35, 70, 216, 0.08);
+}
+
+/* The app's one reduced-motion block, and its in-app override (here ?motion=reduce). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; transition-delay: 0s !important; }
+}
+:root[data-reduce-motion="true"] *, :root[data-reduce-motion="true"] *::before, :root[data-reduce-motion="true"] *::after {
+  animation-duration: 0.001ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; transition-delay: 0s !important;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--bg-bottom); }
+body {
+  margin: 0; min-height: 100vh; color: var(--text); font: 400 16px/1.45 var(--body);
+  background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+}
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* ---- the one focus rule (src/ui.css) ---- */
+:root :is(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--ring); outline-offset: 3px;
+  box-shadow: 0 0 0 7px var(--focus-moat), 0 0 0 13px var(--glow-soft);
+}
+
+/* ---- Panel, Button, TextInput (src/ui.css, minus the SVG outline wobble filter) ---- */
+.panel {
+  position: relative; isolation: isolate; background: var(--panel); border-radius: var(--hm-r-panel);
+  box-shadow: inset 0 0 0 1px var(--panel-edge), var(--paper-shadow); padding: 22px 24px;
+}
+.panel::after { content: ""; position: absolute; inset: -3px; border: 2px solid var(--sketch); border-radius: inherit; pointer-events: none; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 54px; padding: 0 26px;
+  border: 2px solid transparent; border-radius: var(--hm-r-btn); font: 700 17px/1 var(--body); cursor: pointer;
+  touch-action: manipulation; position: relative; top: 0; left: 0; color: var(--text);
+  transition: top 0.15s var(--ease-out), left 0.15s var(--ease-out), box-shadow 0.25s ease, border-color 0.15s ease;
+}
+.btn svg { width: 1.15em; height: 1.15em; flex: none; }
+.btn-secondary { background: var(--panel); border-color: var(--edge); box-shadow: 3px 4px 0 var(--ink-shadow); }
+.btn-secondary svg { color: var(--accent); }
+.btn-secondary:hover { border-color: var(--accent); box-shadow: 4px 5px 0 var(--ink-shadow); }
+.btn-secondary:active { top: 3px; left: 2px; box-shadow: 1px 1px 0 var(--ink-shadow); }
+.text-input {
+  width: 100%; min-height: 48px; padding: 10px 14px; background: var(--field); color: var(--text);
+  border: 2px solid var(--edge); border-radius: var(--hm-r-field); font: 400 16px/1.3 var(--body);
+}
+.text-input:focus { border-color: var(--accent); }
+.field-label { display: block; font: 700 0.95rem/1.2 var(--body); margin-bottom: 6px; }
+.hint { color: var(--muted); font-size: 0.9rem; margin: 6px 0 0; }
+
+.art-box { display: inline-block; flex: none; }
+.art, .art svg { display: block; width: 100%; height: 100%; overflow: visible; }
+/* Avatar TOKENS (never the home mascot) get a 1px sticker edge from the #av-halo filter: a
+   rectangular dilate of the drawing's alpha, flooded with --av-halo, under the drawing. The
+   SVG strings are untouched, so colour 0 + none stays the mascot byte for byte. */
+.halo .art { filter: url(#av-halo); }
+
+/* ---- page ---- */
+.proto-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 10px 16px;
+  background: var(--proto-band); border-bottom: 1px solid var(--panel-edge); font-size: 0.9rem;
+}
+.proto-bar strong { font-family: var(--display); }
+.proto-bar fieldset { display: flex; align-items: center; gap: 6px; border: 0; margin: 0; padding: 0; }
+.proto-bar legend { float: left; margin-right: 6px; color: var(--muted); }
+.proto-bar label { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 6px; cursor: pointer; }
+.proto-bar a { color: var(--text); min-height: 44px; display: inline-flex; align-items: center; }
+
+.page { max-width: 1120px; margin: 0 auto; padding: 24px 16px 48px; display: grid; gap: 28px; }
+.page-title { font: 400 2.4rem/1 var(--hand); color: var(--heading); margin: 0; }
+.lede { margin: 6px 0 0; color: var(--muted); max-width: 62ch; }
+h2 { font: 400 1.7rem/1.1 var(--hand); color: var(--heading); margin: 0 0 14px; }
+h3 { font: 700 1.05rem/1.2 var(--display); margin: 0 0 10px; }
+.two-col { display: grid; grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 28px; align-items: start; }
+
+/* ---- the maker ---- */
+.maker { display: grid; gap: 14px; justify-items: center; }
+.maker h2 { justify-self: start; }
+.preview {
+  width: 176px; height: 176px; display: grid; place-items: center; background: var(--panel-solid);
+  border: 2px solid var(--edge); border-radius: 50%;
+}
+.preview .art-box { width: 140px; height: 140px; }
+@media (prefers-reduced-motion: no-preference) {
+  .preview.hop .art-box { animation: hop 0.15s var(--ease-out); }
+}
+/* Resting state is transform: none, the drawn avatar; reduced motion loses nothing. */
+@keyframes hop { 50% { transform: translateY(-6px); } }
+.desc { margin: 0; min-height: 1.5em; font: 700 1.05rem/1.4 var(--body); text-align: center; }
+
+.picker-row {
+  display: grid; grid-template-columns: 48px minmax(0, 1fr) 48px; align-items: center; gap: 12px; width: 100%;
+}
+.arrow {
+  width: 48px; height: 48px; padding: 0; display: grid; place-items: center; cursor: pointer; color: var(--text);
+  background: var(--panel-solid); border: 2px solid var(--edge); border-radius: var(--hm-r-btn);
+  box-shadow: 3px 4px 0 var(--ink-shadow); position: relative; top: 0; left: 0; touch-action: manipulation;
+  transition: top 0.15s var(--ease-out), left 0.15s var(--ease-out), border-color 0.15s ease, box-shadow 0.25s ease;
+}
+.arrow svg { width: 26px; height: 26px; }
+.arrow:hover { border-color: var(--accent); }
+.arrow:active { top: 3px; left: 2px; box-shadow: 1px 1px 0 var(--ink-shadow); }
+.row-text { text-align: center; display: grid; gap: 2px; }
+.row-label { font: 700 0.8rem/1.2 var(--body); color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.row-value { font: 700 1.1rem/1.2 var(--display); }
+.row-count { font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.maker-actions { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: end; width: 100%; }
+
+/* ---- the tokens, as the app draws them ---- */
+.token-panels { display: grid; gap: 22px; }
+.mini-tile { /* the lobby's 48px avatar tile (App.css .avatar-option.selected) */
+  width: 48px; height: 48px; display: grid; place-items: center; background: var(--panel-solid);
+  border: 3px solid var(--accent); border-radius: var(--hm-r-btn); box-shadow: 0 0 14px -2px var(--glow-accent);
+}
+.you-row { display: flex; align-items: center; gap: 12px; }
+.you-row b { font-size: 1.1rem; }
+.player-list ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.player-row { display: flex; align-items: center; gap: 10px; min-height: 44px; border-bottom: 1px solid var(--panel-edge); }
+.player-row:last-child { border-bottom: 0; }
+.player-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.tag { font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--edge); color: var(--muted); }
+.tag-you { color: var(--you); border-color: var(--you); }
+.lanes { list-style: none; margin: 0; padding: 0; }
+.lane { display: grid; grid-template-columns: 34px minmax(0, 120px) minmax(0, 1fr) 46px; align-items: center; gap: 12px; min-height: 70px; border-bottom: 1px solid var(--panel-edge); }
+.lane:last-child { border-bottom: 0; }
+.lane .pos { text-align: center; font: 800 1.5rem/1 var(--display); }
+.lane .name b { display: block; overflow-wrap: anywhere; }
+.lane .name span { color: var(--you); font-size: 0.85rem; font-weight: 700; }
+.lane .pts { text-align: right; font: 800 1.3rem/1 var(--display); }
+.track { position: relative; height: 54px; }
+.track::before { content: ""; position: absolute; left: 0; right: 16px; top: 50%; border-top: 2px dashed var(--edge); opacity: 0.8; }
+.token {
+  position: absolute; top: 0; width: 54px; height: 54px; padding: 2px; display: grid; place-items: center; background: var(--panel-solid);
+  border: 2px solid var(--text); border-radius: 10px 12px 9px 13px / 12px 9px 13px 10px; box-shadow: 2px 3px 0 var(--ink-shadow);
+}
+.lane.p1 .token { border-color: var(--accent); box-shadow: 0 0 22px -2px var(--glow-accent); }
+.ptokens { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 14px; }
+.ptoken { display: grid; justify-items: center; gap: 4px; width: 64px; }
+.ptoken-disc { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; background: var(--panel-solid); border: 2px solid var(--edge); }
+.ptoken.active .ptoken-disc { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent), 0 0 14px var(--glow-accent); }
+.ptoken-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.8rem; color: var(--muted); }
+.ptoken.you .ptoken-name { color: var(--text); }
+.ptoken.active .ptoken-name { color: var(--accent); font-weight: 700; }
+
+/* ---- the grids ---- */
+.sheet { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 12px; }
+.sheet li { display: grid; justify-items: center; align-content: start; gap: 6px; text-align: center; }
+.sheet .cell { align-self: start; width: 100%; max-width: 104px; aspect-ratio: 1; display: grid; place-items: center; background: var(--panel-solid); border: 2px solid var(--edge); border-radius: 50%; }
+.sheet .cell .art-box { width: 74%; height: 74%; }
+.sheet .cap { font-size: 0.85rem; line-height: 1.25; }
+.sheet .cap small { display: block; color: var(--muted); font-size: 0.75rem; }
+
+@media (max-width: 760px) {
+  .two-col { grid-template-columns: minmax(0, 1fr); }
+  .sheet { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .panel { padding: 18px 16px; }
+  .page-title { font-size: 2rem; }
+  .maker-actions { grid-template-columns: minmax(0, 1fr); }
+  .lane { grid-template-columns: 28px minmax(0, 1fr) 40px; grid-template-areas: "pos name pts" "track track track"; row-gap: 2px; padding: 8px 0; }
+  .lane .pos { grid-area: pos; } .lane .name { grid-area: name; } .lane .pts { grid-area: pts; } .lane .track { grid-area: track; }
+}
