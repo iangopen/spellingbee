@@ -729,6 +729,28 @@ module. It must work with the deployed client. No UI, nothing applied to product
 PRIVACY.md is unchanged: it already says the game stores your avatar and that room players see
 it, and colour and cosmetic are that avatar.
 
+**Follow-up the same day (review and finish):**
+- **Line endings.** Re-run on a fresh Windows checkout, `test:db` failed one test (174/175):
+  the 0021 rollback test.
+  - `core.autocrlf` is on, so the three new SQL files came out CRLF, while 0001–0020 were LF.
+  - The rolled-back backstop's `prosrc` differed from 0016's only in `\r`.
+  - With an LF copy of `0021_down.sql` the test passed 5/5.
+  - Fix: a new `.gitattributes` (`*.sql text eol=lf`) and a re-checkout of the three files;
+    all 24 SQL files are now LF.
+- **Spec §6.5 check.** Every avatar item is covered except one: a mid-game bee change must
+  leave the room's `rooms` and `round_results` rows unchanged, not only the player's row.
+  - Added that snapshot to the four lobby/mid-game cases.
+  - Against a weakened 0021 (the sync trigger made SECURITY DEFINER and nudging
+    `round_results.turn_started_at`), both mid-game cases fail on the new line (3 failures in
+    all). Against the real 0021, 70/70 pass.
+  - Items that deliberately differ from the spec: `avatar_cosmetic` instead of `avatar_hat`;
+    no `avatar_options()`; grants read through `has_column_privilege` (same facts as
+    `information_schema.column_privileges`); game columns from 0022 (`round_wins`,
+    `time_bank_ms`, `contending`) don't exist yet, so 0022 must extend the backstop and
+    `GAME_COLUMNS`. The localStorage mapping test belongs to the picker session.
+- **Gates after the follow-up:** `test:db` 175 passed; `npm test` 174 passed; lint exit 0
+  (11 warnings); build passes, still `index-Dp6w6GCi.js`.
+
 **Open:** Ian applies 0021 (CLAUDE.md, Open, has the steps). The picker UI comes next.
 
 ## Archived CLAUDE.md (2026-10-12, before the trim)

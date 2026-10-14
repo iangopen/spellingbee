@@ -202,7 +202,11 @@ tier) has its own rules in `src/data/words/CLAUDE.md` and `supabase/CLAUDE.md`.
   pair wins, else the key fills the pair; update: changed numbers win, else a
   changed key fills them); it only assigns those three fields. The mapping has a
   second copy in 0021's backfill. Keep `avatar` and the trigger until every
-  client writes the numbers (spec stage 16 drops the trigger).
+  client writes the numbers (spec stage 16 drops the trigger). Where 0021 differs
+  from the spec (§2, §6.2): the column is `avatar_cosmetic`, not `avatar_hat`
+  (the list now holds more than hats), and there is no `avatar_options()`; the
+  range CHECKs plus `avatarParts.ts` replace it, so the guest's function list
+  stays at 13. Update the spec on `plan/multiplayer-modes` to match.
 - Client: elimination has its own `TurnScreen`, not a mode flag in RoundScreen.
   The guess input is ABSENT (not disabled) for non-holders. `isMyTurn` derives
   from server facts only, never the clock. The knockout overlay is latched and
@@ -341,6 +345,9 @@ npx supabase functions deploy --use-api --project-ref wjorfdfpbgyykbhxydqj
 ## Tests and checks
 - `npm run build` (the gate), `npm run lint` (0 errors), `npm test` (src +
   scripts), `npm run test:db` (real migrations under PGlite).
+- `.gitattributes` keeps every `*.sql` LF. The rollback tests compare function
+  bodies (`pg_proc.prosrc`) byte for byte, so a CRLF checkout on Windows failed
+  them; don't remove it.
 - `npm --prefix supabase/concurrency ci && npm --prefix supabase/concurrency test`:
   real Postgres 17 races against the advisory locks, each with a negative control.
 - Browser checks, one command: `PW_MODULE=<playwright/index.mjs> node
