@@ -15,11 +15,13 @@ singleplayer fixes (2026-10-13) are live on `main`, so *(redesign)* paths are no
 - **Hourglass is the first mode to build** (D37). The build plan (§8) is reordered: the timing
   core first, then Hourglass, then the real-player tuning, then the rest. Stage numbers throughout
   this spec are the new ones; §8 ends with the old-to-new table.
-- **Avatars: 8 bee colours and 8 cosmetics** (D17, changed from 8 colours and 10 hats), chosen with
+- **Avatars: 8 bee colours and, since 2026-10-14, 14 cosmetics (both prototype sets; D17)**
+  (first 8 and 8, changed from 8 colours and 10 hats), chosen with
   skribbl-style arrow pickers. The art and the two candidate cosmetic sets are prototyped on branch
   `design/avatar-maker` (`design/prototypes/avatar-maker/`); **Ian's pick is pending**, and §2 takes
   the picked lists when he chooses.
-- **Display precision** has its own decision row (D38): what changes if the charges are shown more
+- **Display precision** (D38, decided 2026-10-14): 0.1 s charges and the 200 ms band stay; exact
+  milliseconds appear only in the results table. The row says what changes if the charges are shown more
   finely than 0.1 s, or the 200 ms dead band goes.
 
 The three new modes get original names:
@@ -220,7 +222,7 @@ Two small integers per player, both indexes into fixed lists:
 | Column (`room_players`) | Type | Default | Range |
 |---|---|---|---|
 | `avatar_color` | `smallint not null` | 0 (Honey) | 0 to `colors − 1` |
-| `avatar_cosmetic` | `smallint not null` | 0 (none) | 0 to `cosmetics − 1` |
+| `avatar_cosmetic` | `smallint not null` | 0 (none) | 0 to `cosmetics − 1` (0–13 since 2026-10-14) |
 
 There is one definition, an immutable SQL function in the shape of `avatar_keys()`:
 
@@ -1268,7 +1270,8 @@ Hourglass is the mode where 0.1 s matters, because charges add up. Five rules:
 3. **Dead band:** if `t − F < 200 ms`, the charge is 0. This absorbs the measurement error and the
    bounded cheating exposure in §4.5, so two players who are effectively tied are treated as tied.
 4. **Quantum:** charges are rounded to the nearest 100 ms and shown to one decimal ("−0.4 s"), so the
-   screen never claims more precision than the measurement has.
+   screen never claims more precision than the measurement has. The results screen's round table also shows the exact
+   measured milliseconds (D38, Ian 2026-10-14).
 5. **Miss cap:** a miss costs at most `miss_cap` (4 s), so one network hiccup that turns into a
    timeout can't end your game on its own (D7).
 
@@ -2171,7 +2174,7 @@ question.
 | D14 | Presence for "left the game"? | No | It is client-asserted. Timeouts handle leaving. | Default |
 | D15 | Feed content | Letters | The spectacle is the point; C3 covers privacy. | Default |
 | D16 | Feed throttle | 250 ms; 400 ms if the Realtime cap binds | 32 msg/s at 8 players | Default |
-| D17 | Avatar model | **Changed 2026-10-13:** two append-only smallint indexes, **8 colours and 8 cosmetics** (was 8 colours and 10 hats), picked with skribbl-style arrows. Which 8 cosmetics: **pick pending** between the prototype's playful and spelling-themed sets (§2.1) | A range CHECK, asserted against the client | **Ian** (the counts) / pick pending (the set) |
+| D17 | Avatar model | **Changed 2026-10-13, set picked 2026-10-14:** two append-only smallint indexes, **8 colours and 14 cosmetics** (index 0 = none). Ian picked BOTH prototype sets: the playful set keeps indices 0–7, the spelling-themed items follow at 8–13 (Headphones shared, 5). Built as migration 0021 on branch `feature/avatar-db` (plain range CHECKs 0–7 / 0–13 instead of an `avatar_options()` function, so the client-callable function list stays at 13; not applied yet). | A range CHECK, asserted against the client (`src/lib/avatarParts.ts`) | **Ian** |
 | D18 | "Surprise me" button | Yes | Cheap, and keyboard reachable | Default |
 | D19 | Legacy `avatar` column after the cleanup | Keep the column; drop the sync trigger in stage 16 | No user benefit in dropping it | Engineering |
 | D20 | Pin edge functions to the DB region? | **Yes, required.** Verified against Supabase's docs on 2026-10-04: regional invocation via `forceFunctionRegion` / `x-region` / supabase-js `region`, with no plan restriction documented (§4.4.1). Uses the query parameter, which needs no CORS change. | Echo and answer stamps must share one clock pool. | Resolved (this review) |
@@ -2192,7 +2195,7 @@ question.
 | D36 (new, fourth pass) | Plumbing found in the fourth pass | `Access-Control-Max-Age: 7200` on every function (live since `64f65f3`); the echo's non-waiting `try_lock_for`; token refresh moved out of the answer path | Each removes a delay or a pool-pinning risk that no player chooses (§4.5.3–4.5.5) | Engineering |
 | D25 (new) | Build order | **Superseded by D37 (2026-10-13).** Was: fixes that stand alone, then avatars, Dash, Spotlight, Hourglass (optional), cleanup. Stopping points after Dash and after Spotlight. Clock sync before the word start it supports. | Ian's order. The one swap is explained in §8. | **Ian** (the order) / this review (the swap) |
 | D37 (2026-10-13) | Build order, revised | **Hourglass first.** The timing core (clock sync, the speech unlock at each player's own tap, the device-independent word start, the echo and latency credit, the warm-ups), then the Hourglass engine and UI, then the real-player tuning, then the Elimination fast path, avatars, Dash, Spotlight and the cleanup (§8). About 11 sessions to Hourglass live, realistically 11 to 15. | Ian wants Hourglass first. It needs the whole timing core, because its charges are tenths of a second that add up. | **Ian** |
-| D38 (2026-10-13) | Display precision of Hourglass charges | **Stays: charges rounded to 0.1 s, gaps under 200 ms charged 0.** What changes with the alternatives is set out below the table. | The measurement can't support more: the budget allows up to 130 ms of timing error between two players' devices, plus up to 70 ms a hostile client can claim (§4.5, stage 7's targets), so a hundredths digit would be noise. | Default (the band is Ian's D7b) |
+| D38 (2026-10-13) | Display precision of Hourglass charges | **Decided 2026-10-14 (Ian): charges stay rounded to 0.1 s with the 200 ms dead band; the exact milliseconds are shown ONLY in the results screen's round table**, labelled as measured. Nothing else changes (§9.3). | The measurement can't support more on the live screen (about 130 ms of device timing error plus up to 70 ms of claimable credit, §4.5), but the detail is there for players who want it. | **Ian** |
 
 ### 9.3 D38 in detail: finer numbers, or no dead band (2026-10-13)
 
