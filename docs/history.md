@@ -650,6 +650,71 @@ in the same tick, word on its end, nothing else for 20 s.
   and resumed later; one check ran after a 2272 MB reading because the reading
   and the run were chained in one command (it passed).
 
+## 2026-10-13: multiplayer plan (Hourglass first) and the avatar maker prototype
+
+**Brief (Ian).** Record two decisions in the spec (docs only), then prototype the avatar maker.
+1. **Hourglass is the first mode to build.** Each round every player loses the gap to the
+   fastest correct time from their stock, and the stock is their lives.
+2. **The avatar maker is skribbl-style:** arrow pickers, 8 bee colours and 8 cosmetics (the
+   spec said 10 hats).
+
+No `src/` or database change.
+
+**Spec, branch `plan/multiplayer-modes`, commit `b3c7d22` (pushed; docs only).**
+- D37: the build plan is reordered (§8).
+  - The timing core comes first: stage 1 clock sync, stage 2 the speech unlock at each player's
+    own join or ready tap (new), stage 3 the device-independent word start, stage 4 the server
+    timing core (echo and latency credit, edge stamps, region pinning, warm-ups, boot
+    validation, Hourglass's part of `mode_schema`).
+  - Then the Hourglass engine (5), UI (6) and the real-player tuning (7, kept after
+    Hourglass).
+  - Then the Elimination fast path, avatars, Dash, Spotlight and cleanup.
+- Estimate: 11 sessions to Hourglass live, realistically 11–15, plus the calendar time to gather
+  players. The whole plan is about 24.5 sessions, up from 22.
+- Every one of the 55 stage references was renumbered, with an old→new table at the end of §8.
+- D17: 8 colours and 8 cosmetics, the set pick pending.
+- D38 and §9.3: what finer charges or no 200 ms dead band would change.
+- The decisions page moves the avatar row to decided and adds D38. It still lists 25 defaults,
+  and the §9 count matches.
+
+**Prototype, branch `design/avatar-maker` (from main `447214b`),
+`design/prototypes/avatar-maker/`.**
+- **The bees:** `beeArt.ts`'s drawing copied verbatim, plus a body-colour parameter.
+  `check-mascot.mjs` imports the real `beeArt.ts`: colour 0 + none === `mascotSvg()` byte for
+  byte, 64 distinct per set, drawing order doesn't matter, and Crown and Flower are the legacy
+  queen and blossom unchanged.
+- **The 7 new colours** (Red, Rose, Purple, Blue, Aqua, Green, Grey) come from `pick-colors.mjs`:
+  - one per hue family;
+  - ≥ 3:1 against the dark panel and against `--bee-line` in both themes;
+  - the minimum ΔE2000 across normal vision and simulated protanopia, deuteranopia and
+    tritanopia is maximised, to 11.7.
+  - The first unconstrained run picked two greys, hence the hue families.
+- **Two cosmetic sets:**
+  - Playful: None, Crown, Party hat, Flower, Sunglasses, Headphones, Bow tie, Honey pot.
+  - Spelling-themed: None, Graduation cap, Pencil, Reading glasses, Quill, Book, Letter block,
+    Headphones.
+- **Contrast**, silhouette edge, 3:1, 2 themes × 2 sets × 64 × 3 backgrounds:
+  - **First run: 128 failures**, every dark avatar (1.06–1.08:1). The cocoa stripes meet the
+    cocoa outline on a dark panel. No disc colour can fix it: it would need luminance ≥ 0.12 and
+    ≤ 0.03 at once.
+  - **Fix:** a 1 px `--av-halo` sticker edge (an `feMorphology` filter) on dark-theme avatar
+    tokens only, so the SVG strings and the home mascot don't change.
+  - **After: 0 failures** (dark 4.27:1 at the honeycomb peak, light 14.32:1).
+  - A 1.5 px halo also passed but blobbed into the wings at 30 px.
+- `check-maker.mjs`: 35 checks, 0 failures.
+  - Two failures on the way were the test's own: Chrome's `elementFromPoint` honours
+    `border-radius`, and the focus ring was read mid box-shadow transition.
+- `shoot.mjs`: 20 screenshots. One run died after 5 shots at 2,962 MB available (error not
+  captured); the rerun completed.
+- `compare.html` loads with 20/20 images and the live legacy mapping.
+- **Legacy mapping:** a forward table and reverse rules per set. Playful round-trips all 8 old
+  keys; Spelling loses `honey` → `bee`.
+
+**Memory:** read before every browser step, each on its own. Lowest 2,556 MB; floor 2,500.
+
+**Open:** Ian picks the set. Then the stages 9–10 build: the `avatar_parts` migration with the
+picked mapping, `beeArt.ts`, the tokens, `AvatarMaker`.
+
 ## Archived CLAUDE.md (2026-10-12, before the trim)
 
 CLAUDE.md had grown to 1,437 lines (95 kB), re-read at every session. On 2026-10-12, before

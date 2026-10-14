@@ -361,6 +361,23 @@ Everything below is live unless marked open.
   `897a55a`, deploy run 38461151873; live bundle `index-Dp6w6GCi.js` = the tested
   build; one live word: 7 requests, all to the site's own origin). Whether a real
   phone now speaks the first word is NOT yet known (see Open).
+- **Multiplayer plan (decided 2026-10-13, docs only):** Hourglass is the FIRST
+  new mode to build (spec D37 on branch `plan/multiplayer-modes`): the timing
+  core first (stages 1-4: clock sync, the speech unlock at each player's own
+  tap, the device-independent word start, the echo/latency credit and warm-ups),
+  then the Hourglass engine, UI and real-player tuning; about 11 sessions to
+  Hourglass live, realistically 11-15. Display precision is D38 (0.1 s charges,
+  200 ms dead band kept; §9.3 says what finer numbers or no band would change).
+- **Avatar maker (decided 2026-10-13; PICK PENDING):** skribbl-style arrows,
+  **8 bee colours and 8 cosmetics** (index 0 = none), two smallint indexes per
+  player (spec §2, D17). Prototype on branch `design/avatar-maker`,
+  `design/prototypes/avatar-maker/compare.html`: two cosmetic sets (Playful,
+  Spelling-themed) for Ian to pick. Settled there, whichever set wins: the 7 new
+  colours (`--av-1`..`--av-7`, colour 0 is `--bee-body`), colour 0 + none IS the
+  mascot byte for byte (`check-mascot.mjs`), and dark-theme avatar TOKENS get a
+  1px `--av-halo` sticker edge (the cocoa stripes vanish into dark panels
+  otherwise: 128 contrast failures before, 0 after). Nothing is in `src/` or the
+  database; the build is spec stages 9-10.
 - Docs: README, PRIVACY.md (last checked 2026-09-29), LICENSE (MIT, Ian Gopen).
   `design/README.md` maps the design folder; `design/PHASE3.md` is the design
   system spec. The design images (prototype screenshots, baselines, stage
@@ -388,10 +405,13 @@ Everything below is live unless marked open.
 - Ian: phone speech on a real phone (emulation can't test it). Steps: open the
   live site, play a singleplayer word; if it is silent, reopen with
   `?debug=speech`, play one word, tap Copy log and paste it back.
-- Follow-up, multiplayer timing-core stage (not done): in multiplayer the word
-  is spoken at a server-chosen moment and players other than the host never
-  tapped to start, so iPhones may drop it. Unlock at each player's own join or
-  ready tap (`unlockSpeech()` inside that tap).
+- Follow-up, multiplayer timing-core stage (not done; spec stage 2): in
+  multiplayer the word is spoken at a server-chosen moment and players other
+  than the host never tapped to start, so iPhones may drop it. Unlock at each
+  player's own join or ready tap (`unlockSpeech()` inside that tap).
+- Ian: pick the avatar cosmetic set (Playful or Spelling-themed) on
+  `design/avatar-maker` (`design/prototypes/avatar-maker/compare.html`). Once
+  picked, the index order is permanent (append-only).
 - Touch auto-submit on Android with Gboard: Gboard composes a word until space
   or a suggestion is tapped, and auto-submit waits for the composition to end,
   so there it may fire only on the space. Check on a real Android phone.
@@ -411,10 +431,10 @@ Everything below is live unless marked open.
 - Known limits: `check-settings-dialog.mjs` cannot see two focus mutations; the
   elimination keyboard pass in the harness runs on mocked state; race lanes show
   no per-player correct count (the client doesn't have it).
-- Follow-up not started: the multiplayer modes spec on branch
-  `plan/multiplayer-modes` (its CORS note predates the change shipping on
-  main). (Done 2026-10-12: the deploy workflow now uses `npm ci`, Node 22, a
-  pinned runner and Node 24 actions; see Deploy.)
+- The multiplayer build has not started: the spec is on branch
+  `plan/multiplayer-modes` (updated 2026-10-13, Hourglass first). Its first
+  stage is the multi-sample clock sync. (Done 2026-10-12: the deploy workflow
+  now uses `npm ci`, Node 22, a pinned runner and Node 24 actions; see Deploy.)
 - Audit (2026-10-12): `npm audit` now reports 0. The one advisory was
   GHSA-68fv-2mgg-jv7q (`source-map-js` 1.0.0-1.2.1, high, CVSS 7.5, event-loop DoS
   from indexed source-map section offsets), dev-only via `vite > postcss` and
