@@ -797,6 +797,16 @@ left blank.
 - **`npx supabase migration list`** (run from the branch, project already linked): local and
   remote both list 0001-0021, 0021 included, with nothing local-only or remote-only.
 - 0021 was moved out of CLAUDE.md's Open list; its rollback stays recorded there.
+- **Gates on `feature/avatar-db` before the merge** (memory read before each; lowest 1,884 MB,
+  so they ran one at a time): build passes (`index-Dp6w6GCi.js`); `npm test` 174 passed;
+  `npm run test:db` 175 passed (10 files); lint exit 0.
+- **Merged to main** with `--no-ff` (merge `1246c32`, so `git revert -m 1 1246c32` undoes it
+  as one commit) and pushed. Deploy run 38697426662: success. The live page still loads
+  `assets/index-Dp6w6GCi.js`, unchanged, since nothing imports `avatarParts.ts` yet.
+- **Spec** on `plan/multiplayer-modes` (docs-only commit `cb01257`): §2 now has the lists,
+  mapping and checks as built (`avatar_cosmetic`, plain CHECKs, no `avatar_options()`, 14
+  cosmetics, 112 combinations, the extended backstop, `0021_down.sql`); the migration table, the
+  §6.5 tests, stages 9-10, D17 and the decisions note say 0021 is live.
 
 ## Archived CLAUDE.md (2026-10-12, before the trim)
 

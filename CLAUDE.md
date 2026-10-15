@@ -206,7 +206,7 @@ tier) has its own rules in `src/data/words/CLAUDE.md` and `supabase/CLAUDE.md`.
   from the spec (§2, §6.2): the column is `avatar_cosmetic`, not `avatar_hat`
   (the list now holds more than hats), and there is no `avatar_options()`; the
   range CHECKs plus `avatarParts.ts` replace it, so the guest's function list
-  stays at 13. Update the spec on `plan/multiplayer-modes` to match.
+  stays at 13. The spec on `plan/multiplayer-modes` matches (updated 2026-10-15).
   The count N = 14 (indices 0-13) is reconciled across the branch: the CHECK,
   `avatarParts.ts`, the trigger's mapping, the backfill, the tests (their range
   edges come from the module's list lengths) and `verify_avatar.sql` (45 checks,
@@ -403,8 +403,10 @@ Everything below is live unless marked open.
   `wjorfdfpbgyykbhxydqj` (applied by Ian). `supabase/scripts/verify_avatar.sql`
   ended in "AVATAR VERIFY: 45 PASS, 0 FAIL" on 2026-10-15, and the live (old)
   client still joins a lobby and changes avatar. `npx supabase migration list`
-  shows local and remote agreeing on 0001-0021. `src/lib/avatarParts.ts` is on
-  main but imported by nothing yet. Rollback: run `supabase/rollback/0021_down.sql`
+  shows local and remote agreeing on 0001-0021. Branch `feature/avatar-db` is
+  merged to main (merge `1246c32`, deploy run 38697426662, success; the live
+  bundle is still `index-Dp6w6GCi.js`, because `src/lib/avatarParts.ts` is
+  imported by nothing yet). Rollback: run `supabase/rollback/0021_down.sql`
   in the SQL editor, then `npx supabase migration repair --status reverted 0021`.
 - Docs: README, PRIVACY.md (last checked 2026-09-29), LICENSE (MIT, Ian Gopen).
   `design/README.md` maps the design folder; `design/PHASE3.md` is the design
