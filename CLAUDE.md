@@ -390,8 +390,9 @@ Everything below is live unless marked open.
 - **Phone singleplayer (2026-10-13):** touch auto-submit, the speech unlock /
   late-voices / retry fixes and the `?debug=speech` log are LIVE (main
   `897a55a`, deploy run 38461151873; live bundle `index-Dp6w6GCi.js` = the tested
-  build; one live word: 7 requests, all to the site's own origin). Whether a real
-  phone now speaks the first word is NOT yet known (see Open).
+  build; one live word: 7 requests, all to the site's own origin). Checked on Ian's
+  own phone on 2026-10-14: the first word is spoken without pressing Hear
+  it again, and touch auto-submit works.
 - **Multiplayer and avatar decisions (Ian, 2026-10-13/14), recorded on branch
   `plan/multiplayer-modes`:** Hourglass is the first mode to build (spec D37,
   timing core first). Hourglass charges stay rounded to 0.1 s with the 200 ms
@@ -432,9 +433,6 @@ Everything below is live unless marked open.
   system spec.
 
 ### Open
-- Ian: phone speech on a real phone (emulation can't test it). Steps: open the
-  live site, play a singleplayer word; if it is silent, reopen with
-  `?debug=speech`, play one word, tap Copy log and paste it back.
 - Follow-up, multiplayer timing-core stage (not done): in multiplayer the word
   is spoken at a server-chosen moment and players other than the host never
   tapped to start, so iPhones may drop it. Unlock at each player's own join or
