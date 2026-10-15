@@ -192,7 +192,7 @@ tier) has its own rules in `src/data/words/CLAUDE.md` and `supabase/CLAUDE.md`.
 - `src/lib/avatars.ts` is the client's one copy of `public.avatar_keys()`
   (`verify_elimination_client.mjs` asserts they match); read stale values through
   `coerceAvatar`.
-- **Avatar parts (migration 0021, on branch `feature/avatar-db`, NOT applied):**
+- **Avatar parts (migration 0021, LIVE and verified 2026-10-15):**
   `room_players.avatar_color` (0-7) and `avatar_cosmetic` (0-13, 0 = none),
   smallint, default 0, range CHECKs. Both lists are APPEND-ONLY (a stored index
   means the same bee forever). `src/lib/avatarParts.ts` is the client copy (names,
@@ -307,7 +307,7 @@ tier) has its own rules in `src/data/words/CLAUDE.md` and `supabase/CLAUDE.md`.
   `(room_id, player_id, display_name, avatar)`, UPDATE `(display_name, avatar)`,
   plus a backstop trigger. Room INSERT is `(id, code, tier, host_id, mode,
   lives_setting)`; `created_at` stays server-set. Never widen these. The one
-  deliberate exception is 0021 (not yet applied): both room_players grants gain
+  deliberate exception is 0021 (live since 2026-10-15): both room_players grants gain
   exactly `avatar_color, avatar_cosmetic`, and its backstop then covers EVERY
   game column (score, streak, lives, turn_order, is_eliminated, connected_at) on
   INSERT and UPDATE, plus room_id/player_id on UPDATE.
@@ -397,9 +397,15 @@ Everything below is live unless marked open.
   timing core first). Hourglass charges stay rounded to 0.1 s with the 200 ms
   dead band, and the exact milliseconds are shown ONLY in the results table
   (D38). Avatars: 8 colours and BOTH prototype cosmetic sets, 14 cosmetics with
-  None as 0 (D17; prototype on `design/avatar-maker`). The database side and the
-  data module are on `feature/avatar-db` (prepared and tested, NOT applied; see
-  Open); the picker UI is the next session.
+  None as 0 (D17; prototype on `design/avatar-maker`). The picker UI is the next
+  session.
+- **Avatar parts, database side (2026-10-15):** migration 0021 is LIVE on project
+  `wjorfdfpbgyykbhxydqj` (applied by Ian). `supabase/scripts/verify_avatar.sql`
+  ended in "AVATAR VERIFY: 45 PASS, 0 FAIL" on 2026-10-15, and the live (old)
+  client still joins a lobby and changes avatar. `npx supabase migration list`
+  shows local and remote agreeing on 0001-0021. `src/lib/avatarParts.ts` is on
+  main but imported by nothing yet. Rollback: run `supabase/rollback/0021_down.sql`
+  in the SQL editor, then `npx supabase migration repair --status reverted 0021`.
 - Docs: README, PRIVACY.md (last checked 2026-09-29), LICENSE (MIT, Ian Gopen).
   `design/README.md` maps the design folder; `design/PHASE3.md` is the design
   system spec. The design images (prototype screenshots, baselines, stage
@@ -424,17 +430,6 @@ Everything below is live unless marked open.
   system spec.
 
 ### Open
-- **Avatar parts, production (Ian; prepared, nothing applied):** migration 0021
-  on branch `feature/avatar-db`. Steps, in order: on that branch,
-  `npx supabase link --project-ref wjorfdfpbgyykbhxydqj`, then
-  `npx supabase db push --dry-run` (must list exactly `0021_avatar_parts.sql`),
-  then `npx supabase db push`; then paste `supabase/scripts/verify_avatar.sql`
-  into the SQL editor and run it (its expected ending is an ERROR reading
-  "AVATAR VERIFY: 45 PASS, 0 FAIL"; it keeps nothing); then play one multiplayer
-  lobby with the live (old) client and change avatar. Rollback: run
-  `supabase/rollback/0021_down.sql` in the SQL editor, then
-  `npx supabase migration repair --status reverted 0021`. Safe to apply before
-  the new picker ships (the old client only writes the key).
 - Ian: phone speech on a real phone (emulation can't test it). Steps: open the
   live site, play a singleplayer word; if it is silent, reopen with
   `?debug=speech`, play one word, tap Copy log and paste it back.

@@ -787,6 +787,17 @@ left blank.
 
 **Open:** Ian applies 0021 (CLAUDE.md, Open, has the steps). The picker UI comes next.
 
+## 2026-10-15: migration 0021 applied and verified on the live project
+
+- **Applied by Ian** to `wjorfdfpbgyykbhxydqj` with the steps CLAUDE.md listed (link,
+  `db push --dry-run`, `db push`).
+- **Verify script:** `supabase/scripts/verify_avatar.sql` in the SQL editor ended in
+  "AVATAR VERIFY: 45 PASS, 0 FAIL" on 2026-10-15 (it keeps nothing).
+- **Old client:** on the live site, joining a lobby and changing avatar still work.
+- **`npx supabase migration list`** (run from the branch, project already linked): local and
+  remote both list 0001-0021, 0021 included, with nothing local-only or remote-only.
+- 0021 was moved out of CLAUDE.md's Open list; its rollback stays recorded there.
+
 ## Archived CLAUDE.md (2026-10-12, before the trim)
 
 CLAUDE.md had grown to 1,437 lines (95 kB), re-read at every session. On 2026-10-12, before
