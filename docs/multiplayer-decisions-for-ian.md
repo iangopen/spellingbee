@@ -14,7 +14,8 @@
   realistically 11 to 15**, plus the calendar time to gather 3+ players for the tuning test.
 - **Avatars: 8 bee colours and 14 cosmetics** with skribbl-style arrows (D17). Picked
   2026-10-14: BOTH prototype sets (None, then the playful 7, then the spelling-themed 6; Headphones
-  is shared). The database side is migration 0021 on branch `feature/avatar-db`, not applied yet.
+  is shared), 112 combinations. The database side is migration 0021 (`avatar_cosmetic`, no
+  `avatar_options()` function), live and verified on 2026-10-15.
 - **Display precision** (D38, 2026-10-14): charges stay at 0.1 s with the 200 ms band; the exact
   milliseconds show only in the results table.
 

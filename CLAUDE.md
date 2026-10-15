@@ -653,7 +653,9 @@ Rules this session must keep:
 
 The spec is `docs/multiplayer-modes-spec.md` (branch `plan/multiplayer-modes`,
 2026-10-04). It covers:
-- an arrow-picker avatar with colour and hat indexes, replacing the 8 bee types;
+- an arrow-picker avatar with colour and cosmetic indexes (8 x 14 = 112 bees),
+  replacing the 8 bee types; its database side is migration 0021, live since
+  2026-10-15;
 - **Dash** (first to 3 round wins), **Hourglass** (a shrinking time bank) and
   **Spotlight** (one speller, watched live).
 

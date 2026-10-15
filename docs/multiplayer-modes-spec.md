@@ -15,11 +15,13 @@ singleplayer fixes (2026-10-13) are live on `main`, so *(redesign)* paths are no
 - **Hourglass is the first mode to build** (D37). The build plan (§8) is reordered: the timing
   core first, then Hourglass, then the real-player tuning, then the rest. Stage numbers throughout
   this spec are the new ones; §8 ends with the old-to-new table.
-- **Avatars: 8 bee colours and, since 2026-10-14, 14 cosmetics (both prototype sets; D17)**
-  (first 8 and 8, changed from 8 colours and 10 hats), chosen with
-  skribbl-style arrow pickers. The art and the two candidate cosmetic sets are prototyped on branch
-  `design/avatar-maker` (`design/prototypes/avatar-maker/`); **Ian's pick is pending**, and §2 takes
-  the picked lists when he chooses.
+- **Avatars: 8 bee colours and 14 cosmetics (both prototype sets, picked 2026-10-14; D17)**,
+  112 combinations, chosen with skribbl-style arrow pickers (earlier drafts: 8 and 8, before that
+  8 colours and 10 hats). The art is prototyped on branch `design/avatar-maker`
+  (`design/prototypes/avatar-maker/`). **The database side is live:** migration 0021
+  (`avatar_color`, `avatar_cosmetic`, plain range CHECKs, no `avatar_options()` function) was
+  applied on 2026-10-15 and verified (`verify_avatar.sql`: 45 PASS, 0 FAIL); the data module is
+  `src/lib/avatarParts.ts` on `main`. §2 describes what was built.
 - **Display precision** (D38, decided 2026-10-14): 0.1 s charges and the 200 ms band stay; exact
   milliseconds appear only in the results table. The row says what changes if the charges are shown more
   finely than 0.1 s, or the 200 ms dead band goes.
@@ -197,23 +199,25 @@ is the redesign's own bee *(redesign)* `beeArt.ts`, drawn for this project.
             │   (bee in   │
             │   a crown)  │
             └─────────────┘
-   [ ◀ ]    Colour: Blue  (3 of 8)       [ ▶ ]
-   [ ◀ ]    Cosmetic: Crown  (4 of 8)    [ ▶ ]
+   [ ◀ ]    Colour: Blue  (5 of 8)       [ ▶ ]
+   [ ◀ ]    Cosmetic: Crown  (2 of 14)   [ ▶ ]
             [ Surprise me ]   Name [______]
      "Blue bee wearing a crown"
 ```
 
 The old 8-choice radiogroup and its distinct bee types (wasp body, big-eyed drone) are removed.
-Every avatar is the same bee, customised by **colour** and **cosmetic** (Ian, 2026-10-13: 8 of
-each; the 2026-10-04 draft said hats, 10 of them). A cosmetic is anything worn or held: a hat,
-glasses, a scarf, a pencil.
+Every avatar is the same bee, customised by **colour** and **cosmetic**: 8 colours and 14
+cosmetics (index 0 = none), 8 × 14 = **112 combinations** (Ian, 2026-10-14; the 2026-10-13 draft
+said 8 of each, the 2026-10-04 draft 10 hats). A cosmetic is anything worn or held: a hat,
+glasses, a bow tie, a pencil.
 
-**Prototype (2026-10-13, pick pending):** branch `design/avatar-maker`,
+**Prototype (2026-10-13):** branch `design/avatar-maker`,
 `design/prototypes/avatar-maker/index.html` (opens from disk). It draws the bees with `beeArt.ts`'s
 own jittered blobs, seeded like the mascot, so colour 0 with no cosmetic IS the mascot, unchanged.
-It offers **two cosmetic sets** for Ian to pick from, one playful and one spelling-themed, the
-8-colour list chosen for colour-blind separation, the 64-combination contrast table, and the
-mapping from the legacy keys. When Ian picks, the lists below are replaced by the picked ones.
+It offered **two cosmetic sets**, one playful and one spelling-themed; Ian picked **both**
+(2026-10-14): the playful set keeps its prototype indices 0–7, the spelling-themed items follow at
+8–13, and Headphones (5) is the one item the sets share. Its contrast table covers the prototype's
+64 pairs (8 × 8); the picker stage must cover all 112.
 
 ### 2.2 Data model
 
@@ -221,38 +225,38 @@ Two small integers per player, both indexes into fixed lists:
 
 | Column (`room_players`) | Type | Default | Range |
 |---|---|---|---|
-| `avatar_color` | `smallint not null` | 0 (Honey) | 0 to `colors − 1` |
-| `avatar_cosmetic` | `smallint not null` | 0 (none) | 0 to `cosmetics − 1` (0–13 since 2026-10-14) |
+| `avatar_color` | `smallint not null` | 0 (Honey) | 0–7 |
+| `avatar_cosmetic` | `smallint not null` | 0 (none) | 0–13 |
 
-There is one definition, an immutable SQL function in the shape of `avatar_keys()`:
-
-```sql
-create function public.avatar_options() returns jsonb language sql immutable
-as $$ select jsonb_build_object('colors', 8, 'cosmetics', 8) $$;
-```
-
-The CHECKs read it:
-`check (avatar_color between 0 and (avatar_options()->>'colors')::int - 1)` and the same for cosmetics.
+The ranges are **plain CHECKs** (migration 0021, live since 2026-10-15):
+`check (avatar_color between 0 and 7)` and `check (avatar_cosmetic between 0 and 13)`. There is
+**no `avatar_options()` function**: the earlier drafts had the CHECKs read one, but a plain CHECK
+has nothing to grant or revoke, so the client-callable function list stays at 13. The client copy,
+`src/lib/avatarParts.ts`, is asserted against the CHECKs instead (§2.3).
 
 **Indexes are append-only.** A value is never reordered or reused. A retired item stays in the
 list and is drawn as a fallback, so a stored index always means the same thing. That is the price
 of ints over keys. It buys a compact row, trivial CHECKs and arrow arithmetic with no lookup.
 
-Starting lists from the 2026-10-04 draft, **superseded** by the prototype's lists once Ian picks
-(names are spoken, see §2.5). Kept here only so the history reads:
+The lists, as built (`AVATAR_COLORS`, `AVATAR_COSMETICS` in `src/lib/avatarParts.ts`; names are
+spoken, see §2.5). The 2026-10-04 draft's lists (Amber, Clover, Sky…; 10 hats) are in git history.
 
-| # | Colour (token pair, both palettes) | Hat |
-|---|---|---|
-| 0 | Honey (`--av-honey`, today's `--bee-body`) | No hat |
-| 1 | Amber | Party hat |
-| 2 | Clover | Beanie |
-| 3 | Sky | Flower |
-| 4 | Plum | Straw hat |
-| 5 | Rose | Graduation cap (it's a spelling bee) |
-| 6 | Slate | Top hat |
-| 7 | Cream | Headphones |
-| 8 | | Paper crown |
-| 9 | | Bow |
+| # | Colour | Cosmetic | Spoken phrase |
+|---|---|---|---|
+| 0 | Honey (the mascot's `--bee-body`) | None | — |
+| 1 | Red | Crown | wearing a crown |
+| 2 | Rose | Party hat | wearing a party hat |
+| 3 | Purple | Flower | wearing a flower |
+| 4 | Blue | Sunglasses | wearing sunglasses |
+| 5 | Aqua | Headphones (in both sets) | wearing headphones |
+| 6 | Green | Bow tie | wearing a bow tie |
+| 7 | Grey | Honey pot | holding a honey pot |
+| 8 | | Graduation cap | wearing a graduation cap |
+| 9 | | Pencil | holding a pencil |
+| 10 | | Reading glasses | wearing reading glasses |
+| 11 | | Quill | wearing a quill |
+| 12 | | Book | holding a book |
+| 13 | | Letter block | holding a letter block |
 
 - Colours are 8 new body tokens (`--av-0` … `--av-7`), each added to **both palettes in the same
   edit** (CLAUDE.md colour rule). Stripes, outline and eyes keep their existing tokens.
@@ -278,14 +282,19 @@ Starting lists from the 2026-10-04 draft, **superseded** by the prototype's list
   Both are revoked and re-granted, never widened table-wide. This touches the 0016 rule "never widen
   these grants". The two columns are cosmetic, like `avatar`, and the change is flagged in
   Decisions C1.
-- **The 0016 backstop trigger is unchanged.** It guards game columns only, and these aren't game
-  columns.
-- `avatar_options()` is revoked from `public` and `anon` and granted to `authenticated`. The
-  `grants.test.mjs` list becomes 14 names.
-- **Client copy:** `src/lib/avatars.ts` exports `AVATAR_COLORS` and `AVATAR_COSMETICS` (name lists).
-  `test:db` reads those array lengths and fails if they differ from `avatar_options()`, the same
-  pattern as `PLAYER_CAP` (`rooms.ts:55-59`). `coerceAvatarPart(n, max)` falls back to 0 for an
-  unknown index, like `coerceAvatar`.
+- **The 0016 backstop trigger is extended** (as built in 0021): it now refuses a client value for
+  EVERY game column (`score`, `streak`, `lives`, `turn_order`, `is_eliminated`, `connected_at`) on
+  INSERT and on UPDATE, plus `room_id` / `player_id` on UPDATE, so it holds even if the grants were
+  ever widened table-wide. 0022 must add its new game columns (`round_wins`, `time_bank_ms`,
+  `contending`) to it and to the test's `GAME_COLUMNS`.
+- **No new function:** there is no `avatar_options()`, so nothing new to revoke, and the
+  `grants.test.mjs` list stays at 13 names. The sync trigger's function is revoked from `public`,
+  `anon` and `authenticated` (triggers don't need EXECUTE).
+- **Client copy:** `src/lib/avatarParts.ts` (not `avatars.ts`, which stays the legacy key list)
+  exports `AVATAR_COLORS` and `AVATAR_COSMETICS`. `avatar_parts.test.mjs` reads those list lengths
+  and fails if they differ from the CHECK ranges, or if `partsFromKey` / `keyFromParts` disagree
+  with the trigger for any key or any of the 112 pairs. `coerceAvatarPart(n, count)` falls back to
+  0 for an unknown index, like `coerceAvatar`.
 
 ### 2.4 Storage and migration while the old client still runs
 
@@ -294,32 +303,35 @@ the new columns. The plan:
 
 1. **Migration A (additive):**
    - Add both columns with defaults.
-   - Backfill them from the existing `avatar` key with a fixed mapping. **The table below is the
-     2026-10-04 draft's and is superseded:** the prototype proposes the mapping for each candidate
-     cosmetic set (`design/prototypes/avatar-maker/README.md` on `design/avatar-maker`), and the
-     picked set's mapping replaces it. The mechanism (backfill, sync trigger, "parts win") stands.
+   - Backfill them from the existing `avatar` key with a fixed mapping. As built (0021's backfill
+     and sync trigger; `partsFromKey` in `avatarParts.ts` is the client copy). Old keys map to
+     playful-set cosmetics only:
 
-     | old key | colour | hat |
+     | old key | colour | cosmetic |
      |---|---|---|
-     | `bee` | Honey | none |
-     | `queen` | Honey | Paper crown |
-     | `drone` | Sky | Headphones |
-     | `hive` | Amber | Beanie |
-     | `honey` | Amber | none |
-     | `blossom` | Rose | Flower |
-     | `clover` | Clover | Flower |
-     | `wasp` | Slate | none |
+     | `bee` | Honey (0) | None (0) |
+     | `queen` | Honey (0) | Crown (1) |
+     | `drone` | Blue (4) | Headphones (5) |
+     | `hive` | Grey (7) | Honey pot (7) |
+     | `honey` | Honey (0) | Honey pot (7) |
+     | `blossom` | Rose (2) | Flower (3) |
+     | `clover` | Green (6) | Flower (3) |
+     | `wasp` | Grey (7) | None (0) |
 
    - Add a `BEFORE INSERT OR UPDATE` sync trigger on `room_players`:
      - If the row's `avatar` changed and the parts did NOT (an old client), derive the parts from
        the mapping.
      - If the parts changed and `avatar` did not (a new client), derive `avatar` as the nearest
-       legacy key (draft lists): hat Paper crown → `queen`, Flower → `blossom`, Headphones → `drone`, Beanie →
-       `hive`; else colour Slate → `wasp`, Amber → `honey`; else `bee`.
-     - If both changed, the parts win.
+       legacy key (`keyFromParts`): Crown or Graduation cap → `queen`; Headphones → `drone`; Honey
+       pot → `hive` if Grey, else `honey`; Flower → `clover` if Green, else `blossom`; otherwise
+       colour Grey → `wasp`, Rose → `blossom`, Green → `clover`; else `bee`.
+     - On INSERT, a non-(0,0) pair wins, else the key fills the pair. On UPDATE, if both changed,
+       the parts win. The trigger assigns only the three avatar fields and is SECURITY INVOKER.
 
      Old and new clients in the same room then each see a sensible avatar.
-   - Extend the rollback file to drop the trigger, the function and the columns.
+   - 0021 ships its own rollback, `supabase/rollback/0021_down.sql` (tested by
+     `avatar_parts_rollback.test.mjs`; it returns the catalog to exactly 0001–0020), rather than
+     extending `0016-0020_down.sql`. To undo both, run `0021_down` first.
    - **Fully compatible:** an old client's insert names only legacy columns, and the parts fill
      themselves in.
 2. **The new client** writes the parts (and lets the trigger keep `avatar`), and reads the parts.
@@ -345,10 +357,11 @@ Structure (one `AvatarMaker` component, used in the lobby and the waiting room):
 
 - `<fieldset>` with `<legend>` "Your bee".
 - Per row: `<div role="group" aria-labelledby="row-label">` containing:
-  - `<button aria-label="Previous bee colour, 3 of 8">` (lucide `ChevronLeft`, aria-hidden); the
+  - `<button aria-label="Previous bee colour, 5 of 8">` (lucide `ChevronLeft`, aria-hidden); the
     name carries the current position so a screen reader hears where it is
-  - `<span id="row-label">Colour</span>`, then a value `<span>` "Blue, 3 of 8"
-  - `<button aria-label="Next bee colour, 3 of 8">`
+  - `<span id="row-label">Colour</span>`, then a value `<span>` "Blue, 5 of 8" (the cosmetic row
+    reads "n of 14")
+  - `<button aria-label="Next bee colour, 5 of 8">`
 - A "Surprise me" `<Button>` (random colour and cosmetic, never the current pair), and the name
   field next to it.
 
@@ -357,7 +370,7 @@ Keys:
 | Key | Effect |
 |---|---|
 | Tab / Shift+Tab | Moves through: Colour prev, Colour next, Cosmetic prev, Cosmetic next, Surprise me, Name. Every control is a real button. |
-| Enter / Space on an arrow | Steps one item. Wraps at both ends (8 → 1, 1 → 8), as skribbl does. |
+| Enter / Space on an arrow | Steps one item. Wraps at both ends (colour 8 → 1, 1 → 8; cosmetic 14 → 1, 1 → 14), as skribbl does. |
 | ← / → while either button in a row has focus | Same as prev/next, so a keyboard player can sit on one button and arrow through. Focus does NOT move. |
 | Home / End in a row | First or last item |
 
@@ -367,10 +380,10 @@ There is deliberately no ↑/↓ binding, so a row never traps vertical page scr
   is measured with `elementFromPoint` anyway, per the redesign rule.
 - **Focus ring:** the one `ui.css` focus rule; never a per-component outline.
 
-**Spoken description:** one function, `describeAvatar(color, cosmetic)` in `lib/avatars.ts`:
-- "Blue bee wearing a crown", "Honey bee" (no cosmetic), "Teal bee holding a pencil".
-- A per-cosmetic phrase table ("wearing a crown", "holding a pencil"), so the phrases read
-  naturally.
+**Spoken description:** one function, `describeAvatar(color, cosmetic)` in `lib/avatarParts.ts`
+(already on `main`):
+- "Blue bee wearing a crown", "Honey bee" (no cosmetic), "Aqua bee holding a pencil".
+- A per-cosmetic phrase table (the table in §2.2), so the phrases read naturally.
 
 Where it is used:
 - **Preview:** a polite live region under the preview carries the description. It changes once per
@@ -1537,7 +1550,7 @@ Also bump "Last checked against the code". Nothing else changes:
 |---|---|---|---|
 | — | `word_start` (stage 3) | Race: `start_game_tx` and `advance_round_tx` set `round_started_at = now() + preroll_ms`, and `submit_answer_tx` refuses an answer before it (`round_not_started`), so a negative elapsed can never score. Elimination: the opening turn also gets the preroll (later turns already start in the future, `0012:856-867`). `preroll_ms()` constant (1500), revoked from anon. | The client from stage 3 shows "Get ready" for a future start. It ships **before** this migration, so a client never meets a future start it can't display. The old client would merely show a full, still bar for 1.5 s. |
 | — | `echo_credit` (stage 4) | `public.echo(p_room_id)` RPC (granted to `authenticated` only, SECURITY DEFINER, `search_path` pinned); `private.echo_samples` and `private.echo_quota`; `purge_echo_samples()` plus a 10-minute cron job (expired quota rows go in the existing daily job); the credit is computed **inside** the submit transactions (median of samples, in an exception block that falls back to 0); `round_scores.credit_ms`; `timing_params()` gains `latency_cap_ms` (**70**, fourth pass), `echo_min_samples` (3), `boot_credit_cap_ms` (500) and `settle_window_ms` (**250**); `abuse_limits()` gains the five echo limits (§4.5.1) and `max_games_started_per_host_per_day` (**30**, fourth pass); `private.runtime_flags` with its six starting rows (§4.5.2); the non-waiting `try_lock_for(kind, id)` helper the echo uses (§4.5.5), revoked from every client role like `lock_for`; `rooms.feed_on boolean not null default false`. `purge_anonymous_users` adds `echo_samples.player_id` and `echo_quota.player_id` to its checks. | New objects only. `rooms.feed_on` has a default and isn't in the client INSERT grant (`0017`). |
-| 0021 | `avatar_parts` | `avatar_options()`; `room_players.avatar_color` and `avatar_hat` plus CHECKs; backfill from `avatar`; the legacy sync trigger (§2.4); column grants re-issued with the two columns | The old client names only legacy columns; the trigger fills the parts. |
+| 0021 | `avatar_parts` (**live since 2026-10-15**) | `room_players.avatar_color` (0–7) and `avatar_cosmetic` (0–13) with plain range CHECKs (no `avatar_options()`); backfill from `avatar`; the legacy sync trigger (§2.4); both column grants gain exactly the two columns; the 0016 backstop extended to every game column on INSERT and UPDATE | The old client names only legacy columns; the trigger fills the parts. Verified live: the old client still joins and changes avatar. |
 | 0022 | `mode_schema` | Widen the `rooms.mode` CHECK to add `dash`, `hourglass` and `spotlight`. Add `room_players.round_wins int not null default 0`, `time_bank_ms int` (null until start) and `contending boolean not null default true`. Add `rooms.phase text` (`regular` / `sudden_death`, null otherwise). Add the `round_scores` table. Add `dash_params()`, `hourglass_params()`, `spotlight_params()` and `timing_params()`. **Extend the 0016 backstop trigger** to reject client rows with non-default `round_wins`, `time_bank_ms` or `contending`. | Purely additive. The old client never creates the new modes (its lobby offers Race and Elimination only), and the column grants are unchanged, so it cannot set the new columns. |
 | 0023 | `timing_core` | `p_received_at` overloads of the submit functions; `floor_ms()`; the `too_fast` path; nothing for `timeout-turn`: `timeout_turn_tx` already takes an optional caller and is already granted to `service_role` (`0012:1052-1057,1152-1157`), so stage 8 needs no migration. The old signatures stay until the old edge functions are redeployed. | The old edge functions call the old signatures, which are unchanged. |
 | 0024 | `dash_engine` | `start_dash_tx`, `submit_dash_tx`, `close_round_tx` (the single resolution path for Dash rounds: winner bookkeeping, end checks, sudden death), `sweep_expired_dash_rounds()` plus a 5 s cron job | New functions only. Mode-guarded. |
@@ -1546,7 +1559,9 @@ Also bump "Last checked against the code". Nothing else changes:
 | 0027 | `typing_channel` | `typing_topic_ok()`, plus the two RLS policies on `realtime.messages` (§5.2) | Nothing old uses Broadcast. |
 
 **Migration numbers** follow the order in which stages ship (§8, revised 2026-10-04). The table is in
-topic order, and the numbers in it are from the first draft. The real sequence will be:
+topic order, and the numbers in it are from the first draft, except 0021: `avatar_parts` shipped
+first and holds 0021 for good, so everything else starts at 0022. The real sequence for the rest
+will be (ignore `avatar_parts` in it, it is done):
 `word_start`, `mode_schema` (Hourglass's part) + `timing_core` + `echo_credit`, `hourglass_engine`,
 `avatar_parts`, `dash_engine` (with Dash's columns from `mode_schema`: `round_wins`, `contending`,
 `rooms.phase`, `dash_params()`), `spotlight_engine` + `typing_channel`, then `retire_old_modes`
@@ -1619,8 +1634,9 @@ Every one returns only `{ok:false, error:"internal_error"}` on a 500 (hardening 
   path) and is repeated on INSERT (joining) and on UPDATE (changing your bee in the waiting room).
   - **Out-of-range values are rejected (23514, `check_violation`):**
     - `avatar_color` −1, 8 (one past the last of 8), and 32767 (smallint max);
-    - `avatar_hat` −1, 10 (one past the last of 10), and 32767;
-    - the boundary values 0, 7 and 9 are accepted;
+    - `avatar_cosmetic` −1, 14 (one past the last of 14), and 32767;
+    - the boundary values 0, 7 and 13 are accepted (as built, every range edge is read from
+      `avatarParts.ts`'s list lengths, never hard-coded);
     - `null` for either is rejected (23502, `not_null_violation`);
     - a fractional value (2.5) and a string (`'2'::text` cast through PostgREST's JSON path) are
       rejected by the type (22P02) rather than silently rounded. The test sends the value the way
@@ -1631,26 +1647,31 @@ Every one returns only `{ok:false, error:"internal_error"}` on a 500 (hardening 
       `time_bank_ms`, `contending` and `connected_at`. The 0016 backstop trigger is proven
       independently by temporarily granting the column inside the test transaction, the way
       `score_integrity.test.mjs` does today.
-    - An UPDATE of `avatar_color` / `avatar_hat` on your own row leaves **every other column
+    - An UPDATE of `avatar_color` / `avatar_cosmetic` on your own row leaves **every other column
       byte-identical**. The whole row is snapshotted with `to_jsonb(rp) - 'avatar' - 'avatar_color'
-      - 'avatar_hat'` before and after, so the sync trigger is proven to write only the three
+      - 'avatar_cosmetic'` before and after, so the sync trigger is proven to write only the three
       avatar columns.
-    - The same UPDATE **during an active game**, in each mode (Dash mid-round, Hourglass with a
-      bank, Spotlight on your turn), leaves `rooms`, `round_results`, `round_scores` and every
-      `room_players` game column unchanged. Changing your bee is never a game event.
+    - The same UPDATE **during an active game** leaves `rooms`, `round_results` and every
+      `room_players` game column unchanged. Changing your bee is never a game event. As built
+      (0021) this runs in race and elimination, lobby and mid-game; each new mode's engine stage
+      adds its own case (Dash mid-round, Hourglass with a bank, Spotlight on your turn, plus
+      `round_scores`).
     - An UPDATE aimed at **another player's** row changes 0 rows (the 0002 own-row policy). The
       sync trigger can't be used to reach across rows.
     - The sync trigger is `SECURITY INVOKER` (asserted from `pg_proc.prosecdef = false`), so it runs
       with the client's privileges and can't write anything the client couldn't.
-    - `avatar_options()` is not SECURITY DEFINER and takes no arguments, so it can't be a write
-      path. `has_function_privilege` shows anon can't execute it.
-  - grants: the exact column lists for INSERT and UPDATE are asserted from
-    `information_schema.column_privileges`, so a later migration that widens them fails here;
+    - There is no `avatar_options()` function, so there is no new function to prove harmless.
+  - grants: the exact column lists for INSERT and UPDATE are asserted (as built, through
+    `has_column_privilege`, the same facts as `information_schema.column_privileges`), so a later
+    migration that widens them fails here;
   - the old-client insert shape still works and gets mapped parts;
   - sync in both directions;
   - "both changed: the parts win";
   - backfill of every legacy key;
-  - `avatar_options()` equals the client lists (reads `src/lib/avatars.ts`).
+  - the CHECK ranges equal the client list lengths, and all 112 pairs map the same way in SQL and
+    TypeScript (reads `src/lib/avatarParts.ts`).
+  - As built, 0021's suite is 70 tests, plus `verify_avatar.sql` (45 checks against the live
+    project, pinned by `verify_avatar_script.test.mjs`) and the rollback test.
 - `echo.test.mjs` (the echo's protection, §4.5.1). Every rejection asserts **that no row was
   written** to `echo_samples` or `echo_quota`.
   - **Non-members are rejected:**
@@ -1960,8 +1981,8 @@ Stage 4 also carries what Hourglass can't run without: the `rooms.mode` CHECK ga
 | | **⏸ Stopping point A: Hourglass live**, next to Race and Elimination (D1 still holds: Dash later replaces Race and Spotlight replaces Elimination). | | | |
 | | ***Stand-alone fix and avatars*** | | | |
 | 8 | **Elimination timeout fast path:** a `timeout-turn` edge function plus the client nudge in `useMultiplayerGame` (replacing the early return at `:604-625`). No migration: `timeout_turn_tx` already takes an optional caller (`0012:1052-1057`). The CORS half of the old stage 1 (`Access-Control-Max-Age: 7200`) is **already live** (`64f65f3`, 2026-10-04). | 0.5 | expired turns end in ~150 ms instead of up to ~5 s | Ian alone, two browsers (Chrome + Edge are two guest identities): let a turn expire and watch it advance. |
-| 9 | `avatar_parts` migration: schema, sync trigger, backfill, rollback, plus the §6.5 range and no-game-state tests | 1 | nothing visible | test:db |
-| 10 | Avatar maker UI from the picked prototype (`design/avatar-maker`), cosmetics art, 8 colour tokens, localStorage migration, contrast gate at 0, keyboard pass | 2 | the new picker | Ian: a taste check (the prototype is it) plus a keyboard pass |
+| 9 | `avatar_parts` migration: schema, sync trigger, backfill, rollback, plus the §6.5 range and no-game-state tests. **Done: 0021, live and verified 2026-10-15 (45 PASS, 0 FAIL).** | 1 | nothing visible | test:db |
+| 10 | Avatar maker UI from the picked prototype (`design/avatar-maker`), cosmetics art for all 14, 8 colour tokens, localStorage migration, contrast gate at 0 over all 112 pairs, keyboard pass (counters "n of 8" and "n of 14") | 2 | the new picker | Ian: a taste check (the prototype is it) plus a keyboard pass |
 | | ***Dash*** | | | |
 | 11 | **Dash engine on the timing core:** `dash_engine` migration (adds `dash` to the mode CHECK, `round_wins`, `contending`, `rooms.phase`, `dash_params()`), `close_round_tx` with the 250 ms settle window, sudden death, Dash sweeper; `start-match` / `submit-round` / `close-round` route Dash; test:db plus concurrency | 1.5 | nothing visible | Tests only |
 | 12 | Dash UI behind `?modes=next`: pips, sudden death, `DashResults`; a Dash playtest for what only Dash uses (`commit_lag_ms` against the settle window, `settled_late`) | 2 | Dash (flagged) | **Real players:** 3–4 people, at least one phone on mobile data |
@@ -2174,7 +2195,7 @@ question.
 | D14 | Presence for "left the game"? | No | It is client-asserted. Timeouts handle leaving. | Default |
 | D15 | Feed content | Letters | The spectacle is the point; C3 covers privacy. | Default |
 | D16 | Feed throttle | 250 ms; 400 ms if the Realtime cap binds | 32 msg/s at 8 players | Default |
-| D17 | Avatar model | **Changed 2026-10-13, set picked 2026-10-14:** two append-only smallint indexes, **8 colours and 14 cosmetics** (index 0 = none). Ian picked BOTH prototype sets: the playful set keeps indices 0–7, the spelling-themed items follow at 8–13 (Headphones shared, 5). Built as migration 0021 on branch `feature/avatar-db` (plain range CHECKs 0–7 / 0–13 instead of an `avatar_options()` function, so the client-callable function list stays at 13; not applied yet). | A range CHECK, asserted against the client (`src/lib/avatarParts.ts`) | **Ian** |
+| D17 | Avatar model | **Changed 2026-10-13, set picked 2026-10-14:** two append-only smallint indexes, **8 colours and 14 cosmetics** (index 0 = none). Ian picked BOTH prototype sets: the playful set keeps indices 0–7, the spelling-themed items follow at 8–13 (Headphones shared, 5). Built as migration 0021, columns `avatar_color` and `avatar_cosmetic` (plain range CHECKs 0–7 / 0–13 instead of an `avatar_options()` function, so the client-callable function list stays at 13), 112 combinations; **live and verified on 2026-10-15** (45 PASS, 0 FAIL) and merged to `main`. | A range CHECK, asserted against the client (`src/lib/avatarParts.ts`) | **Ian** |
 | D18 | "Surprise me" button | Yes | Cheap, and keyboard reachable | Default |
 | D19 | Legacy `avatar` column after the cleanup | Keep the column; drop the sync trigger in stage 16 | No user benefit in dropping it | Engineering |
 | D20 | Pin edge functions to the DB region? | **Yes, required.** Verified against Supabase's docs on 2026-10-04: regional invocation via `forceFunctionRegion` / `x-region` / supabase-js `region`, with no plan restriction documented (§4.4.1). Uses the query parameter, which needs no CORS change. | Echo and answer stamps must share one clock pool. | Resolved (this review) |
