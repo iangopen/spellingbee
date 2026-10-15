@@ -192,6 +192,26 @@ tier) has its own rules in `src/data/words/CLAUDE.md` and `supabase/CLAUDE.md`.
 - `src/lib/avatars.ts` is the client's one copy of `public.avatar_keys()`
   (`verify_elimination_client.mjs` asserts they match); read stale values through
   `coerceAvatar`.
+- **Avatar parts (migration 0021, LIVE and verified 2026-10-15):**
+  `room_players.avatar_color` (0-7) and `avatar_cosmetic` (0-13, 0 = none),
+  smallint, default 0, range CHECKs. Both lists are APPEND-ONLY (a stored index
+  means the same bee forever). `src/lib/avatarParts.ts` is the client copy (names,
+  `describeAvatar`, `partsFromKey`/`keyFromParts`); `avatar_parts.test.mjs` fails
+  if it disagrees with the CHECKs or the trigger. `room_players_avatar_sync`
+  keeps the legacy key and the numbers consistent both ways (insert: a non-(0,0)
+  pair wins, else the key fills the pair; update: changed numbers win, else a
+  changed key fills them); it only assigns those three fields. The mapping has a
+  second copy in 0021's backfill. Keep `avatar` and the trigger until every
+  client writes the numbers (spec stage 16 drops the trigger). Where 0021 differs
+  from the spec (§2, §6.2): the column is `avatar_cosmetic`, not `avatar_hat`
+  (the list now holds more than hats), and there is no `avatar_options()`; the
+  range CHECKs plus `avatarParts.ts` replace it, so the guest's function list
+  stays at 13. Update the spec on `plan/multiplayer-modes` to match.
+  The count N = 14 (indices 0-13) is reconciled across the branch: the CHECK,
+  `avatarParts.ts`, the trigger's mapping, the backfill, the tests (their range
+  edges come from the module's list lengths) and `verify_avatar.sql` (45 checks,
+  pinned by its test). For the picker: the cosmetic counter reads "n of 14", not
+  the prototype's "n of 8", and token rendering covers 8 x 14 = 112 pairs, not 64.
 - Client: elimination has its own `TurnScreen`, not a mode flag in RoundScreen.
   The guess input is ABSENT (not disabled) for non-holders. `isMyTurn` derives
   from server facts only, never the clock. The knockout overlay is latched and
@@ -286,7 +306,11 @@ tier) has its own rules in `src/data/words/CLAUDE.md` and `supabase/CLAUDE.md`.
 - Scores are server-only: `room_players` INSERT is a column grant on
   `(room_id, player_id, display_name, avatar)`, UPDATE `(display_name, avatar)`,
   plus a backstop trigger. Room INSERT is `(id, code, tier, host_id, mode,
-  lives_setting)`; `created_at` stays server-set. Never widen these.
+  lives_setting)`; `created_at` stays server-set. Never widen these. The one
+  deliberate exception is 0021 (live since 2026-10-15): both room_players grants gain
+  exactly `avatar_color, avatar_cosmetic`, and its backstop then covers EVERY
+  game column (score, streak, lives, turn_order, is_eliminated, connected_at) on
+  INSERT and UPDATE, plus room_id/player_id on UPDATE.
 - Names: CHECK (1-24 code points, no control chars) plus a SECURITY DEFINER
   trigger against `private.blocked_name_terms` (sha256 digests only; the term list
   is never in the repo). Add terms with `supabase/scripts/hash_name_terms.mjs`
@@ -305,7 +329,11 @@ tier) has its own rules in `src/data/words/CLAUDE.md` and `supabase/CLAUDE.md`.
 - Guarded paths for presentation work: `src/hooks/*`, `checkAnswer`,
   `GameEngineApi`, `src/lib/rooms.ts`, `auth.ts`, `captcha.ts`, `supabase/`.
 - **Any new migration must extend `supabase/rollback/0016-0020_down.sql` and its
-  test, or ship its own rollback.**
+  test, or ship its own rollback.** 0021 ships its own (`supabase/rollback/0021_down.sql`,
+  `avatar_parts_rollback.test.mjs`); to undo both, run 0021_down first.
+- `supabase/tests/harness.mjs` honours `SB_MIGRATION_OVERRIDE="<file>=<path>"` to
+  run a suite against a deliberately weakened copy of one migration (the way to
+  prove a security test has teeth). Never set it in normal runs.
 - **PRIVACY.md** (last checked 2026-09-29) must be updated in the same commit as
   anything that sends or stores something new. It must never promise less than
   the code does. No published file (README, PRIVACY, LICENSE, `public/`,
@@ -322,6 +350,9 @@ npx supabase functions deploy --use-api --project-ref wjorfdfpbgyykbhxydqj
 ## Tests and checks
 - `npm run build` (the gate), `npm run lint` (0 errors), `npm test` (src +
   scripts), `npm run test:db` (real migrations under PGlite).
+- `.gitattributes` keeps every `*.sql` LF. The rollback tests compare function
+  bodies (`pg_proc.prosrc`) byte for byte, so a CRLF checkout on Windows failed
+  them; don't remove it.
 - `npm --prefix supabase/concurrency ci && npm --prefix supabase/concurrency test`:
   real Postgres 17 races against the advisory locks, each with a negative control.
 - Browser checks, one command: `PW_MODULE=<playwright/index.mjs> node
@@ -361,6 +392,20 @@ Everything below is live unless marked open.
   `897a55a`, deploy run 38461151873; live bundle `index-Dp6w6GCi.js` = the tested
   build; one live word: 7 requests, all to the site's own origin). Whether a real
   phone now speaks the first word is NOT yet known (see Open).
+- **Multiplayer and avatar decisions (Ian, 2026-10-13/14), recorded on branch
+  `plan/multiplayer-modes`:** Hourglass is the first mode to build (spec D37,
+  timing core first). Hourglass charges stay rounded to 0.1 s with the 200 ms
+  dead band, and the exact milliseconds are shown ONLY in the results table
+  (D38). Avatars: 8 colours and BOTH prototype cosmetic sets, 14 cosmetics with
+  None as 0 (D17; prototype on `design/avatar-maker`). The picker UI is the next
+  session.
+- **Avatar parts, database side (2026-10-15):** migration 0021 is LIVE on project
+  `wjorfdfpbgyykbhxydqj` (applied by Ian). `supabase/scripts/verify_avatar.sql`
+  ended in "AVATAR VERIFY: 45 PASS, 0 FAIL" on 2026-10-15, and the live (old)
+  client still joins a lobby and changes avatar. `npx supabase migration list`
+  shows local and remote agreeing on 0001-0021. `src/lib/avatarParts.ts` is on
+  main but imported by nothing yet. Rollback: run `supabase/rollback/0021_down.sql`
+  in the SQL editor, then `npx supabase migration repair --status reverted 0021`.
 - Docs: README, PRIVACY.md (last checked 2026-09-29), LICENSE (MIT, Ian Gopen).
   `design/README.md` maps the design folder; `design/PHASE3.md` is the design
   system spec. The design images (prototype screenshots, baselines, stage

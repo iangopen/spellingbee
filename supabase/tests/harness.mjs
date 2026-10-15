@@ -96,9 +96,17 @@ export function migrationFiles() {
     .sort();
 }
 
-/** A migration's SQL, with pg_cron's CREATE EXTENSION stripped (the stub cron schema stands in for it). */
+/**
+ * A migration's SQL, with pg_cron's CREATE EXTENSION stripped (the stub cron schema stands in for it).
+ *
+ * SB_MIGRATION_OVERRIDE="<file>=<path>" swaps one migration for another file, so a
+ * suite can be run against a deliberately weakened copy to prove its tests catch
+ * the weakness (e.g. 0021 without its CHECKs). Never set in normal runs.
+ */
 export function migrationSql(f) {
-  return readFileSync(join(migrationsDir, f), "utf8").replace(/create extension if not exists pg_cron;/gi, "");
+  const [name, path] = (process.env.SB_MIGRATION_OVERRIDE ?? "").split("=");
+  const file = name === f && path ? path : join(migrationsDir, f);
+  return readFileSync(file, "utf8").replace(/create extension if not exists pg_cron;/gi, "");
 }
 
 /**

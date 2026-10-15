@@ -650,6 +650,154 @@ in the same tick, word on its end, nothing else for 20 s.
   and resumed later; one check ran after a 2272 MB reading because the reading
   and the run were chained in one command (it passed).
 
+## 2026-10-14: avatar parts, database side (branch feature/avatar-db, not applied)
+
+**Brief (Ian).** Build only the database side of the approved avatar maker, plus a data-only
+module. It must work with the deployed client. No UI, nothing applied to production.
+
+**Picks:**
+- **Cosmetics:** "make all of both playful and spelling themed". That is 14 cosmetics with
+  None as 0: the playful set keeps its prototype indices 0–7, the spelling-themed items follow
+  at 8–13, and Headphones is the same item in both. The cosmetic CHECK is therefore 0–13, not
+  the brief's 0–7. The colour CHECK stays 0–7.
+- **Display precision:** exact milliseconds only in the Hourglass results table.
+
+**How avatars work today** (read on main `447214b`):
+- `avatar_keys()` is defined in `0012_elimination_engine.sql:73-93`.
+- `room_players.avatar` is `text not null default 'bee' check (avatar = any(avatar_keys()))`
+  (`0012:343-345`).
+- The UPDATE grant is `(display_name, avatar)` (`0012:359`). The INSERT grant is `(room_id,
+  player_id, display_name, avatar)` (`0016:32-33`), and the backstop trigger is INSERT-only on
+  four game columns (`0016:44-68`).
+- RLS pins insert and update to the caller's own row (`0002:149-163`).
+- **The deployed client:**
+  - inserts the key only: `rooms.ts:119-121` (create) and `:178-180` (join);
+  - updates the key only: `:225-230`;
+  - reads an explicit column list: `PLAYER_COLUMNS`, `:52-53`.
+
+**What was built:**
+- **`supabase/migrations/0021_avatar_parts.sql`:**
+  - the two smallint columns with range CHECKs;
+  - the backfill from the key;
+  - `room_players_avatar_sync` (security invoker, `search_path ''`, assigns only the three
+    avatar fields);
+  - grants widened by exactly the two columns, with the widening stated in the file;
+  - the 0016 backstop extended to every game column on INSERT and UPDATE (plus `room_id` /
+    `player_id` on UPDATE).
+- **`supabase/rollback/0021_down.sql`**, with `avatar_parts_rollback.test.mjs`: the catalog
+  returns to exactly 0001–0020 (columns and their grants, constraints, triggers, functions and
+  their ACLs, policies). The snapshot moved to `tests/catalog.mjs`, and the 0016–0020 rollback
+  test now stops at 0020.
+- **`supabase/tests/avatar_parts.test.mjs`** (70 tests, writes in PostgREST's shapes):
+  - bad values on insert and update (−1, past the end, 32767, null, 2.5, strings);
+  - the exact grants;
+  - game columns refused with or without the new columns;
+  - the backstop refusing on its own when the grants are widened table-wide;
+  - a bee change leaving every other column identical in race and elimination, lobby and
+    mid-game;
+  - another player's row untouched;
+  - the old-key client path end to end;
+  - all 8 keys round-trip, and all 112 pairs agree with the TS module;
+  - one trigger firing at depth 1;
+  - the backfill of rows that existed before 0021.
+- **`src/lib/avatarParts.ts`** with 30 unit tests. Nothing imports it, so the built bundle is
+  `index-Dp6w6GCi.js`, identical to live.
+- **`supabase/scripts/verify_avatar.sql`:** one DO statement acting as throwaway guests
+  through a transaction-local role and claims. It runs 34 checks and ends by raising its report,
+  which rolls everything back.
+  - Tested in PGlite (`verify_avatar_script.test.mjs`): 34 PASS / 0 FAIL with nothing kept,
+    FAILs on a weakened migration, and a clean stop on a 0020 database.
+  - It doesn't use an explicit BEGIN/ROLLBACK, so an error can't leave the editor's pooled
+    connection in an aborted transaction.
+
+**Weakened-migration runs** (`SB_MIGRATION_OVERRIDE`, a new harness hook), avatar suite:
+
+| Weakening | Result |
+|---|---|
+| No CHECKs | 13 failures (every range test and the schema test) |
+| No sync trigger | 14 failures (the mapping, the old-client path, the identical-row tests) |
+| 0016 backstop unchanged | 6 failures (the backstop-alone tests) |
+| Table-wide grants | 1 failure (the exact-grants test). The game-column tests still passed, because the widened backstop refused them: defence in depth working. |
+
+**Gates:**
+- `npm test`: 174 passed.
+- `npm run test:db`: 175 passed (10 files).
+- Lint: 0 errors (the known 11 warnings).
+- Build: passes.
+- Memory was read before each heavy step; the lowest reading was 2,432 MB (floor 2,000).
+
+PRIVACY.md is unchanged: it already says the game stores your avatar and that room players see
+it, and colour and cosmetic are that avatar.
+
+**Follow-up the same day (review and finish):**
+- **Line endings.** Re-run on a fresh Windows checkout, `test:db` failed one test (174/175):
+  the 0021 rollback test.
+  - `core.autocrlf` is on, so the three new SQL files came out CRLF, while 0001–0020 were LF.
+  - The rolled-back backstop's `prosrc` differed from 0016's only in `\r`.
+  - With an LF copy of `0021_down.sql` the test passed 5/5.
+  - Fix: a new `.gitattributes` (`*.sql text eol=lf`) and a re-checkout of the three files;
+    all 24 SQL files are now LF.
+- **Spec §6.5 check.** Every avatar item is covered except one: a mid-game bee change must
+  leave the room's `rooms` and `round_results` rows unchanged, not only the player's row.
+  - Added that snapshot to the four lobby/mid-game cases.
+  - Against a weakened 0021 (the sync trigger made SECURITY DEFINER and nudging
+    `round_results.turn_started_at`), both mid-game cases fail on the new line (3 failures in
+    all). Against the real 0021, 70/70 pass.
+  - Items that deliberately differ from the spec: `avatar_cosmetic` instead of `avatar_hat`;
+    no `avatar_options()`; grants read through `has_column_privilege` (same facts as
+    `information_schema.column_privileges`); game columns from 0022 (`round_wins`,
+    `time_bank_ms`, `contending`) don't exist yet, so 0022 must extend the backstop and
+    `GAME_COLUMNS`. The localStorage mapping test belongs to the picker session.
+- **Gates after the follow-up:** `test:db` 175 passed; `npm test` 174 passed; lint exit 0
+  (11 warnings); build passes, still `index-Dp6w6GCi.js`.
+
+**Cosmetic count reconciled (same day).** Ian asked to make the whole branch agree on one N
+before 0021 is applied. N = 14 (None + 13), the recorded D17 pick; the brief's choice slot was
+left blank.
+- **Audit:**
+  - The CHECK is 0–13.
+  - `avatarParts.ts` holds 14 cosmetics, matching the prototype's `bee-art.js` names and
+    phrases item for item.
+  - The mapping sends the 8 old keys to playful indices only.
+  - The unit tests pin 14, and the rollback has no range.
+- **Mismatches found:**
+  - `verify_avatar.sql` tried only some bad values per column (no cosmetic −1, 32767, null
+    or string; no colour 2.5; no update with colour 8).
+  - The database tests hard-coded the "one past the end" values (8, 14) and the top of each
+    range, instead of reading the module's list lengths.
+  - A statement that wrongly succeeded in the verify script kept its row and broke every check
+    after it: 24 FAILs for one real fault.
+- **Fixes:**
+  - The verify script now tries all six bad values for both columns, on insert and on update.
+  - Each attempt now always undoes itself, so a wrong success fails only its own check.
+  - The verify script now runs 45 checks, and its test pins 45.
+  - The database tests now take the range edges from `avatarParts.ts`.
+- **Wrong ranges shown failing:**
+  - Cosmetic CHECK 0–7 (the 8-cosmetic version): 9 failures. They are the schema test, the
+    top-of-range test, the 112 pairs, the four identical-row cases, the loop test and the
+    verify test (43 PASS, 2 FAIL: the range check and a bee change to cosmetic 12).
+  - Cosmetic CHECK 0–14: 4 failures. They are the schema test, "one past the end" on insert
+    and on update, and the verify test (42 PASS, 3 FAIL: the range check and the two
+    cosmetic-14 refusals).
+- **Gates, one at a time, memory read before each:** `test:db` 175 passed; `npm test` 174
+  passed; lint exit 0 (11 warnings); build passes, `index-Dp6w6GCi.js`. The lowest memory
+  reading was 5,674 MB.
+- The spec on `plan/multiplayer-modes` still says `avatar_hat` with 10 items. It is not on
+  this branch and was left alone (CLAUDE.md notes it).
+
+**Open:** Ian applies 0021 (CLAUDE.md, Open, has the steps). The picker UI comes next.
+
+## 2026-10-15: migration 0021 applied and verified on the live project
+
+- **Applied by Ian** to `wjorfdfpbgyykbhxydqj` with the steps CLAUDE.md listed (link,
+  `db push --dry-run`, `db push`).
+- **Verify script:** `supabase/scripts/verify_avatar.sql` in the SQL editor ended in
+  "AVATAR VERIFY: 45 PASS, 0 FAIL" on 2026-10-15 (it keeps nothing).
+- **Old client:** on the live site, joining a lobby and changing avatar still work.
+- **`npx supabase migration list`** (run from the branch, project already linked): local and
+  remote both list 0001-0021, 0021 included, with nothing local-only or remote-only.
+- 0021 was moved out of CLAUDE.md's Open list; its rollback stays recorded there.
+
 ## Archived CLAUDE.md (2026-10-12, before the trim)
 
 CLAUDE.md had grown to 1,437 lines (95 kB), re-read at every session. On 2026-10-12, before

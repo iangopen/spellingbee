@@ -1,0 +1,3 @@
+# SQL is LF everywhere: the PGlite rollback tests compare function bodies
+# (pg_proc.prosrc) byte for byte, and a CRLF checkout would differ.
+*.sql text eol=lf
