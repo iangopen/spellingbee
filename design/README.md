@@ -29,8 +29,9 @@ The harness tooling:
 | `shoot-hybrid.mjs` | The honey hybrid's screenshots, reduced-motion stills, and its lemon-yellow, grey-tile and decoration-only checks. Its contrast runs through `measure.mjs` with `TARGET=hybrid`. |
 | `contrast.mjs` | Checks the WCAG ratios. |
 | `icons.mjs` | Emits the lucide icons inline for the prototypes. |
-| `run-checks.mjs` | Builds, serves the build and the harness, runs every check below, prints one table. `PW_MODULE=... node design/harness/run-checks.mjs`. |
-| `measure.mjs` (`TARGET=app`) | Contrast of the real screens at the shimmer's peak. Writes into `design/baseline/`; `run-checks.mjs` moves the output to `design/stage-results/` and restores the baseline. |
+| `run-checks.mjs` | Builds, serves the build and the harness, runs every check below, prints one table. `PW_MODULE=... node design/harness/run-checks.mjs`. Runs in CI (`.github/workflows/checks.yml`) with `SB_LOG_DIR`, `SB_OUT_DIR` and `SB_REUSE_BUILD`; see its header. |
+| `measure.mjs` (`TARGET=app`) | Contrast of the real screens at the shimmer's peak. Writes into `design/baseline/` (or `OUT_DIR`); `run-checks.mjs` moves the output to `design/stage-results/` and restores the baseline, except with `SB_OUT_DIR`, where it stays in `<out>/contrast`. |
+| `compare-contrast.mjs`, `failshot.mjs`, `settle.mjs` | A contrast table against a reference, pair by pair (CI: Linux vs the committed Windows run); screenshots when a check fails (`FAIL_SHOTS`); the wait for Settings' voice list. |
 | `check-tier-bars.mjs`, `check-tier-focus.mjs` | Tier bars: tap target and focus rim on the real app / on a prototype copy. |
 | `check-settings-dialog.mjs`, `keyboard-elimination.mjs`, `keyboard-real-app.mjs` | Dialog focus; keyboard-only passes. |
 | `check-reduced-motion.mjs` | Every screen is still under reduced motion and matches the in-app switch. |

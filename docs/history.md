@@ -808,6 +808,57 @@ left blank.
   cosmetics, 112 combinations, the extended backstop, `0021_down.sql`); the migration table, the
   §6.5 tests, stages 9-10, D17 and the decisions note say 0021 is live.
 
+## 2026-10-20: browser checks and screenshots moved to GitHub Actions
+
+Why: three sessions in a row stalled because the laptop's free memory sits near 2 GB with
+nothing of the session running. This session ran no build, server, browser or test
+locally (only `node --check`, git and `gh`); everything was tested by pushing and reading
+Actions runs. Branch `ci/browser-checks` off main, worked in a separate worktree so the
+uncommitted `feature/avatar-ui` work was not touched.
+
+- **Workflow** `.github/workflows/checks.yml`: push (any branch), pull_request,
+  workflow_dispatch; `contents: read`, no secrets, dummy `VITE_SUPABASE_*`; npm cache;
+  Playwright 1.64.0 installed in `$RUNNER_TEMP`, its headless shell cached; build, lint,
+  unit, database, run-checks, Linux-vs-Windows contrast, test counts in the summary;
+  artifact kept 14 days. Optional `concurrency-tests` job by hand. deploy.yml untouched.
+- **Harness portability**: run-checks.mjs takes `SB_LOG_DIR`, `SB_OUT_DIR`,
+  `SB_REUSE_BUILD`, writes the step summary, and kills each preview's process group off
+  Windows. measure.mjs takes `OUT_DIR`. There were no Windows-only paths besides
+  `PW_MODULE`, which was already an env var, and the taskkill branch. Paths go through
+  `join`/`resolve`, output is split on `\n` after `trim()`, and the index is LF
+  (`core.autocrlf=true` on Windows), so CRLF does not reach the runner.
+- **Images missing on main (540 under design/ and docs/review/)**: none of the 14 scripts
+  run-checks runs reads an image or a baseline image. check-tier-focus loads
+  `design/prototypes/homemade/difficulty.html`, which is on main (its screenshots are not
+  needed); measure's `design/baseline/*` are text and on main. The only harness script that
+  reads the missing images is `shoot-final.mjs` (`design/prototypes/homemade/screens/*.jpg`),
+  not a check; it now stops with a message that points at tag `redesign-final`.
+  `compare.html` galleries also link to them (viewing only).
+- **Run 1 (39487886045), main's tree: 12/14.** Build, lint, 174 unit and 175 database tests
+  passed. Two failures, one cause: headless Chromium on Linux exposes no voices, so
+  Settings shows "Loading voices…" until loadVoices() gives up at 3 s, then a two-line note
+  that moves every control below it down 20px. Reduced motion (desktop Settings, both
+  themes) saw 58,000 px change between the mid-session shots at 1.8 s and 2.8 s; contrast
+  sampled three Settings focus rings 20px from where they were (1.31, 2.01, 1.44:1; 11.47
+  and 7.35 on Windows), because ring positions are read first and focused one by one over
+  several seconds. Fix: `settle.mjs`, which waits for the settled dialog in measure,
+  reduced-motion and layering. No threshold changed.
+- **Run 2 (39491848749): 14/14.** Contrast 840 pairs, 0 failing; reduced motion 68/68 at
+  zero tolerance; layering 3,104 points, 0 under; hover flash 32/32; tier focus lowest
+  7.35:1.
+- **Linux vs Windows contrast** (run 2 against `design/stage-results/final-contrast-app.json`):
+  814 shared pairs, 784 identical, 30 different (10 by <=0.05, 7 by 0.05-0.25, 10 by
+  0.25-1, 3 by >1, largest +1.44 on Quit's ring, dark round); 0 cross a threshold; the closest
+  pair, 4.52:1, is the same on both. 26 unmatched each way: random lead-in phrases, and
+  Settings' voice line (Windows: the voice `<select>` with Microsoft David; Linux: the
+  no-voices note).
+- **Proven able to fail**: temporary branch `ci/temp-break-layering` set
+  `.panel > :is(.mascot, .rosette)` to `z-index: auto`; run 39495400381 failed
+  check-layering only (942 points under the outline, e.g. the home Bests rosette),
+  13/14, with 40 failure screenshots in its artifact. The branch was deleted.
+- **Green runs on `ci/browser-checks`**: 39491848749 (push), 39495399740 (by hand, with the
+  concurrency job: green), then the docs push; see CLAUDE.md for what runs where now.
+
 ## Archived CLAUDE.md (2026-10-12, before the trim)
 
 CLAUDE.md had grown to 1,437 lines (95 kB), re-read at every session. On 2026-10-12, before

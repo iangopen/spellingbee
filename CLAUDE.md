@@ -348,6 +348,38 @@ npx supabase functions deploy --use-api --project-ref wjorfdfpbgyykbhxydqj
 ```
 
 ## Tests and checks
+- **The heavy checks run in GitHub Actions, not on the laptop** (since 2026-10-20;
+  its free memory sits near 2 GB with nothing running).
+  `.github/workflows/checks.yml` ("Checks") runs on every push to any branch, on
+  pull requests and by hand: `npm ci`, build (dummy `VITE_SUPABASE_*`, no secrets),
+  lint, `npm test`, `npm run test:db`, then `run-checks.mjs` with Playwright
+  1.64.0's headless shell on ubuntu-24.04, in about 27 minutes. It is separate from
+  deploy.yml, so a red check never blocks a deploy, and its token is read-only.
+  Results: the run's summary page (one row per check, the test counts, Linux vs
+  Windows contrast), plus artifact `checks-<run id>-<attempt>` kept 14 days (logs,
+  `contrast/` tables, `failures/` screenshots, `shots/`). The real-Postgres
+  concurrency tests are the optional `concurrency-tests` job: Actions -> Checks ->
+  Run workflow, tick the box (`gh workflow run checks.yml --ref <branch> -f
+  concurrency=true`). To test a change, push a branch and read its run.
+- **Still safe on the laptop** (no build, server or browser): `npm run lint`,
+  `node --check <file>`, `node design/harness/unused-selectors.mjs --fail`,
+  `unused-tokens.mjs --fail`, `compare-contrast.mjs` on downloaded tables, and
+  `gh run view/download`. `npm test` and `npm run test:db` are light but are tests;
+  CI runs them anyway. Run nothing heavier locally without reading the memory first.
+- **Linux vs Windows** (2026-10-20, 3 runs): contrast is measured on the background
+  with the text hidden, so the platform barely matters: 814 shared pairs, 784
+  identical, 30 differ by at most 1.44 (focus-ring bands landing a pixel apart),
+  none cross a threshold, and the closest pair (4.52:1, dark difficulty "Longer,
+  still familiar") is identical. The unmatched pairs are the random lead-in
+  phrases (measure.mjs does not seed them) and Settings' voice line: CI has no
+  voices, so the voice `<select>` (edge and ring) is measured only on Windows.
+  Tier bars, tier focus and layering are geometry or same-run pixel checks;
+  reduced motion and hover flash compare frames within one run. None uses a
+  stored baseline image, so none needs the images the squash left off main.
+- `design/harness/settle.mjs`: measure.mjs, check-reduced-motion.mjs and
+  check-layering.mjs wait for Settings' voice list to settle ("Loading voices…"
+  gone) before measuring. Without voices it changes at 3 s and moves the controls
+  below it 20px, which read as motion and as 1.31:1 focus rings. Keep the wait.
 - `npm run build` (the gate), `npm run lint` (0 errors), `npm test` (src +
   scripts), `npm run test:db` (real migrations under PGlite).
 - `.gitattributes` keeps every `*.sql` LF. The rollback tests compare function
@@ -365,6 +397,13 @@ npx supabase functions deploy --use-api --project-ref wjorfdfpbgyykbhxydqj
   auto-submit (`check-touch-autosubmit.mjs`, phone emulation) and the
   unused-selector/token checks. `check-glow.mjs` is the Blue Ribbon check and
   fails honey by design. Use viewport captures, never `fullPage`, for pixel diffs.
+  Optional settings (CI sets them): `SB_LOG_DIR`, `SB_OUT_DIR` (contrast tables to
+  `<out>/contrast` without touching `design/stage-results`, failure screenshots
+  via `failshot.mjs`, `shots/`), `SB_REUSE_BUILD=1`, and `GITHUB_STEP_SUMMARY`.
+  It exits non-zero when any check fails, and it runs `shoot-avatars.mjs` into
+  `shots/avatars` when a branch has that script. Proven able to fail in CI:
+  `z-index: auto` on the bee art failed check-layering only (942 points under the
+  outline).
 - On this laptop memory is tight: read `(Get-Counter '\Memory\Available
   MBytes').CounterSamples.CookedValue` before each heavy step and run them alone.
 - With CAPTCHA on, no script can sign up users; the `verify_*.mjs` scripts need
@@ -432,6 +471,12 @@ Everything below is live unless marked open.
   system spec.
 
 ### Open
+- CI coverage gaps (2026-10-20): CI exposes no speech voices, so the Settings voice
+  `<select>` is never measured there (only on Windows); a fake voice list in the
+  harness would close it. `measure.mjs` doesn't seed the lead-in phrase, so
+  pair counts vary between runs (839-840). `shoot-avatars.mjs` exists only as an
+  uncommitted file on `feature/avatar-ui`; once committed there, CI saves its
+  captures to `shots/avatars`.
 - Ian: phone speech on a real phone (emulation can't test it). Steps: open the
   live site, play a singleplayer word; if it is silent, reopen with
   `?debug=speech`, play one word, tap Copy log and paste it back.
