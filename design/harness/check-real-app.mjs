@@ -19,6 +19,7 @@
 //   npm run build && npx vite preview --host 127.0.0.1 --port 4273      (in another terminal)
 //   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:4273/spellingbee/] node design/harness/check-real-app.mjs
 import { pathToFileURL } from "node:url";
+import { failShot } from "./failshot.mjs";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
 const APP = process.env.APP_URL ?? `http://127.0.0.1:${process.env.SB_APP_PORT ?? 4273}/spellingbee/`;
 const ORIGIN = new URL(APP).origin;
@@ -85,7 +86,8 @@ await p.addInitScript(() => {
 });
 
 let fails = 0;
-const check = (ok, what) => { if (!ok) fails++; console.log(`  ${ok ? "PASS" : "FAIL"} ${what}`); };
+const shots = [];
+const check = (ok, what) => { if (!ok) { fails++; shots.push(failShot(p, `real-app--${fails}-${what}`)); } console.log(`  ${ok ? "PASS" : "FAIL"} ${what}`); };
 const oscCount = () => p.evaluate(() => window.__osc.length);
 const speech = () => p.evaluate(() => window.__speech.filter((s) => s.text !== ""));
 const unlocks = () => p.evaluate(() => window.__speech.filter((s) => s.text === "").length);
@@ -155,6 +157,7 @@ console.log(`  ${requests.length} requests: ${Object.entries(kinds).map(([k, v])
 check(foreign.length === 0, `every request went to ${ORIGIN} (foreign: ${foreign.length ? foreign.join(", ") : "none"})`);
 check(errors.length === 0, `no page or console errors${errors.length ? ": " + errors.join(" | ") : ""}`);
 
+await Promise.all(shots);
 await b.close();
 console.log(`\n${fails === 0 ? "PASS" : "FAIL"} ${fails} failures`);
 process.exit(fails === 0 ? 0 : 1);

@@ -7,6 +7,7 @@
 //      check shoot-homemade.mjs runs on the prototype, proven able to fail)
 //   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:5199] node design/harness/check-tier-bars.mjs
 import { pathToFileURL } from "node:url";
+import { failShot } from "./failshot.mjs";
 import { measureTierFocus } from "./tier-focus.mjs";
 
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
@@ -42,7 +43,7 @@ for (const theme of ["dark", "light"]) for (const w of Object.keys(W)) {
     };
   });
   const ok = r.count === 8 && r.sameLeft && r.sameWidth && r.oneRow && r.minV >= 44 && r.minH >= 44;
-  if (!ok) fails++;
+  if (!ok) { fails++; await failShot(p, `tier-bars--${theme}-${w}`); }
   log(`${ok ? "PASS" : "FAIL"} ${theme} ${w}: ${r.count} bars, same left ${r.sameLeft}, same width ${r.sameWidth}, one per row ${r.oneRow}; tap target at centre ${r.minV}px tall x ${r.minH}px wide (need >= 44)`);
   await ctx.close();
 }

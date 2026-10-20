@@ -13,6 +13,7 @@
 // background visible through the gaps) twice per hover. Fix: will-change on .tier-bar.
 //   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:5199] node design/harness/check-hover-flash.mjs
 import { pathToFileURL } from "node:url";
+import { failPng } from "./failshot.mjs";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
 const APP = process.env.APP_URL ?? "http://127.0.0.1:5199";
 const VIEWS = { desktop: { width: 1100, height: 900 }, phone: { width: 390, height: 1000 } };
@@ -90,18 +91,23 @@ for (const theme of ["dark", "light"]) for (const [w, vp] of Object.entries(VIEW
     const hover = async () => { await p.mouse.move(r[0] + r[2] / 2, r[1] + r[3] / 2, { steps: 3 }); await p.waitForTimeout(400); await p.mouse.move(...out, { steps: 3 }); await p.waitForTimeout(400); };
     // 1. pixels
     const frames = await record(p, cdp, hover);
-    let worst = { n: 0, box: "" };
-    for (let k = 1; k < frames.length; k++) { const m = await changedOutside(frames[0], frames[k], keep); if (m.n > worst.n) worst = m; }
+    let worst = { n: 0, box: "" }, worstK = 0;
+    for (let k = 1; k < frames.length; k++) { const m = await changedOutside(frames[0], frames[k], keep); if (m.n > worst.n) { worst = m; worstK = k; } }
     // 2. repaint
     await cdp.send("Overlay.setShowPaintRects", { result: true });
     await p.waitForTimeout(300);
     const pf = await record(p, cdp, hover);
-    let green = 0, greenBox = "";
-    for (const f of pf) { const g = await greenOutside(f, keep); if (g.n > green) { green = g.n; greenBox = g.box; } }
+    let green = 0, greenBox = "", greenFrame = null;
+    for (const f of pf) { const g = await greenOutside(f, keep); if (g.n > green) { green = g.n; greenBox = g.box; greenFrame = f; } }
     await ctx.close();
     checked++;
     const ok = worst.n === 0 && green === 0;
-    if (!ok) bad++;
+    if (!ok) {
+      bad++;
+      const tag = `hover-flash--${theme}-${w}-bar${i + 1}`;
+      if (worst.n) { failPng(frames[0], tag + "--before"); failPng(frames[worstK], tag + "--most-changed"); }
+      if (green) failPng(greenFrame, tag + "--paint-flash");
+    }
     console.log(`${ok ? "  ok" : "FAIL"}  ${theme} ${w} bar ${i + 1}/${n}: ${frames.length} frames, ${worst.n} px changed outside the bar${worst.box ? " in " + worst.box : ""}; ${green} px repainted outside it${greenBox ? " in " + greenBox : ""}`);
   }
 }

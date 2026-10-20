@@ -4,7 +4,7 @@
 // The app side is the REAL components with mocked state (design/harness), shimmer caught
 // mid-sweep like the prototype's own screenshots.
 //   PW_MODULE=<playwright/index.mjs> node design/harness/shoot-final.mjs   (harness on :5199)
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
@@ -12,6 +12,12 @@ const HARNESS = process.env.HARNESS_URL ?? "http://127.0.0.1:5199";
 const OUT = resolve("docs/review");
 mkdirSync(OUT, { recursive: true });
 const PROTO = resolve("design/prototypes/homemade/screens");
+// The prototype screenshots are not on main (the redesign squash left out every image under
+// design/ and docs/review/); they are on tag redesign-final. Stop with a clear message, not a crash.
+if (!existsSync(resolve(PROTO, "light--home--desktop--dark.jpg"))) {
+  console.error(`shoot-final: the prototype screenshots are missing from ${PROTO}. They are on tag redesign-final: git checkout redesign-final -- design/prototypes/homemade/screens`);
+  process.exit(2);
+}
 const PAGES = [["home", "home"], ["difficulty", "difficulty"], ["round", "sp-round"], ["race-results", "race-results"]];
 const VIEW = {
   desktop: (page) => (page === "difficulty" ? { width: 1280, height: 960 } : { width: 1280, height: 800 }),

@@ -3,12 +3,14 @@
 // is inert. Presentation changes must never regress these (hardening #18).
 //   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:5199] node design/harness/check-settings-dialog.mjs
 import { pathToFileURL } from "node:url";
+import { failShot } from "./failshot.mjs";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
 const APP = process.env.APP_URL ?? "http://127.0.0.1:5199";
 const b = await chromium.launch();
 let fails = 0;
 const check = (ok, what) => { if (!ok) fails++; console.log(`${ok ? "PASS" : "FAIL"} ${what}`); };
 for (const theme of ["dark", "light"]) {
+  const before = fails;
   const p = await (await b.newContext({ viewport: { width: 900, height: 800 } })).newPage();
   await p.goto(`${APP}/?screen=home&theme=${theme}`, { waitUntil: "networkidle" });
   await p.click(".settings-toggle");
@@ -28,6 +30,7 @@ for (const theme of ["dark", "light"]) {
   const closed = await p.waitForSelector("dialog[open]", { state: "detached", timeout: 3000 }).then(() => true, () => false);
   check(closed, `${theme}: Escape closes the dialog`);
   check(await p.evaluate(() => document.activeElement?.classList.contains("settings-toggle")), `${theme}: Escape closes and focus returns to the Settings button`);
+  if (fails > before) await failShot(p, `settings-dialog--${theme}`);
 }
 await b.close();
 console.log(`\n${fails === 0 ? "PASS" : "FAIL"} ${fails} failures`);

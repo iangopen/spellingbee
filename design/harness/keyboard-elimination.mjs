@@ -3,11 +3,13 @@
 // lands on, so a regression in order, focus loss or a trap shows up as text.
 //   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:5199] node design/harness/keyboard-elimination.mjs
 import { pathToFileURL } from "node:url";
+import { failShot } from "./failshot.mjs";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
 const APP = process.env.APP_URL ?? "http://127.0.0.1:5199";
 const b = await chromium.launch();
 let fails = 0;
-const check = (ok, what) => { if (!ok) fails++; console.log(`  ${ok ? "PASS" : "FAIL"} ${what}`); };
+const shots = [];
+const check = (ok, what) => { if (!ok) { fails++; shots.push(failShot(current, `keyboard-elimination--${fails}-${what}`)); } console.log(`  ${ok ? "PASS" : "FAIL"} ${what}`); };
 
 const where = (p) => p.evaluate(() => {
   const a = document.activeElement;
@@ -20,8 +22,9 @@ async function tabs(p, n) {
   for (let i = 0; i < n; i++) { await p.keyboard.press("Tab"); seen.push(await where(p)); }
   return seen;
 }
+let current = null; // the page being checked, for failure screenshots
 const open = async (screen, w = 900) => {
-  const p = await (await b.newContext({ viewport: { width: w, height: 900 } })).newPage();
+  const p = current = await (await b.newContext({ viewport: { width: w, height: 900 } })).newPage();
   await p.goto(`${APP}/?screen=${screen}&theme=dark`, { waitUntil: "networkidle" });
   await p.waitForTimeout(300);
   return p;
@@ -91,6 +94,7 @@ console.log("\n## final results (elim-results)");
   check(/Back to lobby/.test(await where(p)), "the primary button takes focus");
 }
 
+await Promise.all(shots);
 await b.close();
 console.log(`\n${fails === 0 ? "PASS" : "FAIL"} ${fails} failures`);
 process.exit(fails === 0 ? 0 : 1);
