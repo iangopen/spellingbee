@@ -97,7 +97,7 @@ jobs:
             echo
             for f in "$OUT/tests/unit.log" "$OUT/tests/db.log"; do
               [ -f "$f" ] || continue
-              echo "- \`$(basename "$f")\`: $(grep -E '^ *(Test Files|Tests) ' "$f" | sed 's/\x1b\[[0-9;]*m//g' | tr -s ' ' | paste -sd ';' -)"
+              echo "- \`$(basename "$f")\`: $(sed 's/\x1b\[[0-9;]*m//g' "$f" | grep -E '^ *(Test Files|Tests) ' | tr -s ' ' | paste -sd ';' -)"
             done
             echo
           } >> "$GITHUB_STEP_SUMMARY"

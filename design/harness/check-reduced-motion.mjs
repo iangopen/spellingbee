@@ -18,6 +18,7 @@
 //   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:5199] node design/harness/check-reduced-motion.mjs
 import { pathToFileURL } from "node:url";
 import { failPng } from "./failshot.mjs";
+import { settleSettings } from "./settle.mjs";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
 const APP = process.env.APP_URL ?? "http://127.0.0.1:5199";
 const SCREENS = ["home", "difficulty", "sp-round", "sp-correct", "sp-incorrect", "sp-results", "settings", "lobby", "waiting-room",
@@ -77,7 +78,7 @@ async function open(url, screen, vp, rm, inits) {
   for (const f of [seed, noCaret, ...inits]) await p.addInitScript(f);
   await p.goto(url, { waitUntil: "networkidle" });
   await p.evaluate(() => document.fonts.ready); // a late font swap would read as motion
-  if (screen === "settings") await p.click(".settings-toggle");
+  if (screen === "settings") { await p.click(".settings-toggle"); await settleSettings(p); }
   await fitPage(p, vp);
   return { ctx, p };
 }

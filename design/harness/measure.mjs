@@ -18,6 +18,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { settleSettings } from "./settle.mjs";
 
 //   TARGET=hybrid               design/prototypes/honey-hybrid, all three
 //                               variants (?v=a|b|c), bee on, ?peak=1
@@ -114,7 +115,7 @@ for (const r of RUNS) {
   const p = await ctx.newPage();
   await p.goto(urlFor(r), { waitUntil: "networkidle" });
   await p.evaluate(() => document.fonts.ready);
-  if (TARGET === "app" && r.page === "settings") await p.click(".settings-toggle");
+  if (TARGET === "app" && r.page === "settings") { await p.click(".settings-toggle"); await settleSettings(p); }
   await p.waitForTimeout(300);
 
   // 1. Collect targets while everything is visible.
