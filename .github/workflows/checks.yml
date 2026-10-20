@@ -1,0 +1,131 @@
+name: Checks
+
+# The heavy checks (build, unit and database tests, every browser check) run here, not on the
+# laptop. Separate from deploy.yml on purpose: a failing check never blocks or cancels a deploy.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      concurrency:
+        description: Also run the real-Postgres concurrency tests (downloads ~100 MB of Postgres binaries)
+        type: boolean
+        default: false
+
+# No secrets are used anywhere in this workflow, and the token can only read, so a pull
+# request from a fork runs exactly what it would run here.
+permissions:
+  contents: read
+
+# A newer push to the same branch replaces a run that is still going.
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # The Playwright the browser checks were last run with on Windows (docs/history.md). It is
+  # installed outside the repo, never a dependency (CLAUDE.md, Tests and checks).
+  PW_VERSION: 1.64.0
+  # Dummy values so the bundle is shaped like production (the Supabase client is included, not
+  # tree-shaken out). Nothing contacts them: no check opens multiplayer, and the client is lazy.
+  VITE_SUPABASE_URL: https://ci-placeholder.invalid
+  VITE_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    env:
+      OUT: ${{ github.workspace }}/ci-out
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Prepare the output folders
+        run: mkdir -p "$OUT/logs" "$OUT/tests"
+
+      - name: Build (npm run build)
+        run: npm run build 2>&1 | tee "$OUT/logs/build.log"
+      - name: Lint
+        run: npm run lint 2>&1 | tee "$OUT/logs/lint.log"
+      - name: Unit tests (npm test)
+        run: npm test 2>&1 | tee "$OUT/tests/unit.log"
+      - name: Database tests (npm run test:db)
+        run: npm run test:db 2>&1 | tee "$OUT/tests/db.log"
+
+      - name: Install Playwright outside the repo
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pw" --no-audit --no-fund "playwright@$PW_VERSION"
+          echo "PW_MODULE=$RUNNER_TEMP/pw/node_modules/playwright/index.mjs" >> "$GITHUB_ENV"
+      - name: Cache Playwright's Chromium
+        id: pw-cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ env.PW_VERSION }}-headless-shell
+      # The headless shell is what the Windows runs used (docs/history.md). System packages
+      # live outside the cache, so they are installed on every run.
+      - name: Install Chromium and its system dependencies
+        run: |
+          PW="$RUNNER_TEMP/pw/node_modules/.bin/playwright"
+          if [ "${{ steps.pw-cache.outputs.cache-hit }}" = "true" ]; then
+            "$PW" install-deps chromium
+          else
+            "$PW" install --with-deps --only-shell chromium
+          fi
+
+      - name: Browser checks (run-checks.mjs)
+        env:
+          SB_LOG_DIR: ${{ env.OUT }}/logs/run-checks
+          SB_OUT_DIR: ${{ env.OUT }}
+          SB_REUSE_BUILD: '1'
+        run: node design/harness/run-checks.mjs
+
+      - name: Contrast, this run (Linux) vs the committed Windows run
+        if: always() && hashFiles('ci-out/contrast/contrast-app.json') != ''
+        run: node design/harness/compare-contrast.mjs "$OUT/contrast/contrast-app.json" design/stage-results/final-contrast-app.json "$OUT/contrast/linux-vs-windows.md"
+
+      - name: Test counts
+        if: always()
+        run: |
+          {
+            echo "## Build and tests"
+            echo
+            for f in "$OUT/tests/unit.log" "$OUT/tests/db.log"; do
+              [ -f "$f" ] || continue
+              echo "- \`$(basename "$f")\`: $(grep -E '^ *(Test Files|Tests) ' "$f" | sed 's/\x1b\[[0-9;]*m//g' | tr -s ' ' | paste -sd ';' -)"
+            done
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload logs, contrast tables and screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: checks-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ci-out/
+          retention-days: 14
+          if-no-files-found: warn
+
+  # Optional: real Postgres 17 races against the advisory locks. Run by hand (Run workflow,
+  # tick the box), because embedded-postgres downloads large binaries.
+  concurrency-tests:
+    if: github.event_name == 'workflow_dispatch' && inputs.concurrency
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            supabase/concurrency/package-lock.json
+      - run: npm ci
+      - run: npm --prefix supabase/concurrency ci
+      - run: npm --prefix supabase/concurrency test
