@@ -60,6 +60,12 @@
   /* bee art: a honey bee with cocoa bands */
   --bee-body: #f0b24c; --bee-stripe: #2a2013; --bee-wing: rgba(255, 246, 228, 0.75); --bee-line: #1a1410; --bee-cheek: #ff9fb2;
   --bee-eye: #fffdf8; --bee-leaf: #6fd49e;
+  /* avatar maker body colours 1-7 (0 is --bee-body), the same in both palettes: each is
+     >= 3:1 against the dark panel and --bee-line (design/prototypes/avatar-maker, pick-colors.mjs) */
+  --av-1: #c85b32; --av-2: #a8669a; --av-3: #796ce0; --av-4: #5aa0d0; --av-5: #64d1d7; --av-6: #83aa84; --av-7: #867e7f;
+  /* the 1px sticker edge round an avatar TOKEN (the #av-halo filter): cocoa outline and
+     stripes vanish on a dark panel, this edge is >= 4.27:1 against every dark background */
+  --av-halo: #9d8d70;
 
 
   /* the homemade "light" strength: marker shadows, one hand-drawn outline, stickers, paper grain */
@@ -146,6 +152,8 @@
 
   --bee-body: #eaa640; --bee-stripe: #2c2419; --bee-wing: rgba(255, 255, 255, 0.85); --bee-line: #2c2419; --bee-cheek: #ff9fb2;
   --bee-eye: #fffdf8; --bee-leaf: #4fae7c;
+  --av-1: #c85b32; --av-2: #a8669a; --av-3: #796ce0; --av-4: #5aa0d0; --av-5: #64d1d7; --av-6: #83aa84; --av-7: #867e7f;
+  --av-halo: transparent; /* the cocoa outline already reads at 14:1 on light panels */
 
 
   --sketch: rgba(122, 75, 8, 0.6);
