@@ -26,8 +26,17 @@
 // Every server's and script's full output is kept in a log folder (printed at the start), the
 // servers are health-checked before each script, and a failing script's first error line is
 // printed, so a crash can always be traced afterwards.
+//
+// Optional settings (each defaults to the local behaviour; .github/workflows/checks.yml sets them):
+//   SB_LOG_DIR=<dir>     the log folder (default: a new folder under the OS temp dir)
+//   SB_OUT_DIR=<dir>     contrast tables go to <dir>/contrast instead of design/stage-results
+//                        (the committed files are left alone), failure screenshots to
+//                        <dir>/failures, screenshots a script writes to <dir>/shots
+//   SB_REUSE_BUILD=1     serve the existing dist/ instead of running `npm run build` again
+//   GITHUB_STEP_SUMMARY  set by GitHub Actions: the result table is appended to it
+// Exit code: 0 only when every check passed, 1 when any failed, 2 when it could not start.
 import { spawn, spawnSync } from "node:child_process";
-import { createWriteStream, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
+import { appendFileSync, createWriteStream, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
 import http from "node:http";
 import net from "node:net";
 import { tmpdir } from "node:os";
@@ -35,8 +44,12 @@ import { join, resolve } from "node:path";
 
 if (!process.env.PW_MODULE) { console.error("set PW_MODULE to playwright/index.mjs (see design/README.md)"); process.exit(2); }
 const win = process.platform === "win32";
-const LOGS = join(tmpdir(), "spellingbee-run-checks", new Date().toISOString().replace(/[:.]/g, "-"));
+const LOGS = resolve(process.env.SB_LOG_DIR ?? join(tmpdir(), "spellingbee-run-checks", new Date().toISOString().replace(/[:.]/g, "-")));
 mkdirSync(LOGS, { recursive: true });
+const OUT = process.env.SB_OUT_DIR ? resolve(process.env.SB_OUT_DIR) : null;
+const FAIL_SHOTS = OUT ? join(OUT, "failures") : null;
+const SHOTS = OUT ? join(OUT, "shots") : null;
+for (const d of [FAIL_SHOTS, SHOTS]) if (d) mkdirSync(d, { recursive: true });
 console.log(`logs: ${LOGS}`);
 const run = (cmd, args, env = {}) => spawnSync(cmd, args, { encoding: "utf8", shell: win, env: { ...process.env, ...env }, maxBuffer: 1 << 28 });
 const last = (s, n = 1) => s.trim().split("\n").slice(-n).join(" | ");
@@ -79,16 +92,21 @@ for (const [name, port, envVar] of [["app", APP_PORT, "SB_APP_PORT"], ["harness"
   }
 }
 
-console.log("building the app and the harness...");
-const build = run("npm", ["run", "build"]);
-writeFileSync(join(LOGS, "build-app.log"), build.stdout + build.stderr);
-if (build.status !== 0) { console.error(build.stdout + build.stderr); process.exit(1); }
+const reuse = process.env.SB_REUSE_BUILD === "1" && existsSync("dist/index.html");
+console.log(reuse ? "reusing dist/ (SB_REUSE_BUILD=1), building the harness..." : "building the app and the harness...");
+if (!reuse) {
+  const build = run("npm", ["run", "build"]);
+  writeFileSync(join(LOGS, "build-app.log"), build.stdout + build.stderr);
+  if (build.status !== 0) { console.error(build.stdout + build.stderr); process.exit(1); }
+}
 const hbuild = run("npx", ["vite", "build", "--config", "design/harness/vite.config.ts", "--outDir", HARNESS_DIST, "--emptyOutDir"]);
 writeFileSync(join(LOGS, "build-harness.log"), hbuild.stdout + hbuild.stderr);
 if (hbuild.status !== 0) { console.error(hbuild.stdout + hbuild.stderr); process.exit(1); }
 
+// Off Windows each server gets its own process group (detached), so stop() kills npx AND the
+// vite process under it; killing npx alone can leave vite running and holding the port.
 function serve(name, args) {
-  const s = spawn("npx", args, { shell: win, stdio: ["ignore", "pipe", "pipe"] });
+  const s = spawn("npx", args, { shell: win, detached: !win, stdio: ["ignore", "pipe", "pipe"] });
   const log = createWriteStream(join(LOGS, `server-${name}.log`));
   s.stdout.pipe(log); s.stderr.pipe(log);
   s.on("exit", (code) => log.write(`\n[server exited with code ${code}]\n`));
@@ -99,7 +117,7 @@ const servers = [
   serve("harness", ["vite", "preview", "--config", "design/harness/vite.config.ts", "--outDir", HARNESS_DIST, "--host", "127.0.0.1", "--port", String(HARNESS_PORT), "--strictPort"]),
 ];
 let stopped = false;
-const stop = () => { if (stopped) return; stopped = true; for (const s of servers) { if (win) spawnSync("taskkill", ["/pid", String(s.pid), "/T", "/F"]); else s.kill(); } };
+const stop = () => { if (stopped) return; stopped = true; for (const s of servers) { if (win) spawnSync("taskkill", ["/pid", String(s.pid), "/T", "/F"]); else { try { process.kill(-s.pid, "SIGTERM"); } catch { s.kill(); } } } };
 process.on("exit", stop);
 process.on("SIGINT", () => { stop(); process.exit(130); });
 async function up(url) { for (let i = 0; i < 60; i++) { if (await answers(url)) return; await new Promise((r) => setTimeout(r, 500)); } throw new Error(url + " did not start; see " + LOGS); }
@@ -108,23 +126,27 @@ await up(HARNESS);
 
 const results = [];
 const record = (name, ok, detail) => { results.push({ name, ok, detail }); console.log(`${ok ? "PASS" : "FAIL"}  ${name}${detail ? "  (" + detail + ")" : ""}`); };
-const env = { APP_URL: HARNESS.replace(/\/$/, "") };
-const appEnv = { APP_URL: APP };
+const shotEnv = FAIL_SHOTS ? { FAIL_SHOTS } : {};
+const env = { APP_URL: HARNESS.replace(/\/$/, ""), ...shotEnv };
+const appEnv = { APP_URL: APP, ...shotEnv };
 
 // 1. contrast, app-wide
 {
-  const r = run("node", ["design/harness/measure.mjs"], { TARGET: "app", ...env });
+  const contrastDir = OUT ? join(OUT, "contrast") : resolve("design/baseline");
+  const r = run("node", ["design/harness/measure.mjs"], { TARGET: "app", ...env, ...(OUT ? { OUT_DIR: contrastDir } : {}) });
   writeFileSync(join(LOGS, "measure.log"), r.stdout + r.stderr);
-  const json = resolve("design/baseline/contrast-app.json");
+  const json = join(contrastDir, "contrast-app.json");
   if (r.status !== 0 || !existsSync(json)) record("measure.mjs (contrast, app-wide)", false, firstError(r.stdout + r.stderr) ?? last(r.stdout + r.stderr));
   else {
     const rows = JSON.parse(readFileSync(json, "utf8"));
     const m = new Map();
     for (const x of rows) { if (x.worst === null) continue; const k = [x.theme, x.page, x.kind, x.label, x.need].join("|"); m.set(k, [Math.min(m.get(k)?.[0] ?? 99, x.worst), x.need]); }
     const failing = [...m.values()].filter(([w, need]) => w < need).length;
-    renameSync(json, resolve("design/stage-results/final-contrast-app.json"));
-    renameSync(resolve("design/baseline/contrast-app.md"), resolve("design/stage-results/final-contrast-app.md"));
-    spawnSync("git", ["checkout", "--", "design/baseline"]);
+    if (!OUT) {
+      renameSync(json, resolve("design/stage-results/final-contrast-app.json"));
+      renameSync(resolve("design/baseline/contrast-app.md"), resolve("design/stage-results/final-contrast-app.md"));
+      spawnSync("git", ["checkout", "--", "design/baseline"]);
+    }
     record("measure.mjs (contrast, app-wide)", failing === 0, `${m.size} pairs, ${failing} failing`);
   }
 }
@@ -140,7 +162,7 @@ const scripts = [
   ["check-hover-flash.mjs", env],
   ["check-real-app.mjs", appEnv],
   ["keyboard-real-app.mjs", appEnv],
-  ["check-touch-autosubmit.mjs", appEnv],
+  ["check-touch-autosubmit.mjs", { ...appEnv, ...(SHOTS ? { SHOTS } : {}) }],
   ["unused-selectors.mjs", {}, ["--fail"]],
   ["unused-tokens.mjs", {}, ["--fail"]],
 ];
@@ -152,13 +174,30 @@ for (const [file, scriptEnv, extra = []] of scripts) {
   if (r.status === 0) record(file, true, last(out));
   else record(file, false, `${firstError(out) ?? "(no error line)"} | ${last(out)} | full output: ${join(LOGS, file.replace(/\.mjs$/, ".log"))}`);
 }
+// Screenshot scripts, run while the servers are up, when SB_OUT_DIR is set and the branch has
+// them. They are not checks, but a crash is recorded as a failure so it cannot pass unnoticed.
+const SHOOTS = [["shoot-avatars.mjs", "avatars"]];
+if (SHOTS) for (const [file, dir] of SHOOTS) {
+  if (!existsSync(`design/harness/${file}`)) { console.log(`skip  ${file} (not on this branch)`); continue; }
+  const r = run("node", [`design/harness/${file}`], { APP_URL: HARNESS.replace(/\/$/, ""), OUT_DIR: join(SHOTS, dir) });
+  const out = r.stdout + r.stderr;
+  writeFileSync(join(LOGS, file.replace(/\.mjs$/, ".log")), out);
+  record(`${file} (screenshots)`, r.status === 0, r.status === 0 ? last(out) : `${firstError(out) ?? "(no error line)"} | ${last(out)}`);
+}
 stop();
 
 // how many browser-check scripts exist vs ran
 const all = readdirSync("design/harness").filter((f) => /^(check-|keyboard-|measure)/.test(f) && f.endsWith(".mjs"));
 const ran = new Set(["measure.mjs", ...scripts.map((s) => s[0])]);
 const notRun = all.filter((f) => !ran.has(f));
-console.log(`\nbrowser check scripts: ${all.filter((f) => ran.has(f)).length} run of ${all.length} (${notRun.length ? "not run: " + notRun.join(", ") + (notRun.includes("check-glow.mjs") ? " (check-glow is the Blue Ribbon prototype's no-yellow check; it fails honey by design)" : "") : "none skipped"})`);
+const coverage = `browser check scripts: ${all.filter((f) => ran.has(f)).length} run of ${all.length} (${notRun.length ? "not run: " + notRun.join(", ") + (notRun.includes("check-glow.mjs") ? " (check-glow is the Blue Ribbon prototype's no-yellow check; it fails honey by design)" : "") : "none skipped"})`;
+console.log(`\n${coverage}`);
 const bad = results.filter((r) => !r.ok);
-console.log(`${bad.length === 0 ? "PASS" : "FAIL"}: ${results.length - bad.length}/${results.length} checks pass`);
+const verdict = `${bad.length === 0 ? "PASS" : "FAIL"}: ${results.length - bad.length}/${results.length} checks pass`;
+console.log(verdict);
+if (process.env.GITHUB_STEP_SUMMARY) {
+  const cell = (t) => String(t ?? "").replace(/\|/g, "\\|").replace(/\r?\n/g, " ").slice(0, 400);
+  const rows = results.map((r) => `| ${r.ok ? "PASS" : "**FAIL**"} | \`${r.name}\` | ${cell(r.detail)} |`).join("\n");
+  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## Browser checks (run-checks.mjs)\n\n**${verdict}**\n\n| | Check | Result |\n|---|---|---|\n${rows}\n\n${coverage}\n\n`);
+}
 process.exit(bad.length ? 1 : 0);

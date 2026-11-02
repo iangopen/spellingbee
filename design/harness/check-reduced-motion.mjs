@@ -17,6 +17,8 @@
 // Text carets are hidden first (a blinking caret is the only thing that legitimately changes).
 //   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:5199] node design/harness/check-reduced-motion.mjs
 import { pathToFileURL } from "node:url";
+import { failPng } from "./failshot.mjs";
+import { settleSettings } from "./settle.mjs";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
 const APP = process.env.APP_URL ?? "http://127.0.0.1:5199";
 const SCREENS = ["home", "difficulty", "sp-round", "sp-correct", "sp-incorrect", "sp-results", "settings", "lobby", "waiting-room",
@@ -76,7 +78,7 @@ async function open(url, screen, vp, rm, inits) {
   for (const f of [seed, noCaret, ...inits]) await p.addInitScript(f);
   await p.goto(url, { waitUntil: "networkidle" });
   await p.evaluate(() => document.fonts.ready); // a late font swap would read as motion
-  if (screen === "settings") await p.click(".settings-toggle");
+  if (screen === "settings") { await p.click(".settings-toggle"); await settleSettings(p); }
   await fitPage(p, vp);
   return { ctx, p };
 }
@@ -106,7 +108,10 @@ for (const theme of ["dark", "light"]) for (const [wname, vp] of Object.entries(
 
   n++;
   const v = [await verdict("OS: t=0.5s vs t=2.5s", a1, a2), await verdict("OS vs stored in-app switch", a1, b1), await verdict("switch flipped mid-session: +1.8s vs +2.8s", c1, c2)];
-  if (v.some((x) => !x.ok)) { bad++; console.log(`FAIL ${theme} ${wname} ${screen}: ${v.map((x) => x.text).join("; ")}`); }
+  if (v.some((x) => !x.ok)) {
+    bad++; console.log(`FAIL ${theme} ${wname} ${screen}: ${v.map((x) => x.text).join("; ")}`);
+    for (const [png, what] of [[a1, "os-0.5s"], [a2, "os-2.5s"], [b1, "stored-switch"], [c1, "mid-session-1.8s"], [c2, "mid-session-2.8s"]]) failPng(png, `reduced-motion--${theme}-${wname}-${screen}--${what}`);
+  }
 }
 await b.close();
 console.log(`\n${bad === 0 ? "PASS" : "FAIL"} ${n - bad}/${n} screen configurations are pixel-identical: still under the OS setting, the same page under the stored in-app switch, and still after the switch is flipped mid-session`);

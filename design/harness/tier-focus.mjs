@@ -2,6 +2,8 @@
 // check-tier-focus.mjs. Rim vs the pixels immediately inside and outside it,
 // measured with the honeycomb at its peak. A failing bar must make this FAIL:
 // check-tier-focus.mjs proves that on a copy with the rim removed.
+import { failShot } from "./failshot.mjs";
+
 export async function measureTierFocus({ browser, cmp, url, view, W, STRENGTHS, THEMES, log }) {
   log("\n## Tier bar focus indicator (a thickened rim in the focus colour; an outline would be clipped by the hexagon)");
   let focusMin = Infinity, focusFails = 0, focusN = 0;
@@ -48,7 +50,7 @@ export async function measureTierFocus({ browser, cmp, url, view, W, STRENGTHS, 
     }
     focusN++; focusMin = Math.min(focusMin, worstRimFill, worstRimOut);
     const ok = worstRimFill >= 3 && worstRimOut >= 3;
-    if (!ok) focusFails++;
+    if (!ok) { focusFails++; await failShot(pg, `tier-focus--${h}-${theme}-${w}`); }
     log(`${ok ? "PASS" : "FAIL"} ${h}, ${theme}, ${w}: focused rim vs the moat band just inside it ${worstRimFill.toFixed(2)}:1, vs the moat just outside it ${worstRimOut.toFixed(2)}:1 (need 3:1), worst of all ${n} bars`);
     await ctx.close();
   }

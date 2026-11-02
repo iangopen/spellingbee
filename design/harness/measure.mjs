@@ -18,6 +18,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { settleSettings } from "./settle.mjs";
 
 //   TARGET=hybrid               design/prototypes/honey-hybrid, all three
 //                               variants (?v=a|b|c), bee on, ?peak=1
@@ -114,7 +115,7 @@ for (const r of RUNS) {
   const p = await ctx.newPage();
   await p.goto(urlFor(r), { waitUntil: "networkidle" });
   await p.evaluate(() => document.fonts.ready);
-  if (TARGET === "app" && r.page === "settings") await p.click(".settings-toggle");
+  if (TARGET === "app" && r.page === "settings") { await p.click(".settings-toggle"); await settleSettings(p); }
   await p.waitForTimeout(300);
 
   // 1. Collect targets while everything is visible.
@@ -244,7 +245,8 @@ if (noOutline.length) {
   md += `\n## Controls with no outline when focused\n\nFocus is shown some other way (a border colour, a background change). The contrast of that indicator isn't measured by this script.\n\n| Theme | Screen | Control |\n|---|---|---|\n`;
   for (const x of noOutline) md += `| ${x.theme} | ${x.page} | ${x.label.replace("focus ring: ", "")} |\n`;
 }
-const outDir = TARGET === "app" ? resolve("design/baseline") : PROTO_DIR;
+// OUT_DIR (TARGET=app only): run-checks.mjs points it outside the repo in CI.
+const outDir = TARGET === "app" ? resolve(process.env.OUT_DIR ?? "design/baseline") : PROTO_DIR;
 const base = TARGET === "homemade" ? `contrast-${v}` : TARGET === "hybrid" ? `contrast-${v}` : TARGET === "prototype" ? "contrast" : "contrast-app";
 mkdirSync(outDir, { recursive: true });
 writeFileSync(resolve(outDir, `${base}.md`), md);

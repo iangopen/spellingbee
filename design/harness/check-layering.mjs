@@ -16,6 +16,8 @@
 //   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:5199] node design/harness/check-layering.mjs
 // Exit 1 on any point where the outline paints over a decoration.
 import { pathToFileURL } from "node:url";
+import { failShot } from "./failshot.mjs";
+import { settleSettings } from "./settle.mjs";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
 const APP = process.env.APP_URL ?? "http://127.0.0.1:5199";
 const SCREENS = ["home", "difficulty", "sp-round", "sp-correct", "sp-incorrect", "sp-results", "settings", "lobby", "waiting-room",
@@ -62,7 +64,7 @@ for (const theme of ["dark", "light"]) for (const [w, vp] of Object.entries(VIEW
   await p.addInitScript((css) => document.addEventListener("DOMContentLoaded", () => { const s = document.createElement("style"); s.textContent = css; document.head.append(s); }), HITTABLE_OUTLINE);
   await p.goto(`${APP}/?screen=${screen}&theme=${theme}`, { waitUntil: "networkidle" });
   await p.evaluate(() => document.fonts.ready);
-  if (screen === "settings") await p.click(".settings-toggle");
+  if (screen === "settings") { await p.click(".settings-toggle"); await settleSettings(p); }
   if (screen === "elim-knockout") await p.waitForTimeout(800);
   // at the top of the page, then (phone) scrolled in steps so the fixed Settings button crosses outlines
   const maxScroll = await p.evaluate(() => document.documentElement.scrollHeight - innerHeight);
@@ -70,6 +72,7 @@ for (const theme of ["dark", "light"]) for (const [w, vp] of Object.entries(VIEW
   for (const s of scrolls) {
     await p.evaluate((y) => window.scrollTo(0, y), s);
     const res = await p.evaluate(probe);
+    if (res.some((r) => !r.ok)) await failShot(p, `layering--${theme}-${w}-${screen}-scroll${s}`);
     for (const r of res) {
       points++;
       const key = `${w} ${screen}: ${r.panel} <- ${r.deco}`;

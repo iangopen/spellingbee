@@ -17,13 +17,15 @@
 //
 //   PW_MODULE=<playwright/index.mjs> [APP_URL=http://127.0.0.1:4273/spellingbee/] [SHOTS=<dir>] node design/harness/check-touch-autosubmit.mjs
 import { pathToFileURL } from "node:url";
+import { failShot } from "./failshot.mjs";
 const { chromium } = await import(pathToFileURL(process.env.PW_MODULE).href);
 const APP = process.env.APP_URL ?? `http://127.0.0.1:${process.env.SB_APP_PORT ?? 4273}/spellingbee/`;
 const SHOTS = process.env.SHOTS;
 const TOUCH_QUERY = "(pointer: coarse) and (hover: none)";
 
 let fails = 0;
-const check = (ok, what) => { if (!ok) fails++; console.log(`  ${ok ? "PASS" : "FAIL"} ${what}`); };
+const shots = [];
+const check = (ok, what) => { if (!ok) { fails++; shots.push(failShot(p, `touch-autosubmit--${fails}-${what}`)); } console.log(`  ${ok ? "PASS" : "FAIL"} ${what}`); };
 
 // A fake speechSynthesis that "speaks" instantly and records the text, so the script knows
 // the word; and an oscillator counter for the sounds.
@@ -196,6 +198,7 @@ check(enterOsc === autoOsc, `Enter and auto-submit make the same sounds (${enter
 check(enterStatus.replace(/\d+/, "N") === autoStatus.replace(/\d+/, "N"), "and the same screen-reader announcement");
 check(desk.errors.length === 0, `no page errors on desktop${desk.errors.length ? ": " + desk.errors.join(" | ") : ""}`);
 
+await Promise.all(shots);
 await b.close();
 console.log(`\n${fails === 0 ? "PASS" : "FAIL"} ${fails} failures`);
 process.exit(fails === 0 ? 0 : 1);
