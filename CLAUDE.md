@@ -474,12 +474,13 @@ Everything below is live unless marked open.
 - CI coverage gaps (2026-10-20): CI exposes no speech voices, so the Settings voice
   `<select>` is never measured there (only on Windows); a fake voice list in the
   harness would close it. `measure.mjs` doesn't seed the lead-in phrase, so
-  pair counts vary between runs (839-840). `shoot-avatars.mjs` exists only as an
-  uncommitted file on `feature/avatar-ui`; once committed there, CI saves its
-  captures to `shots/avatars`.
-- Ian: phone speech on a real phone (emulation can't test it). Steps: open the
-  live site, play a singleplayer word; if it is silent, reopen with
-  `?debug=speech`, play one word, tap Copy log and paste it back.
+  pair counts vary between runs (839-840). `shoot-avatars.mjs` is committed on
+  `feature/avatar-ui` (`0aaea56`, 2026-11-02), not on this branch or main. CI
+  saves its captures to `shots/avatars` only once both branches reach main.
+- This branch (`checks.yml`) is NOT merged to main. It was green on its last 3
+  runs (39491848749, 39495399740, 39499470553, 2026-10-20). Merging is Ian's call.
+- (Removed 2026-11-02: the real-phone speech check passed on Ian's phone on
+  2026-10-14, recorded in `ea99797` on `feature/avatar-ui`.)
 - Follow-up, multiplayer timing-core stage (not done): in multiplayer the word
   is spoken at a server-chosen moment and players other than the host never
   tapped to start, so iPhones may drop it. Unlock at each player's own join or
