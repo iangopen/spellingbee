@@ -398,8 +398,8 @@ Everything below is live unless marked open.
   timing core first). Hourglass charges stay rounded to 0.1 s with the 200 ms
   dead band, and the exact milliseconds are shown ONLY in the results table
   (D38). Avatars: 8 colours and BOTH prototype cosmetic sets, 14 cosmetics with
-  None as 0 (D17; prototype on `design/avatar-maker`). The picker UI is the next
-  session.
+  None as 0 (D17; prototype on `design/avatar-maker`). The picker UI is in
+  progress on branch `feature/avatar-ui` (see Open).
 - **Avatar parts, database side (2026-10-15):** migration 0021 is LIVE on project
   `wjorfdfpbgyykbhxydqj` (applied by Ian). `supabase/scripts/verify_avatar.sql`
   ended in "AVATAR VERIFY: 45 PASS, 0 FAIL" on 2026-10-15, and the live (old)
@@ -433,6 +433,22 @@ Everything below is live unless marked open.
   system spec.
 
 ### Open
+- **Avatar maker UI (spec stage 10), branch `feature/avatar-ui`, IN PROGRESS** (state
+  read 2026-11-02 from git only; nothing was built or tested). The branch sits on
+  current main (`33ee02f`).
+  - Done but NOT built or tested: 7 colour tokens `--av-1..7` plus `--av-halo` in
+    both palettes (`e2ef654`); the art for all 14 cosmetics x 8 colours,
+    `partsSvg()` in `src/lib/beeArt.ts` (`2edc885`); the capture script
+    `design/harness/shoot-avatars.mjs` (`0aaea56`).
+  - Not started: the `AvatarMaker` component (arrow pickers with "n of 8" and
+    "n of 14" counters) replacing `AvatarPicker` in the lobby "You" panel and the
+    waiting room; wiring `updateAvatar(roomId, {color, cosmetic})`; the localStorage
+    migration of the old avatar key; the contrast gate at 0 over all 112 pairs; the
+    keyboard pass; Ian's taste check. `partsSvg` is imported by nothing yet.
+  - The `beeArt.ts` comment says `ui.test.tsx` checks the list lengths and pins a
+    digest of all 112 drawings, but no such test exists yet. Write it.
+  - `design/harness/dist-before/` (an untracked Vite build, the "before" for the
+    captures) is local only and deliberately not committed.
 - Follow-up, multiplayer timing-core stage (not done): in multiplayer the word
   is spoken at a server-chosen moment and players other than the host never
   tapped to start, so iPhones may drop it. Unlock at each player's own join or
