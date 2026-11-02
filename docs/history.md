@@ -2304,3 +2304,23 @@ Still unverified (deliberately not run on 2026-10-09, because the laptop had und
   elimination keyboard pass ran on mocked state; the lane subtitles from the prototype
   ("8 of 10 spelled") are not shown because the client has no per-player correct count.
 - Not in the redesign and untouched on purpose: game logic, `supabase/`, edge functions.
+
+## 2026-11-02: browser-check CI merged to main
+Git and the GitHub CLI only; nothing was built, tested or served on the laptop.
+- Run 41412610030 (`ci/browser-checks` `a1e7fbe`): success, 14/14.
+- `e0314e6` reviewed: `settle.mjs` waits until Settings' "Loading voices…" is gone (plus two frames)
+  in measure, reduced-motion and layering. It fakes nothing and hides, skips or loosens nothing.
+  It also fixes the step summary's test-count line. Every changed line in the check scripts against
+  main was read: the only additions are failure screenshots, the settle wait and output paths. No
+  threshold or tolerance changed. The coverage gaps are listed in CLAUDE.md, Tests and checks.
+- `.gitignore`: `design/harness/dist-*` (`cf94744`). No generated output is tracked.
+- Merged with `--no-ff` as `385515f`; only workflow, harness, docs and `.gitignore` changed. Deploy
+  41416036629 succeeded. Checks on main's tree, 41416036757: success, 14/14 (measure 841 pairs, 0
+  failing; tier bars; tier focus; settings dialog; keyboard elimination; reduced motion 68/68; network
+  36 loads, 0 off-origin; layering; hover flash 32/32; real app; keyboard real app; touch auto-submit;
+  unused selectors; unused tokens 0 of 94), unit 174 and db 175 passed. None needed the images the
+  squash left off main.
+- Live after the deploy (curl): same bundle `index-Dp6w6GCi.js`, title "Spelling Bee | Hear the word.
+  Spell it right.", manifest 200 `application/manifest+json`. No word was played live, because that
+  needs a browser on the laptop. The bundle is byte-identical (same content hash), so the earlier live
+  word check (7 requests, all same-origin) still applies.

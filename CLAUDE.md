@@ -361,6 +361,34 @@ npx supabase functions deploy --use-api --project-ref wjorfdfpbgyykbhxydqj
   concurrency tests are the optional `concurrency-tests` job: Actions -> Checks ->
   Run workflow, tick the box (`gh workflow run checks.yml --ref <branch> -f
   concurrency=true`). To test a change, push a branch and read its run.
+- **On main since 2026-11-02** (merge `385515f`). Every branch made from main now gets
+  the checks. First run on main's own tree: 41416036757, 14/14 PASS (841 contrast pairs,
+  0 failing), unit 174 + db 175 passed. So nothing needs the 540 images the squash left off.
+- **Running a heavy check from this PC:** push the branch, then
+  `gh run list --branch <branch> --limit 3`, `gh run watch <id> --exit-status`,
+  `gh run view <id> --log-failed` (only the failing steps), and
+  `gh run download <id> -D <folder outside the repo>` for the logs, `contrast/` tables
+  and `failures/` screenshots. The summary page (`gh run view <id> --web`) has one row per check.
+- **Coverage gaps: what CI measures less than the Windows runs did.** No threshold differs
+  (checked 2026-11-02 against main before the merge; the branch only added failure
+  screenshots, `settle.mjs` and output paths).
+  - The Settings voice `<select>` (edge and focus ring): headless Linux Chromium has no
+    voices, so the control never appears. Fix: a fake voice list in the harness.
+  - Speech itself: no voices or audio in CI. It is checked on a real phone only.
+  - Font rendering: Linux anti-aliasing puts focus-ring bands about 1px apart (30 of
+    814 pairs differ, by at most 1.44, none crossing a threshold). The Windows table
+    in `design/stage-results` stays the reference.
+  - The random lead-in phrases: `measure.mjs` doesn't seed them, so pair counts vary
+    (839-842).
+  - The real-Postgres concurrency tests run only by hand (`concurrency-tests`), not on push.
+  - Multiplayer against a live backend: CI uses placeholder Supabase values and never
+    connects (the same as locally; the live probes are `verify_*.mjs`).
+  - `check-glow.mjs` isn't run, here or locally (it fails honey by design).
+- **To remove the CI in one step:** `git revert -m 1 385515f && git push origin main`
+  (it reverts the whole merge). To stop runs and keep the files: `gh workflow disable checks.yml`.
+- **Merging main into `feature/avatar-ui` will turn `unused-tokens.mjs` red**, because that
+  branch defines `--av-1..7` and `--av-halo` and nothing uses them until the picker does.
+  That is the check working. Don't loosen it or delete the tokens; wire up the picker.
 - **Still safe on the laptop** (no build, server or browser): `npm run lint`,
   `node --check <file>`, `node design/harness/unused-selectors.mjs --fail`,
   `unused-tokens.mjs --fail`, `compare-contrast.mjs` on downloaded tables, and
@@ -429,15 +457,16 @@ Everything below is live unless marked open.
 - **Phone singleplayer (2026-10-13):** touch auto-submit, the speech unlock /
   late-voices / retry fixes and the `?debug=speech` log are LIVE (main
   `897a55a`, deploy run 38461151873; live bundle `index-Dp6w6GCi.js` = the tested
-  build; one live word: 7 requests, all to the site's own origin). Whether a real
-  phone now speaks the first word is NOT yet known (see Open).
+  build; one live word: 7 requests, all to the site's own origin). Checked on Ian's
+  own phone on 2026-10-14: the first word is spoken without pressing Hear
+  it again, and touch auto-submit works.
 - **Multiplayer and avatar decisions (Ian, 2026-10-13/14), recorded on branch
   `plan/multiplayer-modes`:** Hourglass is the first mode to build (spec D37,
   timing core first). Hourglass charges stay rounded to 0.1 s with the 200 ms
   dead band, and the exact milliseconds are shown ONLY in the results table
   (D38). Avatars: 8 colours and BOTH prototype cosmetic sets, 14 cosmetics with
-  None as 0 (D17; prototype on `design/avatar-maker`). The picker UI is the next
-  session.
+  None as 0 (D17; prototype on `design/avatar-maker`). The picker UI is in
+  progress on branch `feature/avatar-ui`.
 - **Avatar parts, database side (2026-10-15):** migration 0021 is LIVE on project
   `wjorfdfpbgyykbhxydqj` (applied by Ian). `supabase/scripts/verify_avatar.sql`
   ended in "AVATAR VERIFY: 45 PASS, 0 FAIL" on 2026-10-15, and the live (old)
@@ -471,16 +500,12 @@ Everything below is live unless marked open.
   system spec.
 
 ### Open
-- CI coverage gaps (2026-10-20): CI exposes no speech voices, so the Settings voice
-  `<select>` is never measured there (only on Windows); a fake voice list in the
-  harness would close it. `measure.mjs` doesn't seed the lead-in phrase, so
-  pair counts vary between runs (839-840). `shoot-avatars.mjs` is committed on
-  `feature/avatar-ui` (`0aaea56`, 2026-11-02), not on this branch or main. CI
-  saves its captures to `shots/avatars` only once both branches reach main.
-- This branch (`checks.yml`) is NOT merged to main. It was green on its last 3
-  runs (39491848749, 39495399740, 39499470553, 2026-10-20). Merging is Ian's call.
-- (Removed 2026-11-02: the real-phone speech check passed on Ian's phone on
-  2026-10-14, recorded in `ea99797` on `feature/avatar-ui`.)
+- CI coverage gaps: see Tests and checks. Closing the biggest one, the voice
+  `<select>`, needs a fake voice list in the harness. `shoot-avatars.mjs` is on
+  `feature/avatar-ui` (`0aaea56`), not on main. CI saves its captures to
+  `shots/avatars` on that branch once main is merged into it.
+- The avatar maker UI is in progress on `feature/avatar-ui` (that branch's
+  CLAUDE.md lists what is done and what remains).
 - Follow-up, multiplayer timing-core stage (not done): in multiplayer the word
   is spoken at a server-chosen moment and players other than the host never
   tapped to start, so iPhones may drop it. Unlock at each player's own join or
